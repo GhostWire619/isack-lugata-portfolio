@@ -1,0 +1,15 @@
+/* Soft, continuous light instead of the original dithered bitmap. */
+#hero .framer-1y9f584-container { background:radial-gradient(ellipse 80% 95% at 50% -10%,rgba(175,168,220,.66) 0%,rgba(117,109,167,.32) 32%,rgba(64,58,102,.11) 57%,transparent 82%); }
+#hero .framer-1y9f584-container > * { visibility:hidden !important; }
+.portfolio-social-row { flex-wrap:wrap !important; }
+.portfolio-contact { box-sizing:border-box; width:min(460px,calc(100% - 32px)); padding:32px; border:1px solid #555; border-radius:22px; color:#f5f5f5; background:linear-gradient(145deg,#262626,#101010 65%); box-shadow:inset 0 1px 0 #ffffff35,0 24px 90px #0009; font:15px/1.5 "Inter Display",Inter,Arial,sans-serif; }
+.portfolio-contact::backdrop { background:#0009; backdrop-filter:blur(10px); }
+.portfolio-contact h2 { margin:0 28px 10px 0; font:40px/1.1 Georgia,serif; letter-spacing:-1.5px; }
+.portfolio-contact p { color:#aaa; margin:0 0 25px; }
+.portfolio-contact .contact-close { position:absolute; right:17px; top:13px; border:0; background:none; color:#aaa; font:27px Arial; cursor:pointer; padding:6px; }
+.portfolio-contact .contact-option { display:flex; gap:15px; align-items:center; padding:17px; margin-top:12px; border:1px solid #444; border-radius:12px; color:white; background:linear-gradient(#333,#222); box-shadow:inset 0 1px 0 #ffffff20,0 3px 7px #0005; text-decoration:none; transition:background .2s,border-color .2s; }
+.portfolio-contact .contact-option:hover { background:#383838; border-color:#777; }
+.portfolio-contact .contact-option img { width:26px; height:26px; }
+.portfolio-contact .contact-option span { display:block; color:#aaa; font-size:13px; margin-top:3px; }
+.portfolio-contact :focus-visible { outline:2px solid #ddd; outline-offset:4px; }
+@media(max-width:480px) { .portfolio-contact { padding:26px 20px; } .portfolio-contact h2 { font-size:35px; } }

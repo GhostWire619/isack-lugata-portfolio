@@ -390,6 +390,8 @@ for name,soup in pages.items():
     for tag in soup.select('meta[name="description"],meta[property="og:description"],meta[name="twitter:description"]'):tag['content']=DATA['intro']
     for tag in soup.select('script[type="application/ld+json"]'):tag.string=schema
     link=soup.new_tag('link',rel='stylesheet',href='/assets/personal/personal.css');soup.head.append(link)
+    link=soup.new_tag('link',rel='stylesheet',href='/assets/personal/contact.css');soup.head.append(link)
+    script=soup.new_tag('script',src='/assets/personal/contact.js');script['defer']='';soup.head.append(script)
     script=soup.new_tag('script',src='/assets/personal/personal.js');script['defer']='';soup.head.append(script)
     output=replace_all(clean_snippets(str(soup)))
     (DIST/(name+'.html')).write_text(output,encoding='utf8')
@@ -602,3 +604,10 @@ captures.append({'project':lab['name'],'url':lab['url'],'image':lab['cover'],'co
 (ROOT/'content/public-previews.json').write_text(json.dumps(captures,indent=2,ensure_ascii=False)+'\n',encoding='utf8')
 print('Personalized',len(pages),'captured pages and',len(DATA['projects']),'canonical case studies.')
 print('Replaced',len(ASSETS),'asset references and',len(MAPPINGS),'content strings.')
+
+# Contact choices share the same configuration across every page.
+out('contact.css',(ROOT/'scripts/contact.css').read_text(encoding='utf8'))
+contact_data={key:DATA[key] for key in ['email','whatsapp','instagram','inquiry']}
+out('contact.js',(ROOT/'scripts/contact.js').read_text(encoding='utf8').replace('__PORTFOLIO_CONTACT__',json.dumps(contact_data,ensure_ascii=False)))
+lab_path=DIST/'robotics.html'
+lab_path.write_text(lab_path.read_text(encoding='utf8').replace('</head>','<link rel="stylesheet" href="/assets/personal/contact.css"><script defer src="/assets/personal/contact.js"></script></head>'),encoding='utf8')
