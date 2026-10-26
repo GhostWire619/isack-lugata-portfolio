@@ -14,6 +14,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Check search metadata and sitemap
+        run: python scripts/check_seo.py
       - name: Build and check Nginx configuration
         run: |
           docker build -t isack-portfolio:test .
@@ -23,8 +25,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          docker run -d --name portfolio-check -p 3100:3100 isack-portfolio:test
-          trap 'docker logs portfolio-check; docker rm -f portfolio-check' EXIT
+          docker network create ecofy-network
+          trap 'docker logs isack-portfolio; docker compose down; docker network rm ecofy-network' EXIT
+          docker compose up -d --build
           curl --fail --retry 15 --retry-all-errors --retry-delay 1 http://localhost:3100/healthz
           for route in / /about /ecofy /globoexpats /wakili-msomi /habitek /osher-market /falco /tanstack-tanzania /robotics; do
             curl --fail --silent --show-error "http://localhost:3100$route" -o /tmp/portfolio-page.html
@@ -36,4 +39,10 @@ jobs:
           module=$(find dist/assets -name '*.mjs' -print -quit)
           curl --fail --silent --show-error -D /tmp/module-headers "http://localhost:3100/${module#dist/}" -o /tmp/module.js
           grep -qi 'content-type: application/javascript' /tmp/module-headers
+          curl --fail --silent --show-error http://localhost:3100/robots.txt | grep 'Sitemap: https://isack.space/sitemap.xml'
+          curl --fail --silent --show-error http://localhost:3100/sitemap.xml | grep 'https://isack.space/about'
+          docker inspect --format '{{json .NetworkSettings.Networks}}' isack-portfolio | grep 'ecofy-network'
+          docker run --rm --network ecofy-network --entrypoint wget isack-portfolio:test -q -O - http://isack-portfolio:3100/healthz
+          curl --fail --silent --show-error -D /tmp/auxiliary-headers http://localhost:3100/test-1 -o /dev/null
+          grep -qi 'x-robots-tag: noindex, follow' /tmp/auxiliary-headers
           test "$(curl --silent -o /dev/null -w '%{http_code}' http://localhost:3100/missing-page)" = '404'

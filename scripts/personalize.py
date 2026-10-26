@@ -18,7 +18,7 @@ ROOT = Path(__file__).resolve().parents[1]
 BASE = 'd644207659b68a8a866714bf4216042a9229802a'
 DIST = ROOT / 'dist'
 DATA = json.loads((ROOT / 'content/portfolio.json').read_text(encoding='utf8'))
-ORIGIN = 'https://daniel-sun-portfolio-replica.darkseed8192.chatgpt.site'
+ORIGIN = DATA.get('siteUrl', 'https://isack.space').rstrip('/')
 PERSONAL = DIST / 'assets/personal'
 PERSONAL.mkdir(parents=True, exist_ok=True)
 MAPPINGS = {}

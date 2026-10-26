@@ -1,6 +1,14 @@
 services:
   portfolio:
+    container_name: isack-portfolio
     build: .
     ports:
       - "3100:3100"
     restart: unless-stopped
+    networks:
+      - ecofy-network
+
+networks:
+  ecofy-network:
+    external: true
+    name: ecofy-network

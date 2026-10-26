@@ -5,6 +5,7 @@ import { resolve, extname, sep } from 'node:path';
 const root = resolve('dist');
 const port = Number(process.env.PORT || 5173);
 const types = { '.html': 'text/html; charset=utf-8', '.mjs': 'text/javascript', '.js': 'text/javascript', '.json': 'application/json', '.css': 'text/css', '.svg': 'image/svg+xml', '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.webp': 'image/webp', '.avif': 'image/avif', '.gif': 'image/gif', '.woff': 'font/woff', '.woff2': 'font/woff2', '.ttf': 'font/ttf', '.otf': 'font/otf', '.mp4': 'video/mp4', '.webm': 'video/webm', '.wasm': 'application/wasm', '.lottie': 'application/zip' };
+Object.assign(types, { '.xml': 'application/xml; charset=utf-8', '.txt': 'text/plain; charset=utf-8' });
 createServer((req, res) => {
   let pathname;
   try { pathname = decodeURIComponent(new URL(req.url, 'http://localhost').pathname); }

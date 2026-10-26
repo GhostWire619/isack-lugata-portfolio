@@ -4,7 +4,7 @@ A freelance-focused portfolio for Isack Lugata, a full-stack and mobile develope
 
 ## Run on your server with Docker
 
-Requires Docker Engine and the Docker Compose plugin. The finished site and its assets are already included; no Node.js, Python, or content generation is needed on the server.
+Requires Docker Engine and the Docker Compose plugin. The finished site and its assets are already included; no Node.js, Python, or content generation is needed on the server. The portfolio joins the existing external **`ecofy-network`**, matching Ecofy backend's Docker Compose configuration. Start Ecofy first so that network exists.
 
 ```sh
 git clone https://github.com/GhostWire619/isack-lugata-portfolio.git
@@ -27,13 +27,29 @@ docker compose up -d --build
 docker compose down
 ```
 
-The repository is private, so clone it using an authorised GitHub account or a server deploy key. Nginx serves clean page URLs, fonts, JavaScript modules, and media directly. Container health is checked at `/healthz`. GitHub Actions builds the image and verifies the live container on port 3100 after each push.
+The repository is public. Nginx serves clean page URLs, fonts, JavaScript modules, and media directly. Container health is checked at `/healthz`. GitHub Actions checks the SEO files, builds the image, and verifies the live container on port 3100 and on the shared Docker network after each push.
+
+### Nginx Proxy Manager
+
+Container name: **`isack-portfolio`**. Compose service name: `portfolio`. Network name: **`ecofy-network`**.
+
+With Nginx Proxy Manager attached to `ecofy-network`, create a Proxy Host with:
+
+- Domain: `isack.space`
+- Scheme: `http`
+- Forward hostname: `isack-portfolio`
+- Forward port: `3100`
+- SSL: request a certificate for `isack.space`, then enable Force SSL.
+
+To connect an existing proxy container, use `docker network connect ecofy-network YOUR_NPM_CONTAINER`. Also declare that external network in Nginx Proxy Manager's own Compose file so it survives a recreation. The portfolio configuration does not change Ecofy's services or the proxy manager's settings.
+
+If the domain returns 502, check `docker compose ps`, `docker compose logs --tail=100`, and that the proxy container and portfolio both appear in `docker network inspect ecofy-network`. The proxy can use the server IP and published port 3100 instead if they do not share a Docker network.
 
 Without Compose:
 
 ```sh
 docker build -t isack-portfolio .
-docker run -d --name isack-portfolio --restart unless-stopped -p 3100:3100 isack-portfolio
+docker run -d --name isack-portfolio --network ecofy-network --restart unless-stopped -p 3100:3100 isack-portfolio
 ```
 
 ## Run locally without Docker
@@ -45,6 +61,19 @@ npm run dev
 ```
 
 Open http://localhost:5173. Set `PORT` to change the port.
+
+## Search visibility for isack.space
+
+`content/portfolio.json` declares `siteUrl: "https://isack.space"`. The content build generates unique page titles/descriptions, canonical links, social previews, Person/WebSite/ProfilePage/Service/case-study structured data, `robots.txt`, and a sitemap containing the ten main pages. Both the initial HTML and Framer's client metadata use the production domain. Auxiliary captures are excluded from indexing. Run `python scripts/check_seo.py` after changes.
+
+After pulling and rebuilding on the server:
+
+1. Confirm `https://isack.space/`, `/about`, `/robots.txt`, and `/sitemap.xml` return HTTP 200 without login. A 502 blocks discovery.
+2. Verify the `isack.space` domain property in Google Search Console using its DNS TXT record. Submit `https://isack.space/sitemap.xml`, then inspect the homepage and request indexing.
+3. Link the website from your GitHub, LinkedIn, and Instagram profiles. Ask project partners for genuine contributor links where appropriate.
+4. Add specific, accurate project lessons and outcomes as you have evidence to share. The portfolio targets software, frontend/mobile/backend development, and applied AI in Tanzania, without inventing design credentials or rankings.
+
+Search Console verification requires the domain owner's DNS access; the repository alone does not submit or verify the site. Search rankings, indexing, and AI citations are not guaranteed. No special AI text file is required for Google Search's AI features.
 
 ## Edit the content
 
