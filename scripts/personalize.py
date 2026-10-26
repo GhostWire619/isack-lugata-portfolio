@@ -531,7 +531,7 @@ out('personal.js','''
       const heroImage = [...document.querySelectorAll('#main [data-framer-name="project stack"] img')].find(img => !img.closest('a') && img.getBoundingClientRect().width > 250);
       if (heroImage) setCover(heroImage, project);
     }
-    if (project && !document.querySelector('.personal-live-link')) {
+    if (project && !document.querySelector('.portfolio-case-root,.personal-live-link')) {
       const heading = document.querySelector('h1');
       const paragraphs = [...document.querySelectorAll('#main p')];
       const intro = paragraphs.find(p => p.textContent.length > 90);

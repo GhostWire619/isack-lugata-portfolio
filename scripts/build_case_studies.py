@@ -3,6 +3,7 @@ from pathlib import Path
 import html
 import json
 import re
+from bs4 import BeautifulSoup
 from urllib.parse import quote, urlsplit
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -41,6 +42,7 @@ socials = [
 ]
 social_html = ''.join(f'<a class="social-button" href="{esc(url,quote=True)}" aria-label="{esc(label,quote=True)}" target="_blank" rel="noopener noreferrer"><img src="{icon}" alt="" width="48" height="48"></a>' for label, url, icon in socials)
 
+captured_pages = {p['slug']: (DIST / (p['slug'] + '.html')).read_text(encoding='utf8') for p in data['projects']}
 for i, project in enumerate(data['projects']):
     slug = project['slug']
     image = project.get('cover') or project['artwork']
@@ -66,3 +68,6 @@ for i, project in enumerate(data['projects']):
 </body></html>'''
     (DIST / (slug + '.html')).write_text(page, encoding='utf8')
 print('Built', len(data['projects']), 'editorial case studies with one contextual image each and complete contribution narratives.')
+
+from integrate_case_router import integrate
+integrate(captured_pages)

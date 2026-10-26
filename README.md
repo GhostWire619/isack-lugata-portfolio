@@ -118,11 +118,9 @@ See `content/REVIEW.md` for source notes and remaining editorial details.
 
 The seven project pages are editorial case studies: one main contextual image, the complete project narrative, explicit contribution scope, and a compact horizontal carousel for other work. `scripts/build_case_studies.py` renders them after personalization and before SEO generation. `scripts/case-studies.css` and `scripts/case-interactions.js` control their responsive layout and short reveals.
 
-Works/Story links load fresh pages so the captured router cannot retain slow blur or scroll state. Mobile headings remain immediately readable; supporting motion uses short native page transitions where supported and respects reduced-motion preferences. Project links load the actual case-study HTML at every viewport size. `scripts/navigation.css` also tightens mobile spacing and adds shortcuts to work and services.
+Works, Story, and all seven case studies use the captured site's original client router. Navigation keeps the current document and shared layout instead of forcing reloads or covering the page with a black/white overlay. Editorial project content is rendered by matching server markup and React route adapters (`scripts/integrate_case_router.py` and `scripts/case-router.mjs`).
 
-The Works cards retain their original mobile dimensions and proportions. Page tabs use fresh documents on every screen size, with short native transitions where supported.
-
-Works/Story navigation uses an eclipse reveal from the clicked tab. The old page stays opaque beneath the reveal; the destination sets its light/dark canvas before first paint and waits for its SSR markup to be parsed before the snapshot. This avoids both a white flash and an empty-frame transition without waiting for images. Browsers without cross-document transitions use a brief dark bridge; reduced-motion settings skip the animation. Incoming hero text stays readable instead of starting another blur intro.
+The Works cards retain their original mobile dimensions. Scroll reveals repeat when cards and sections re-enter the viewport in either direction; reduced-motion preferences disable these reveals. The original heading and navigation animations remain in place.
 
 The captured Lottie player's file-type detection reads the URL pathname, so versioned JSON animation URLs still load as JSON rather than being mistaken for ZIP files. This keeps the original sun/moon hover animations working with browser caching.
 
@@ -130,7 +128,7 @@ The captured Lottie player's file-type detection reads the URL pathname, so vers
 
 The final content build runs `scripts/optimize_site.py`. It creates high-quality WebP copies of raster assets and optimizes embedded rasters inside SVG artwork without changing image dimensions or the layouts. Original raster sources remain available. Case-study screenshots include smaller phone variants and dimensions to reserve their layout space.
 
-Below-the-fold images load lazily, replaced showreels do not preload video data, critical fonts/runtime modules preload, and the template preloader is hidden. Contact and content enhancements start when the motion tree mounts rather than waiting for all media to finish loading.
+Below-the-fold images load lazily, replaced showreels do not preload video data, and critical fonts/runtime modules preload. Contact and content enhancements start when the motion tree mounts rather than waiting for all media to finish loading.
 
 Generated asset references carry a shared deployment version, including transitive module imports. Nginx caches these versioned URLs for a year; unversioned assets revalidate, and HTML always revalidates. This allows repeat visits to reuse assets without trapping new releases behind old cache entries. Precompressed gzip files ship with the site and Nginx serves them directly. `content/performance.json` records build sizes; `.performance-cache/` only speeds local asset generation and is not committed or deployed.
 

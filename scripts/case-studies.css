@@ -16,7 +16,7 @@ h1,h2 { font-family:"LT Superior Serif Regular",Georgia,serif; font-weight:400; 
 .header-contact { justify-self:end; }
 .chrome-button { display:inline-flex; align-items:center; width:fit-content; padding:8px 16px; border:1px solid #bcbcbc; border-radius:10px; background:linear-gradient(#fff 5%,#eee 45%,#d2d2d2 51%,#e4e4e4); color:#222; box-shadow:inset 0 1px 1px #fff,0 3px 7px #0003; font-size:16px; line-height:1.4; text-decoration:none; transition:transform .15s; }
 .chrome-button:hover { transform:translateY(-2px); }
-.case-shell { max-width:1200px; margin:auto; border-inline:1px solid var(--line); background:white; }
+.case-shell { padding-top:58px; max-width:1200px; margin:auto; border-inline:1px solid var(--line); background:white; }
 .case-intro { padding:48px 48px 44px; }
 .back-link { display:inline-block; color:var(--muted); font-size:14px; text-decoration:none; margin-bottom:52px; }
 .case-title { display:flex; align-items:center; gap:12px; color:var(--muted); font-size:14px; margin-bottom:22px; }

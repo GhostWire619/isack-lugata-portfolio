@@ -19,6 +19,8 @@ jobs:
           python scripts/check_seo.py
           python scripts/check_case_studies.py
           python scripts/check_performance.py
+          python -m pip install beautifulsoup4
+          python scripts/check_navigation.py
       - name: Build and check Nginx configuration
         run: |
           docker build -t isack-portfolio:test .

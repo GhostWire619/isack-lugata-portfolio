@@ -3,3 +3,5 @@ node_modules/
 .performance-cache/
 .openai/*.tar.gz
 *.log
+
+__pycache__/

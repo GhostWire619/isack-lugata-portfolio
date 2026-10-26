@@ -1,21 +1,35 @@
 (() => {
-  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (!reduceMotion && 'IntersectionObserver' in window) {
-    const observer = new IntersectionObserver(entries => {
-      entries.forEach(entry => {
-        if (!entry.isIntersecting) return;
-        entry.target.classList.add('is-visible');
-        observer.unobserve(entry.target);
-      });
-    }, {threshold:.08});
-    document.querySelectorAll('[data-case-reveal]').forEach(el => {
-      if (el.getBoundingClientRect().top < innerHeight) return;
-      el.classList.add('reveal-pending');
-      observer.observe(el);
-    });
-  }
+ const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+ const observed = new WeakSet();
+ const observer = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+   const el=entry.target;
+   if(!entry.isIntersecting){el.dataset.revealOutside='true';return;}
+   if(el.dataset.revealOutside==='true' && !reduced.matches){
+    el.getAnimations().filter(a=>a.id==='portfolio-reveal').forEach(a=>a.cancel());
+    const from=entry.boundingClientRect.top<0?-14:14;
+    el.animate([{opacity:.35,translate:`0 ${from}px`},{opacity:1,translate:'0 0'}],{duration:420,easing:'cubic-bezier(.2,.7,.2,1)',id:'portfolio-reveal'});
+   }
+   el.dataset.revealOutside='false';
+  });
+ },{threshold:0});
+ function scan(){
+  document.querySelectorAll('[data-case-reveal],.portfolio-project-tile,[data-framer-appear-id]').forEach(el=>{
+   if(observed.has(el) || el.closest('#hero,.framer-QEZlT,.framer-KEAwE'))return;
+   const bounds=el.getBoundingClientRect();
+   if(bounds.width<80 || bounds.height<50)return;
+   observed.add(el);
+   const r=el.getBoundingClientRect();
+   el.dataset.revealOutside=String(r.top>=innerHeight || r.bottom<=0);
+   observer.observe(el);
+  });
+  bindRail();
+ }
+ function bindRail(){
+  const reduceMotion=reduced.matches;
   const rail = document.querySelector('.more-work-rail');
-  if (!rail) return;
+  if (!rail || rail.dataset.railBound) return;
+  rail.dataset.railBound = 'true';
   const previous = document.querySelector('[data-rail-previous]');
   const next = document.querySelector('[data-rail-next]');
   function update() {
@@ -31,4 +45,10 @@
   rail.addEventListener('scroll',update,{passive:true});
   window.addEventListener('resize',update);
   update();
+ }
+ let pending=false;
+ function schedule(){if(pending)return;pending=true;requestAnimationFrame(()=>{pending=false;scan();});}
+ new MutationObserver(schedule).observe(document.body,{childList:true,subtree:true});
+ document.addEventListener('portfolio:route',schedule);
+ scan();
 })();

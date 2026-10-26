@@ -7,7 +7,7 @@
     dialog = document.createElement('dialog');
     dialog.className = 'portfolio-contact';
     dialog.setAttribute('aria-labelledby', 'contact-title');
-    dialog.innerHTML = '<button class="contact-close" aria-label="Close contact options">×</button><h2 id="contact-title">Let’s build something.</h2><p>Have a project in mind? Choose how you’d like to get in touch.</p><a class="contact-option" data-contact-direct="true"><img src="/assets/identity/contact-email.svg?v=edcbd969365f51e4" alt=""><div>Email me<span></span></div></a><a class="contact-option" data-contact-direct="true" target="_blank" rel="noopener noreferrer"><img src="/assets/identity/contact-whatsapp.svg?v=edcbd969365f51e4" alt=""><div>Chat on WhatsApp<span></span></div></a>';
+    dialog.innerHTML = '<button class="contact-close" aria-label="Close contact options">×</button><h2 id="contact-title">Let’s build something.</h2><p>Have a project in mind? Choose how you’d like to get in touch.</p><a class="contact-option" data-contact-direct="true"><img src="/assets/identity/contact-email.svg?v=c25ce90af72b00eb" alt=""><div>Email me<span></span></div></a><a class="contact-option" data-contact-direct="true" target="_blank" rel="noopener noreferrer"><img src="/assets/identity/contact-whatsapp.svg?v=c25ce90af72b00eb" alt=""><div>Chat on WhatsApp<span></span></div></a>';
     const options = dialog.querySelectorAll('a');
     options[0].href = email;
     options[0].querySelector('span').textContent = contact.email;

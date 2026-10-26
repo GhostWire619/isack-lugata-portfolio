@@ -33,10 +33,6 @@ for name in ['index', 'about', 'ecofy']:
     assert 'as="font"' in html and 'rel="preload"' in html
     assert '?v=' + version in html
     assert 'preload="metadata"' not in html
-    assert 'id="portfolio-canvas"' in html
-    assert 'id="portfolio-navigation-boot"' in html
-    assert html.count('id="portfolio-render-ready"') == 1
-    if name == 'about':
-        assert 'data-portfolio-theme="dark"' in html
-        assert 'body{background:#000000!important}' in html
+    assert 'portfolio-transition-bridge' not in html
+    assert 'portfolio-navigation-boot' not in html
 print('Performance checks passed:', compressed_count, 'valid gzip files,', module_count, 'versioned modules, valid SVGs and a homepage under 64 KB compressed.')
