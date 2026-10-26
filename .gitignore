@@ -1,4 +1,5 @@
 node_modules/
 .mirror-cache/
+.performance-cache/
 .openai/*.tar.gz
 *.log

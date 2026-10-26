@@ -3,6 +3,7 @@ from html.parser import HTMLParser
 from pathlib import Path
 import json
 import xml.etree.ElementTree as ET
+from urllib.parse import urlsplit
 
 ROOT = Path(__file__).resolve().parents[1]
 DIST = ROOT / 'dist'
@@ -70,8 +71,8 @@ for route in expected:
     assert head.meta['twitter:title'] == [head.title]
     assert head.meta['robots'] == ['index, follow, max-image-preview:large']
     image = head.meta['og:image'][0]
-    assert image.startswith(origin + '/assets/') and not image.endswith('.svg')
-    assert (DIST / image.removeprefix(origin + '/')).is_file()
+    assert image.startswith(origin + '/assets/') and not urlsplit(image).path.endswith('.svg')
+    assert (DIST / urlsplit(image).path.lstrip('/')).is_file()
     assert len(head.graphs) == 1
     graph = head.graphs[0]['@graph']
     person = next(n for n in graph if n['@type'] == 'Person')

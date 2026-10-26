@@ -4,6 +4,8 @@
 @keyframes portfolio-out { to { opacity:0; } }
 @keyframes portfolio-in { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:none; } }
 .portfolio-mobile-jumps { display:none; }
+/* The captured template's full-screen preloader adds an artificial wait. */
+.framer-BQ9ux,div[class*="-container"]:has(> .framer-BQ9ux) { display:none !important; pointer-events:none !important; }
 /* Phone layouts use quick, readable motion and shorter browsing distances. */
 @media(max-width:639px) {
   #hero { height:auto !important; min-height:0 !important; }
@@ -12,8 +14,7 @@
   #hero h1 span { opacity:1 !important; filter:none !important; transform:none !important; }
   .framer-QEZlT,.case-header { view-transition-name:portfolio-header; }
   ::view-transition-group(portfolio-header) { animation-duration:.16s; }
-  .portfolio-project-tile { height:clamp(250px,82vw,340px) !important; min-height:0 !important; opacity:1 !important; }
-  .portfolio-project-card { height:100% !important; touch-action:pan-y; }
+  .portfolio-project-card { touch-action:pan-y; }
   .portfolio-project-card:active { filter:brightness(.94); }
   [data-framer-name="areas"] > .framer-ocy3gl,[data-framer-name="explorations"] > .framer-tbci47 { padding-top:64px !important; padding-bottom:28px !important; }
   [data-framer-name="areas"] h1,[data-framer-name="explorations"] h1 { font-size:34px !important; line-height:1.12 !important; letter-spacing:-1.4px !important; }

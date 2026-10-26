@@ -569,7 +569,8 @@ out('personal.js','''
       new MutationObserver(schedule).observe(document.body, { childList:true, subtree:true, attributes:true, attributeFilter:['src'] });
     });
   }
-  window.addEventListener('load', start, {once:true});
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start, {once:true});
+  else start();
 })();
 ''')
 (ROOT/'content/REVIEW.md').write_text('# Content review\n\n'+ '\n'.join('- '+x for x in DATA['reviewNotes'])+'\n',encoding='utf8')

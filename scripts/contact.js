@@ -49,5 +49,6 @@
     let pending=false;
     new MutationObserver(() => { if(pending)return; pending=true; requestAnimationFrame(()=>{pending=false;enhance();}); }).observe(document.body,{childList:true,subtree:true});
   }
-  window.addEventListener('load',start,{once:true});
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded',start,{once:true});
+  else start();
 })();

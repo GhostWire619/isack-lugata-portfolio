@@ -118,7 +118,19 @@ See `content/REVIEW.md` for source notes and remaining editorial details.
 
 The seven project pages are editorial case studies: one main contextual image, the complete project narrative, explicit contribution scope, and a compact horizontal carousel for other work. `scripts/build_case_studies.py` renders them after personalization and before SEO generation. `scripts/case-studies.css` and `scripts/case-interactions.js` control their responsive layout and short reveals.
 
-Mobile Works/Story links load fresh pages so the captured router cannot retain slow blur or scroll state. Mobile headings remain immediately readable; supporting motion uses short native page transitions where supported and respects reduced-motion preferences. Project links load the actual case-study HTML at every viewport size. `scripts/navigation.css` also tightens mobile spacing and adds shortcuts to work and services.
+Works/Story links load fresh pages so the captured router cannot retain slow blur or scroll state. Mobile headings remain immediately readable; supporting motion uses short native page transitions where supported and respects reduced-motion preferences. Project links load the actual case-study HTML at every viewport size. `scripts/navigation.css` also tightens mobile spacing and adds shortcuts to work and services.
+
+The Works cards retain their original mobile dimensions and proportions. Page tabs use fresh documents on every screen size, with short native transitions where supported.
+
+## Loading performance
+
+The final content build runs `scripts/optimize_site.py`. It creates high-quality WebP copies of raster assets and optimizes embedded rasters inside SVG artwork without changing image dimensions or the layouts. Original raster sources remain available. Case-study screenshots include smaller phone variants and dimensions to reserve their layout space.
+
+Below-the-fold images load lazily, replaced showreels do not preload video data, critical fonts/runtime modules preload, and the template preloader is hidden. Contact and content enhancements start when the motion tree mounts rather than waiting for all media to finish loading.
+
+Generated asset references carry a shared deployment version, including transitive module imports. Nginx caches these versioned URLs for a year; unversioned assets revalidate, and HTML always revalidates. This allows repeat visits to reuse assets without trapping new releases behind old cache entries. Precompressed gzip files ship with the site and Nginx serves them directly. `content/performance.json` records build sizes; `.performance-cache/` only speeds local asset generation and is not committed or deployed.
+
+Run `python scripts/check_performance.py` to verify compressed-file integrity, module dependencies, SVG validity, and the compressed homepage budget. CI also tests real Nginx compression and cache headers in Docker. Real loading time still depends on the server and visitor connection.
 
 Run `python scripts/check_case_studies.py` to check that all confirmed story paragraphs appear once, each case has only one main image, related projects are distinct, and every image asset exists. These checks and the SEO checks also run in GitHub Actions.
 

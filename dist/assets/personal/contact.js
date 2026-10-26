@@ -7,7 +7,7 @@
     dialog = document.createElement('dialog');
     dialog.className = 'portfolio-contact';
     dialog.setAttribute('aria-labelledby', 'contact-title');
-    dialog.innerHTML = '<button class="contact-close" aria-label="Close contact options">×</button><h2 id="contact-title">Let’s build something.</h2><p>Have a project in mind? Choose how you’d like to get in touch.</p><a class="contact-option" data-contact-direct="true"><img src="/assets/identity/contact-email.svg" alt=""><div>Email me<span></span></div></a><a class="contact-option" data-contact-direct="true" target="_blank" rel="noopener noreferrer"><img src="/assets/identity/contact-whatsapp.svg" alt=""><div>Chat on WhatsApp<span></span></div></a>';
+    dialog.innerHTML = '<button class="contact-close" aria-label="Close contact options">×</button><h2 id="contact-title">Let’s build something.</h2><p>Have a project in mind? Choose how you’d like to get in touch.</p><a class="contact-option" data-contact-direct="true"><img src="/assets/identity/contact-email.svg?v=18b110fea435234d" alt=""><div>Email me<span></span></div></a><a class="contact-option" data-contact-direct="true" target="_blank" rel="noopener noreferrer"><img src="/assets/identity/contact-whatsapp.svg?v=18b110fea435234d" alt=""><div>Chat on WhatsApp<span></span></div></a>';
     const options = dialog.querySelectorAll('a');
     options[0].href = email;
     options[0].querySelector('span').textContent = contact.email;
@@ -49,5 +49,6 @@
     let pending=false;
     new MutationObserver(() => { if(pending)return; pending=true; requestAnimationFrame(()=>{pending=false;enhance();}); }).observe(document.body,{childList:true,subtree:true});
   }
-  window.addEventListener('load',start,{once:true});
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded',start,{once:true});
+  else start();
 })();

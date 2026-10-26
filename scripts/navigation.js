@@ -37,8 +37,8 @@
     const destination = new URL(href, location.href);
     if (destination.origin !== location.origin) return;
     const path = destination.pathname.replace(/\/$/, '') || '/';
-    const mobileTab = matchMedia('(max-width: 639px)').matches && (label === 'Story' || label === 'Works');
-    if (!mobileTab && !caseRoutes.has(path)) return;
+    const pageTab = label === 'Story' || label === 'Works';
+    if (!pageTab && !caseRoutes.has(path)) return;
     event.preventDefault();
     event.stopImmediatePropagation();
     if (path === (location.pathname.replace(/\/$/, '') || '/') && !destination.hash) {

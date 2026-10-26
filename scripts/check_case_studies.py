@@ -2,6 +2,7 @@
 from html.parser import HTMLParser
 from pathlib import Path
 import json
+from urllib.parse import urlsplit
 
 ROOT = Path(__file__).resolve().parents[1]
 DIST = ROOT / 'dist'
@@ -54,6 +55,6 @@ for project in data['projects']:
         assert paragraph in page.paragraphs, (project['slug'], 'Missing contribution narrative')
         assert page.paragraphs.count(paragraph) == 1, (project['slug'], 'Repeated paragraph')
     for image in page.images:
-        assert image.startswith('/assets/') and (DIST / image.lstrip('/')).is_file(), image
+        assert image.startswith('/assets/') and (DIST / urlsplit(image).path.lstrip('/')).is_file(), image
     assert 'data-framer-name="project stack"' not in raw
 print('All seven case studies preserve every story paragraph once, use one hero image, and link to six different projects with valid assets.')
