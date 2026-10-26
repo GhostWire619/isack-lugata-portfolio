@@ -1,0 +1,2 @@
+import{n as e}from"./rolldown-runtime.BgaNhQyE.mjs";function t(e,t){return{description:`Identities and websites SaaS founders can finally be proud of. Trusted by teams backed by Sequoia, Founders Fund, Stripe, and YC`,favicon:`/assets/framerusercontent.com/assets/DcY4zKT27pnqbAPSSNLjUhP2zU.png`,robots:`max-image-preview:large`,socialImage:`/assets/framerusercontent.com/assets/mXvQ9cdxVJdixvLxFCsF6ITg7RE.png`,title:`Daniel Sun | Web & brand designer for SaaS and Web3 founders`}}var n=e((()=>{}));export{t as n,n as t};
+//# sourceMappingURL=siteMetadata.CPWy_ann.mjs.map
