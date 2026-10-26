@@ -2,9 +2,26 @@ from xml.etree import ElementTree as ET
 from django.conf import settings
 from django.db import connection
 from django.http import HttpResponse
+from django.shortcuts import render
 from django.views.decorators.http import require_GET
 from wagtail.models import Site
 from .models import ArticlePage, JournalIndexPage
+
+
+@require_GET
+def ads_txt(request):
+    publisher = settings.ADSENSE_PUBLISHER_ID.removeprefix('ca-')
+    return HttpResponse(f'google.com, {publisher}, DIRECT, f08c47fec0942fa0\n', content_type='text/plain; charset=utf-8')
+
+
+@require_GET
+def privacy(request):
+    from types import SimpleNamespace
+    return render(request, 'publishing/privacy.html', {
+        'page': SimpleNamespace(title='Privacy & cookies', seo_title='Privacy & cookies'),
+        'canonical_path': '/blog/privacy/',
+        'description': 'How this journal uses essential storage, advertising services and privacy choices.',
+    })
 
 
 def portfolio_preview(request, path=''):
@@ -54,6 +71,7 @@ def sitemap(request):
             add(settings.PUBLIC_URL + urlsplit(loc.text).path)
     site = Site.find_for_request(request)
     if site:
+        add(settings.PUBLIC_URL + '/blog/privacy/')
         for page in JournalIndexPage.objects.live().public().descendant_of(site.root_page, inclusive=True):
             add(settings.PUBLIC_URL + page.get_url(request), page.last_published_at)
         for page in ArticlePage.objects.live().public().descendant_of(site.root_page):

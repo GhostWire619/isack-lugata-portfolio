@@ -6,7 +6,7 @@ from .models import ArticlePage, PublicationSettings
 def journal_context(request):
     publication = PublicationSettings.for_request(request)
     return {'publication': publication, 'public_origin': settings.PUBLIC_URL,
-        'development': settings.DEBUG}
+        'development': settings.DEBUG, 'adsense_publisher_id': settings.ADSENSE_PUBLISHER_ID}
 
 
 def article_schema(page, request):

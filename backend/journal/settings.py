@@ -107,6 +107,7 @@ WAGTAIL_PASSWORD_RESET_ENABLED = True
 LOGIN_URL = '/admin/login/'
 # Allow the bounded MCP JSON envelope for a base64 image up to 2 MiB.
 DATA_UPLOAD_MAX_MEMORY_SIZE = 3_000_000
+ADSENSE_PUBLISHER_ID = 'ca-pub-4911606730643023'
 SESSION_COOKIE_NAME = 'journal_session'
 CSRF_COOKIE_NAME = 'journal_csrf'
 SESSION_COOKIE_HTTPONLY = True

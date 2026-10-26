@@ -117,6 +117,26 @@ This is a token-authenticated connection, **not yet an OAuth connector for ChatG
 
 The journal, article pages, login and Studio share paper/forest palettes and a light/dark appearance control. The choice persists in `localStorage` under `journal-theme`, synchronizes between tabs and defaults to the device setting. A tiny head script applies it before styles paint. Without JavaScript, content remains readable in light mode. Uploaded photographs retain their original colours; controls and backgrounds change together.
 
+## Google AdSense
+
+The authorized `ads.txt` record is in `content/ads.txt`, generated to `dist/ads.txt` for both Docker variants and served by Django during development. The portfolio homepage and journal include verification-only metadata for `ca-pub-4911606730643023`. Portfolio pages never load ad-serving scripts. `scripts/build_advertising.py` preserves the metadata and refreshes any precompressed homepage when content is rebuilt.
+
+Three real Display ad units are preconfigured under **Studio → Your articles → Advertising settings** (the publication settings form):
+
+| Unit | Slot | Placement |
+| --- | --- | --- |
+| Vertical | 1485658746 | 300 px desktop right rail, at viewport widths of 1200 px and above |
+| Horizontal | 8873194178 | Between whole text blocks in articles of 450+ words; after the article for shorter pieces |
+| Square | 6247030833 | Journal listing after two articles, only when there are at least three listed articles |
+
+Articles of 1600+ words allow two horizontal breaks. At least 180 words precede and 150 words follow an in-article ad. Headlines, image/caption pairs, code and quote blocks are never split. Slots reserve their height, use asynchronous loading, and request once when near the viewport. Hidden desktop rails never request an ad on mobile; there is no refresh loop or sticky overlay. Full-width mobile expansion is disabled to protect the reading-column layout. Keep **Auto ads OFF** in AdSense so Google does not introduce additional placements.
+
+Ad serving starts **off**. After site approval, publish Google's consent message for `isack.space` in AdSense **Privacy & messaging**; then check **Google consent message is published** and **Enable journal advertisements** in Studio. The form requires all three slot IDs and the consent confirmation. This flag records your account setup; it does not create a certified consent message. Google's CMP handles consent; the footer adds its preference-reopening control when the CMP API becomes available. `/blog/privacy/` explains essential storage and advertising. This page is included in the combined sitemap.
+
+Ad requests never run in local development, Studio, staff sessions, or draft previews. **Preview ad placements** in Your articles opens the real layout with clearly labelled boxes, through MFA-protected `/admin/advertising/preview/`; add `?layout=journal` for the listing. This preview never includes Google ad-serving code and cannot generate impressions or clicks. It works even while advertising is disabled.
+
+Deploy with the existing additive Compose command after pulling updates. Site approval, the consent message and real ad fill must be checked in your AdSense account; a passing build does not confirm Google approval or that an ad will be returned.
+
 ## Backups and restoration
 
 Back up both named volumes and the private `.env.blog`. A database-only backup does not include images. Store backups outside this server and test restoring them before relying on them. Example database dump:

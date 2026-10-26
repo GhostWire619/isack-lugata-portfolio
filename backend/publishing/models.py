@@ -5,6 +5,7 @@ import secrets
 from django.db import models
 from django.conf import settings
 from django.core.paginator import Paginator
+from django.core.validators import RegexValidator
 from django.db.models import Q
 from django.utils.html import strip_tags
 from wagtail import blocks
@@ -72,6 +73,9 @@ class JournalIndexPage(Page):
             'articles': page, 'categories': Category.objects.all(), 'query': query,
             'active_category': category, 'filtered': bool(query or category),
             'description': self.search_description or self.intro})
+        from .advertising import eligible
+        context['ad_preview'] = bool(getattr(request, 'advertising_preview', False))
+        context['show_journal_ads'] = (eligible(request) or context['ad_preview']) and len(page.object_list) >= 3
         return context
 
 
@@ -129,6 +133,12 @@ class ArticlePage(Page):
         from .context import article_schema
         context['article_schema'] = article_schema(self, request)
         context['related'] = ArticlePage.objects.sibling_of(self).live().public().exclude(pk=self.pk).select_related('cover', 'category').order_by('-first_published_at')[:3]
+        from .advertising import eligible, article_blocks
+        context['show_article_ad'] = self.live and eligible(request)
+        context['ad_preview'] = bool(getattr(request, 'advertising_preview', False))
+        if context['ad_preview']:
+            context['show_article_ad'] = True
+        context['article_blocks'], context['has_inline_ad'] = article_blocks(self.body)
         return context
 
 
@@ -138,7 +148,27 @@ class PublicationSettings(BaseSiteSetting):
     tagline = models.CharField(max_length=200, default='An independent journal of ideas and perspectives.')
     about = models.TextField(default='Articles and perspectives on technology, science, culture, and the ideas shaping our world. A space to look closer, ask better questions, and explore beyond the familiar.')
     contact_email = models.EmailField(default='lugata619@gmail.com')
-    panels = [FieldPanel('name'), FieldPanel('tagline'), FieldPanel('about'), FieldPanel('contact_email')]
+    adsense_article_slot = models.CharField(max_length=20, blank=True, default='8873194178', verbose_name='Horizontal ad-unit slot',
+        validators=[RegexValidator(r'^[0-9]{1,20}$', 'Enter only the numeric data-ad-slot value from Google.')],
+        help_text='Create a responsive Display ad unit in AdSense, then copy its data-ad-slot number. Publisher: pub-4911606730643023.')
+    adsense_vertical_slot = models.CharField(max_length=20, blank=True, default='1485658746', verbose_name='Vertical ad-unit slot',
+        validators=[RegexValidator(r'^[0-9]{1,20}$', 'Enter only the numeric data-ad-slot value from Google.')])
+    adsense_square_slot = models.CharField(max_length=20, blank=True, default='6247030833', verbose_name='Square ad-unit slot',
+        validators=[RegexValidator(r'^[0-9]{1,20}$', 'Enter only the numeric data-ad-slot value from Google.')])
+    adsense_cmp_ready = models.BooleanField(default=False,
+        verbose_name='Google consent message is published',
+        help_text='Confirm that the Google-certified consent message is published for isack.space in AdSense → Privacy & messaging. A homemade cookie banner does not replace it.')
+    adsense_enabled = models.BooleanField(default=False,
+        verbose_name='Enable journal advertisements',
+        help_text='Enable after Google approves the site and the consent message is published. Keep Auto ads OFF in AdSense to preserve these placements. No ads run in local development, Studio, staff sessions or draft previews.')
+    panels = [FieldPanel('name'), FieldPanel('tagline'), FieldPanel('about'), FieldPanel('contact_email'),
+        MultiFieldPanel([FieldPanel('adsense_article_slot'), FieldPanel('adsense_vertical_slot'), FieldPanel('adsense_square_slot'), FieldPanel('adsense_cmp_ready'), FieldPanel('adsense_enabled')], heading='Google AdSense')]
+
+    def clean(self):
+        super().clean()
+        if self.adsense_enabled and (not all([self.adsense_article_slot, self.adsense_vertical_slot, self.adsense_square_slot]) or not self.adsense_cmp_ready):
+            from django.core.exceptions import ValidationError
+            raise ValidationError({'adsense_enabled': 'Add the ad-unit slot and confirm the published Google consent message before enabling ads.'})
 
 
 class MCPConnection(models.Model):

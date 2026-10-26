@@ -44,6 +44,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          node scripts/check_advertising.mjs
           unset JOURNAL_ENV PUBLIC_URL DATABASE_URL
           python scripts/setup_blog_env.py
           docker network create ecofy-network
@@ -52,8 +53,12 @@ jobs:
           docker compose --env-file .env.blog -f compose.yaml -f compose.blog.yaml up -d --build --wait --wait-timeout 180
           curl --fail --silent http://localhost:3100/ -o /tmp/portfolio.html
           grep -q 'Isack Lugata' /tmp/portfolio.html
+          curl --fail --silent http://localhost:3100/ads.txt -o /tmp/ads.txt
+          grep -qx 'google.com, pub-4911606730643023, DIRECT, f08c47fec0942fa0' /tmp/ads.txt
           curl --fail --silent -H 'Host: isack.space' -H 'X-Forwarded-Proto: https' http://localhost:3100/blog/ -o /tmp/journal.html
           grep -q 'A journal for' /tmp/journal.html
+          curl --fail --silent -H 'Host: isack.space' -H 'X-Forwarded-Proto: https' http://localhost:3100/blog/privacy/ -o /tmp/privacy.html
+          grep -q 'Privacy &amp; cookies' /tmp/privacy.html
           curl --fail --silent -H 'Host: isack.space' -H 'X-Forwarded-Proto: https' http://localhost:3100/admin/login/ -o /tmp/login.html
           grep -q 'csrfmiddlewaretoken' /tmp/login.html
           test "$(curl --silent -o /tmp/mcp-auth.txt -w '%{http_code}' -X POST -H 'Host: isack.space' -H 'X-Forwarded-Proto: https' -H 'Content-Type: application/json' --data '{}' http://localhost:3100/mcp/)" = '401'
