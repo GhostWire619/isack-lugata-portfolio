@@ -2,5 +2,13 @@
 !Dockerfile
 !deploy/
 !deploy/nginx.conf
+!deploy/nginx-blog.conf
+!backend/
+!backend/**
+backend/.venv/
+backend/data/
+backend/media/
+backend/staticfiles/
+**/__pycache__/
 !dist/
 !dist/**

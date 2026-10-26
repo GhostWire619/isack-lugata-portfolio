@@ -5,3 +5,9 @@ node_modules/
 *.log
 
 __pycache__/
+backend/.venv/
+backend/data/
+backend/media/
+backend/staticfiles/
+.env.blog
+*.sqlite3

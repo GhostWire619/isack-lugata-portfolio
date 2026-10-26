@@ -1,0 +1,64 @@
+name: Journal backend
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  publishing:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: journal_test
+          POSTGRES_USER: journal
+          POSTGRES_PASSWORD: test-only-password
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U journal -d journal_test"
+          --health-interval 5s --health-timeout 3s --health-retries 20
+    env:
+      JOURNAL_ENV: development
+      PUBLIC_URL: http://localhost:8001
+      DATABASE_URL: postgresql://journal:test-only-password@localhost:5432/journal_test
+      JOURNAL_LOG_LEVEL: WARNING
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: pip
+          cache-dependency-path: backend/requirements.lock
+      - name: Install journal dependencies
+        run: pip install -r backend/requirements.lock
+      - name: Check models and test PostgreSQL publishing and authentication
+        working-directory: backend
+        run: |
+          python manage.py check
+          python manage.py makemigrations --check --dry-run
+          python manage.py test publishing --noinput
+      - name: Verify the production Docker deployment
+        shell: bash
+        run: |
+          set -euo pipefail
+          unset JOURNAL_ENV PUBLIC_URL DATABASE_URL
+          python scripts/setup_blog_env.py
+          docker network create ecofy-network
+          trap 'docker compose --env-file .env.blog -f compose.yaml -f compose.blog.yaml logs --tail=60; docker compose --env-file .env.blog -f compose.yaml -f compose.blog.yaml down -v; docker network rm ecofy-network' EXIT
+          docker compose --env-file .env.blog -f compose.yaml -f compose.blog.yaml config --quiet
+          docker compose --env-file .env.blog -f compose.yaml -f compose.blog.yaml up -d --build --wait --wait-timeout 180
+          curl --fail --silent http://localhost:3100/ -o /tmp/portfolio.html
+          grep -q 'Isack Lugata' /tmp/portfolio.html
+          curl --fail --silent -H 'Host: isack.space' -H 'X-Forwarded-Proto: https' http://localhost:3100/blog/ -o /tmp/journal.html
+          grep -q 'A journal for' /tmp/journal.html
+          curl --fail --silent -H 'Host: isack.space' -H 'X-Forwarded-Proto: https' http://localhost:3100/admin/login/ -o /tmp/login.html
+          grep -q 'csrfmiddlewaretoken' /tmp/login.html
+          curl --fail --silent -H 'Host: isack.space' -H 'X-Forwarded-Proto: https' http://localhost:3100/blog/feed/ -o /tmp/feed.xml
+          grep -q '<rss' /tmp/feed.xml
+          curl --fail --silent -H 'Host: isack.space' -H 'X-Forwarded-Proto: https' http://localhost:3100/sitemap.xml -o /tmp/sitemap.xml
+          grep -q 'https://isack.space/blog/' /tmp/sitemap.xml
+          test -z "$(docker port isack-journal-db)"
+          docker inspect --format '{{json .NetworkSettings.Networks}}' isack-portfolio | grep 'ecofy-network'

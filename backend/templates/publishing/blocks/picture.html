@@ -1,0 +1,1 @@
+{% load wagtailimages_tags %}<figure class="body-picture">{% picture value.image format-{avif,webp} width-{480,960,1440} sizes="(max-width: 700px) 100vw, 680px" alt=value.alt loading="lazy" decoding="async" %}{% if value.caption %}<figcaption>{{ value.caption }}</figcaption>{% endif %}</figure>

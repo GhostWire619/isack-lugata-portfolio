@@ -149,3 +149,18 @@ The original reference section structure and headings are retained, including Ho
 Social icons use genuine Simple Icons and Phosphor SVG artwork with consistent optical padding. Service icons combine the original globe/cursor artwork with Microsoft Fluent 3D assets. Licensing files are deployed alongside assets under `dist/assets/identity/`, and public asset source URLs are recorded in `content/asset-sources.json`.
 
 Photo compositions retain real people and real photographs. Captions do not invent a family, pets, or personal events. The career timeline uses actual brand/university marks and a generic briefcase for practical training.
+
+
+## Journal publishing system
+
+The database-backed journal lives in `backend/`; see [the journal setup guide](backend/README.md). It adds Django/Wagtail, owner login with two-factor authentication, article editing and scheduling, optimized uploaded images, PostgreSQL, RSS and a combined sitemap. The independent visual prototype remains in `design/blog/` for reference.
+
+The default Compose command above still runs the existing portfolio only. To enable the journal, generate private settings and use the additive deployment:
+
+```sh
+python3 scripts/setup_blog_env.py
+docker compose --env-file .env.blog -f compose.yaml -f compose.blog.yaml up -d --build
+docker compose --env-file .env.blog -f compose.yaml -f compose.blog.yaml exec journal python manage.py createsuperuser
+```
+
+Nginx Proxy Manager still forwards to `isack-portfolio:3100`. The journal is at `/blog/` and the real publishing studio at `/admin/`. Real analytics and authenticated MCP integration are the next development phase; the design dashboard's sample figures are not live analytics.
