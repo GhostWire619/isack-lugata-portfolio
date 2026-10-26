@@ -59,6 +59,8 @@ jobs:
           grep -q 'A journal for' /tmp/journal.html
           curl --fail --silent -H 'Host: isack.space' -H 'X-Forwarded-Proto: https' http://localhost:3100/blog/privacy/ -o /tmp/privacy.html
           grep -q 'Privacy &amp; cookies' /tmp/privacy.html
+          curl --fail --silent -H 'Host: isack.space' -H 'X-Forwarded-Proto: https' http://localhost:3100/blog/terms/ -o /tmp/terms.html
+          grep -q 'Terms of use' /tmp/terms.html
           curl --fail --silent -H 'Host: isack.space' -H 'X-Forwarded-Proto: https' http://localhost:3100/admin/login/ -o /tmp/login.html
           grep -q 'csrfmiddlewaretoken' /tmp/login.html
           test "$(curl --silent -o /tmp/mcp-auth.txt -w '%{http_code}' -X POST -H 'Host: isack.space' -H 'X-Forwarded-Proto: https' -H 'Content-Type: application/json' --data '{}' http://localhost:3100/mcp/)" = '401'

@@ -24,6 +24,16 @@ def privacy(request):
     })
 
 
+@require_GET
+def terms(request):
+    from types import SimpleNamespace
+    return render(request, 'publishing/terms.html', {
+        'page': SimpleNamespace(title='Terms of use', seo_title='Terms of use'),
+        'canonical_path': '/blog/terms/',
+        'description': 'Terms for reading, sharing and using material published in this independent journal.',
+    })
+
+
 def portfolio_preview(request, path=''):
     """Local-only integration: serve the existing portfolio beside the journal."""
     from django.http import FileResponse, Http404
@@ -72,6 +82,7 @@ def sitemap(request):
     site = Site.find_for_request(request)
     if site:
         add(settings.PUBLIC_URL + '/blog/privacy/')
+        add(settings.PUBLIC_URL + '/blog/terms/')
         for page in JournalIndexPage.objects.live().public().descendant_of(site.root_page, inclusive=True):
             add(settings.PUBLIC_URL + page.get_url(request), page.last_published_at)
         for page in ArticlePage.objects.live().public().descendant_of(site.root_page):

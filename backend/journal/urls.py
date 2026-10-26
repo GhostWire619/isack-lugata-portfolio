@@ -10,6 +10,7 @@ from publishing.feeds import JournalFeed
 urlpatterns = [
     path('ads.txt', views.ads_txt, name='journal_ads_txt'),
     path('blog/privacy/', views.privacy, name='journal_privacy'),
+    path('blog/terms/', views.terms, name='journal_terms'),
     path('mcp/', mcp.endpoint, name='journal_mcp'),
     path('admin/', studio.articles, name='journal_studio'),
     path('admin/articles/', studio.articles, name='journal_articles'),

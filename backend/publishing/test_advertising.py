@@ -38,6 +38,11 @@ class AdvertisingTests(TestCase):
         self.assertContains(response, 'Privacy &amp; cookies')
         self.assertContains(response, '/blog/privacy/"')
         self.assertNotContains(response, 'pagead2.googlesyndication.com')
+        self.assertContains(response, 'https://adssettings.google.com/')
+        response = self.client.get('/blog/terms/')
+        self.assertContains(response, 'Terms of use')
+        self.assertContains(response, '/blog/terms/"')
+        self.assertNotContains(response, 'pagead2.googlesyndication.com')
 
     def test_article_has_one_loader_and_correct_units_at_text_break(self):
         article = self.article()
