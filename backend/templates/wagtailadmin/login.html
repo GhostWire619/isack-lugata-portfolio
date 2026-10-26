@@ -1,0 +1,4 @@
+{% extends 'wagtailadmin/login.html' %}
+{% block branding_login %}Sign in to {{ publication.name }} Studio{% endblock %}
+{% block above_login %}<p class="studio-login-intro">Your private workspace for articles, images, and publishing.</p>{% endblock %}
+{% block branding_logo %}<div class="studio-login-brand">{{ publication.name }}.</div>{% endblock %}

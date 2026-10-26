@@ -1,0 +1,3 @@
+@font-face{font-family:JournalEditorial;src:url(assets/editorial.woff2);font-display:swap}
+.studio-login-brand{font:56px/1.1 JournalEditorial,Georgia,serif;letter-spacing:-.05em;margin:40px 0 0;color:#355a36}.studio-login-intro{font-size:14px;line-height:1.7;color:#62695e;margin:0 0 26px}
+.login{--w-color-primary:#355a36;--w-color-primary-200:#42643a;--w-color-secondary:#355a36}.login .button{background:#355a36;border-color:#355a36}.login .button:hover{background:#28452a}.login .content-wrapper{max-width:440px}

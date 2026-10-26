@@ -4,6 +4,13 @@ from wagtail import hooks
 from publishing.models import ArticlePage, JournalIndexPage
 
 
+@hooks.register('insert_global_admin_css')
+def journal_admin_styles():
+    from django.templatetags.static import static
+    from django.utils.html import format_html
+    return format_html('<link rel="stylesheet" href="{}">', static('sidenotes/studio.css'))
+
+
 class JournalWelcomePanel:
     name = 'journal_welcome'
     order = 50

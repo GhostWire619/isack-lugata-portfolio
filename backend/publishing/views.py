@@ -7,6 +7,24 @@ from wagtail.models import Site
 from .models import ArticlePage, JournalIndexPage
 
 
+def portfolio_preview(request, path=''):
+    """Local-only integration: serve the existing portfolio beside the journal."""
+    from django.http import FileResponse, Http404
+    import mimetypes
+    if not settings.DEBUG:
+        raise Http404
+    root = (settings.BASE_DIR.parent / 'dist').resolve()
+    file = (root / (path or 'index.html')).resolve()
+    if not file.is_relative_to(root):
+        raise Http404
+    if not file.suffix:
+        file = file.with_suffix('.html')
+    if not file.is_file():
+        raise Http404
+    content_type = 'text/javascript' if file.suffix == '.mjs' else mimetypes.guess_type(file.name)[0]
+    return FileResponse(file.open('rb'), content_type=content_type or 'application/octet-stream')
+
+
 @require_GET
 def health(request):
     with connection.cursor() as cursor:
