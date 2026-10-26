@@ -15,7 +15,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Check search metadata and sitemap
-        run: python scripts/check_seo.py
+        run: |
+          python scripts/check_seo.py
+          python scripts/check_case_studies.py
       - name: Build and check Nginx configuration
         run: |
           docker build -t isack-portfolio:test .

@@ -116,6 +116,12 @@ See `content/REVIEW.md` for source notes and remaining editorial details.
 
 ## Verification
 
+The seven project pages are editorial case studies: one main contextual image, the complete project narrative, explicit contribution scope, and a compact horizontal carousel for other work. `scripts/build_case_studies.py` renders them after personalization and before SEO generation. `scripts/case-studies.css` and `scripts/case-interactions.js` control their responsive layout and short reveals.
+
+Mobile Works/Story links load fresh pages so the captured router cannot retain slow blur or scroll state. Mobile headings remain immediately readable; supporting motion uses short native page transitions where supported and respects reduced-motion preferences. Project links load the actual case-study HTML at every viewport size. `scripts/navigation.css` also tightens mobile spacing and adds shortcuts to work and services.
+
+Run `python scripts/check_case_studies.py` to check that all confirmed story paragraphs appear once, each case has only one main image, related projects are distinct, and every image asset exists. These checks and the SEO checks also run in GitHub Actions.
+
 Check the homepage, Story navigation, project cards, clean project routes, back navigation, contact links, and image loading after changing content. Because content appears in both HTML and hydrated modules, regenerate both with `npm run content`.
 
 `scripts/mirror.py` is retained for provenance. `npm run capture:reference` captures the reference again and overwrites generated files; it is not the content-editing command.

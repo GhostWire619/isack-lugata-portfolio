@@ -391,6 +391,8 @@ for name,soup in pages.items():
     for tag in soup.select('script[type="application/ld+json"]'):tag.string=schema
     link=soup.new_tag('link',rel='stylesheet',href='/assets/personal/personal.css');soup.head.append(link)
     link=soup.new_tag('link',rel='stylesheet',href='/assets/personal/contact.css');soup.head.append(link)
+    link=soup.new_tag('link',rel='stylesheet',href='/assets/personal/navigation.css');soup.head.append(link)
+    script=soup.new_tag('script',src='/assets/personal/navigation.js');script['defer']='';soup.head.append(script)
     script=soup.new_tag('script',src='/assets/personal/contact.js');script['defer']='';soup.head.append(script)
     script=soup.new_tag('script',src='/assets/personal/personal.js');script['defer']='';soup.head.append(script)
     output=replace_all(clean_snippets(str(soup)))
@@ -607,6 +609,8 @@ print('Replaced',len(ASSETS),'asset references and',len(MAPPINGS),'content strin
 
 # Contact choices share the same configuration across every page.
 out('contact.css',(ROOT/'scripts/contact.css').read_text(encoding='utf8'))
+out('navigation.css',(ROOT/'scripts/navigation.css').read_text(encoding='utf8'))
+out('navigation.js',(ROOT/'scripts/navigation.js').read_text(encoding='utf8').replace('__CASE_ROUTES__',json.dumps(['/'+p['slug'] for p in DATA['projects']])))
 contact_data={key:DATA[key] for key in ['email','whatsapp','instagram','inquiry']}
 out('contact.js',(ROOT/'scripts/contact.js').read_text(encoding='utf8').replace('__PORTFOLIO_CONTACT__',json.dumps(contact_data,ensure_ascii=False)))
 lab_path=DIST/'robotics.html'
