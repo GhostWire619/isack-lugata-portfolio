@@ -23,6 +23,7 @@ PERSONAL = DIST / 'assets/personal'
 PERSONAL.mkdir(parents=True, exist_ok=True)
 MAPPINGS = {}
 ASSETS = {}
+CASE_HEADINGS = {}
 TOOL_LABELS = {'figma':'Python','webflow':'FastAPI','framer':'Docker','illustrator':'PostgreSQL','photoshop':'Linux','after effects':'nginx','my brain':'Engineering judgment','chat gpt':'LLM APIs','branding':'backend engineering','logotype':'API design','brand research':'data modeling','ui/ux research':'requirements','illustrations':'AI integration','website design':'backend APIs','visual direction':'architecture','design system':'service design','framer development':'deployment','portfolio research':'document ingestion','icons & illustrations':'data processing','web platform design':'platform APIs','illustrations creation':'service configuration','marketing design':'product planning','illustrations & icons design':'data processing','agent development':'AI services'}
 
 def original(path):
@@ -123,6 +124,10 @@ def asset(source,target):
 def add(old,new):
     if old and old!=new:MAPPINGS[old]=new
 
+def cover(project):
+    image=project.get('cover')
+    return image if image and (DIST/image.lstrip('/')).is_file() else panel(project,0)
+
 def long_paragraphs(soup):
     return list(OrderedDict((p.get_text(),p) for p in soup.select('#main p') if len(p.get_text())>90).values())
 
@@ -133,7 +138,16 @@ for name,soup in pages.items():
     for label in soup.select('#main p'):
         if label.get_text() in TOOL_LABELS:label.string=TOOL_LABELS[label.get_text()]
     project=next((p for p in DATA['projects'] if p['legacy']==name),None)
-    newtitle=(project['name']+' — ' if project else ('About ' if name=='about' else ''))+DATA['name']+(' | Backend & applied AI engineer' if not project else '')
+    if project:
+        headings=[h for h in soup.select('#main h2,#main h3') if h.get_text()!='Other projects']
+        CASE_HEADINGS[project['slug']]=[]
+        for i,heading in enumerate(headings):
+            replacement=project['sections'][i%len(project['sections'])]
+            CASE_HEADINGS[project['slug']].append((heading.get_text(),replacement));heading.string=replacement
+        for i,label in enumerate(soup.select('[data-framer-name="tags"] p')):label.string=project['stack'][i%len(project['stack'])]
+        for label in soup.select('#main p'):
+            if label.get_text() in ['Tools','Services']:label.string={'Tools':'Focus','Services':'Contribution'}[label.get_text()]
+    newtitle=(project['name']+' — ' if project else ('About ' if name=='about' else ''))+DATA['name']+(' | '+DATA['title'] if not project else '')
     if soup.title:add(soup.title.get_text(),newtitle)
     for meta in soup.select('meta[name="description"],meta[property="og:description"],meta[name="twitter:description"]'):
         add(meta.get('content',''),project['summary'] if project else DATA['intro'])
@@ -142,7 +156,7 @@ for name,soup in pages.items():
 
 add(home.h1.get_text(),DATA['hero'])
 add('Everything your product needs to be taken seriously','What I can build for your business')
-add('Pushing my limits through curiosity','Small experiments. Bigger questions.')
+add('Pushing my limits through curiosity','Lab projects. Shared curiosity.')
 add(about.h1.get_text(),DATA['aboutHero'])
 add('Ready for the next adventures','Curious about what we could build?')
 
@@ -170,16 +184,18 @@ for p in DATA['projects']:
         if 'logo' in ' '.join(parents).lower() or i==0:
             asset(src,monogram(p['shortName'][:2].upper(),p['color'],p['ink']))
         elif src not in ASSETS:
-            asset(src,panel(p,i%5))
+            asset(src,cover(p) if i==1 else panel(p,i%5))
 
 # Project covers (including all responsive variants) use the relevant project sketch.
 for p in DATA['projects']:
     for a in home.select(f'a[href="./{p["legacy"]}"]'):
-        for img in a.select('img'):asset(img.get('src'),panel(p,0))
+        labels=a.select('p')
+        if not labels or labels[0].get_text()!=p['oldName']:continue
+        for img in a.select('img'):asset(img.get('src'),cover(p))
         for i,label in enumerate(a.select('p')[1:]):label.string=p['tags'][i%len(p['tags'])]
 
 # The source's client marquee becomes a technology marquee: no borrowed affiliations.
-tools=['Python','FastAPI','PostgreSQL','Docker']
+tools=['React','Python','FastAPI','Docker']
 for i,img in enumerate([x for x in home.select('img') if ' logo' in x.get('alt','')]):
     label=tools[i%4];asset(img.get('src'),wordmark(label));add(img.get('alt'),label)
 
@@ -199,7 +215,7 @@ for i,img in enumerate(aboutimgs[14:23]):asset(img.get('src'),panel(DATA['projec
 
 # The existing exploration carousel and service imagery keep their motion containers.
 for i,img in enumerate(home.select('#main img')[35:58]):
-    asset(img.get('src'),monogram(['API','AI','PAY','OPS'][min(i//4,3)]) if i<15 else panel(DATA['projects'][[6,2,5,0][(i-15)%4]],0))
+    asset(img.get('src'),monogram(['WEB','APP','API','AI'][min(i//4,3)]) if i<15 else cover(DATA['projects'][[6,2,5,0][(i-15)%4]]))
 
 service_old=[
  'I start from scratch, define goals the site actually has to achieve, then comes shape structure, navigation, and every UI element around them.',
@@ -211,13 +227,13 @@ for old,new in zip(service_old,DATA['services']):add(old,new['description'])
 
 shared={
  '6+ years designing for tech founders. Seed to Series C, across fintech, dev tools, and Web3.':DATA['intro'],
- '6+ years designing for tech founders. ':'Backend & applied AI engineer. ',
+ '6+ years designing for tech founders. ':'Full-stack & mobile developer. ',
  'Seed to Series C, across fintech, dev tools, and Web3.':'Dar es Salaam. Co-founder of Ecofy Africa.',
  'Companies I helped:':'Tools I build with:',
- 'Brand identity':'Payments & messaging',
- 'Illustration':'Deployment & infrastructure',
- 'Web design':'Backend & APIs',
- 'Development':'Applied AI',
+ 'Brand identity':DATA['services'][2]['title'],
+ 'Illustration':DATA['services'][3]['title'],
+ 'Web design':DATA['services'][0]['title'],
+ 'Development':DATA['services'][1]['title'],
  'Branding':'Systems',
  'Marketing':'Product',
  'Platform design':'Engineering',
@@ -226,6 +242,8 @@ shared={
  'Events and swag':'Engineering decisions',
  'Other projects':'More engineering work',
  'More projects coming soon':'More experiments coming soon',
+ 'More projects ':'Lab projects ',
+ 'coming soon':'Nena AI & robotics',
  'Currently open to collaborations':'Open to freelance projects & collaborations',
  'Connect on socials':'Find me online',
  'Long story short':'The engineering story',
@@ -235,18 +253,18 @@ shared={
  'Senior Web & Brand designer':'Co-founder, CEO & AI Lead',
  'Senior Brand & Web designer':'Backend Developer',
  'Senior Web Designer':'Practical Training',
- 'Middle Web Designer':'Chairperson, Robotics Lab',
+ 'Middle Web Designer':'Former chairperson, Robotics Lab',
  'Junior Web Designer':'BSc Computer Science',
  'at O0 Design':'at TanStack Tanzania',
  'at Ooze':'at Bluefin Solutions',
  'at Heartbeat':'at UDSM CoICT',
  'at HaloLab':'at University of Dar es Salaam',
- 'Freelance work':'Backend & API projects',
+ 'Freelance work':'Web, mobile & backend projects',
  'for different companies':'for founders & teams',
  'Dec 2024 - Jul 2026':'2025 - present',
  'Mar 2024 - Dec 2024':'2026 - present',
- 'Mar 2023 - Feb 2024':'[Confirm dates]',
- 'Dec 2020 - Feb 2023':'[Confirm dates]',
+ 'Mar 2023 - Feb 2024':'Practical training',
+ 'Dec 2020 - Feb 2023':'Previous leadership role',
  'May 2020 - Dec 2020':'2023 - 2026; award pending',
  'Jan 2021 - Now':'Project-based',
  'hello@danielsun.space':DATA['email'],
@@ -254,13 +272,13 @@ shared={
  'https://www.linkedin.com/in/daniel-sun-design/':'https://www.linkedin.com/in/isack-lugata-a6356531a/',
  'https://x.com/danielsun_ui':'https://github.com/GhostWire619',
  'https://www.instagram.com/daniel.sun_design/':'mailto:'+DATA['email'],
- 'https://www.threads.com/@daniel.sun_design':'https://3drobotics.space',
+ 'https://www.threads.com/@daniel.sun_design':DATA['lab']['url'],
  'https://pinterest.com/daniel_sun_design/':'#unused-social',
  'https://dribbble.com/daniel_sun':'#unused-social',
  'https://drive.google.com/file/d/1GoylHM-evy5PBWtHRkDwa8ltOfER8Njk/view?usp=share_link':'mailto:'+DATA['email']+'?subject=Current%20engineering%20CV',
  'https://danielsun.space/':ORIGIN+'/',
- 'Web & brand designer for SaaS and Web3 founders':'Backend & applied AI engineer in Tanzania',
- 'designer making founders more competitive':'Backend engineer, AI builder & founder',
+ 'Web & brand designer for SaaS and Web3 founders':DATA['title'],
+ 'designer making founders more competitive':'Full-stack developer, mobile builder & founder',
  'Card image':'Isack Lugata: engineering and exploration',
  'Daniel Sun on X':'Isack Lugata on GitHub',
  'Daniel Sun on Instagram':'Email Isack Lugata',
@@ -291,7 +309,10 @@ for soup in pages.values():
 for soup in pages.values():
     for img in soup.select('img[alt]'):
         old=img['alt']
-        if len(old)>45 and img.get('src') in ASSETS:add(old,'Illustrative technical sketch from Isack Lugata’s project notes')
+        if len(old)>45 and img.get('src') in ASSETS:
+            target=ASSETS[img.get('src')]
+            project=next((p for p in DATA['projects'] if p.get('cover')==target),None)
+            add(old,(project['name']+' public website preview; my contribution: '+project['role']) if project else 'Illustrative technical sketch from Isack Lugata’s project notes')
 
 def replace_all(value):
     # One pass prevents short names from rewriting newly inserted content.
@@ -304,7 +325,7 @@ def replace_all(value):
     pattern=re.compile('|'.join(re.escape(k) for k in sorted(mapping,key=len,reverse=True)))
     return pattern.sub(lambda m:mapping[m.group()],value)
 
-schema=json.dumps({'@context':'https://schema.org','@type':'Person','name':DATA['name'],'url':ORIGIN,'jobTitle':'Backend & Applied AI Engineer','email':DATA['email'],'homeLocation':{'@type':'Place','name':DATA['location']},'sameAs':['https://github.com/GhostWire619','https://www.linkedin.com/in/isack-lugata-a6356531a/']},ensure_ascii=False)
+schema=json.dumps({'@context':'https://schema.org','@type':'Person','name':DATA['name'],'url':ORIGIN,'jobTitle':DATA['title'],'email':DATA['email'],'homeLocation':{'@type':'Place','name':DATA['location']},'sameAs':['https://github.com/GhostWire619','https://www.linkedin.com/in/isack-lugata-a6356531a/']},ensure_ascii=False)
 schema_tag='<script type="application/ld+json">'+schema+'</script>'
 
 def clean_snippets(raw):
@@ -360,6 +381,16 @@ for filename in paths:
         # Tool names are literal text children, never framework identifiers.
         for old,new in TOOL_LABELS.items():
             raw=raw.replace('children:`'+old+'`','children:`'+new+'`')
+        case=next((p for p in DATA['projects'] if p['story'][0] in raw),None)
+        if case:
+            for old,new in CASE_HEADINGS.get(case['slug'],[]):
+                raw=raw.replace('children:`'+MAPPINGS.get(old,old)+'`','children:`'+new+'`')
+            tag_index=[0]
+            def case_tag(match):
+                label=case['stack'][tag_index[0]%len(case['stack'])];tag_index[0]+=1
+                return 'gGxJjYTTd:`'+label+'`'
+            raw=re.sub(r'gGxJjYTTd:`[^`]*`',case_tag,raw)
+            raw=raw.replace('children:`Tools`','children:`Focus`').replace('children:`Services`','children:`Contribution`')
         for project in DATA['projects']:
             pattern=r'(\w+\(\w+,\{Ciu1NbIJT:(?:(?!RehjAvB2r).){0,2400}?RehjAvB2r:`'+re.escape(project['name'])+r'`.{0,450}?YjyOs65XK:`[^`]*`)'
             def tags(match):
@@ -378,15 +409,27 @@ video { object-fit:cover !important; visibility:hidden !important; }
 img[src^="/assets/personal/"][src$=".svg"] { object-fit:contain !important; object-position:center !important; }
 [data-framer-name="cards"] > [data-framer-name="block"] > :nth-child(n+3) { display:none !important; }
 .personal-confirmation { border-left:2px solid currentColor; padding-left:16px; opacity:.7; }
+.personal-live-link { display:inline-flex; width:fit-content; align-self:flex-start; padding:10px 15px; margin-top:16px; border-radius:8px; background:linear-gradient(#555,#111); box-shadow:inset 0 0 0 1px #000,0 3px 6px #0003; color:white !important; font:14px Inter,sans-serif !important; text-decoration:none !important; }
+[data-framer-name="tags"] > :nth-child(n+5) { display:none !important; }
+.personal-project-role { display:block; margin-top:10px; font:12px/1.5 Inter,sans-serif; opacity:.65; }
+[data-personal-gallery] { cursor:pointer; }
+[data-personal-gallery]::after { content:attr(data-personal-gallery-label); white-space:pre-line; position:absolute; inset:0; z-index:5; display:flex; align-items:flex-end; padding:22px; background:linear-gradient(transparent 45%,#000b); color:white; font:16px/1.6 Inter,sans-serif; pointer-events:none; }
 @media (prefers-reduced-motion:reduce) {
   html { scroll-behavior:auto !important; }
   *, *::before, *::after { animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; }
 }
 '''+ '\n'.join('a[href="./'+p['slug']+'"] [data-framer-name="cover"] { background:'+p['color']+'; }' for p in DATA['projects']))
-posters=[panel(DATA['projects'][i],0) for i in [6,2,5,0]]
+nena={'slug':'nena-ai','name':'Nena AI','color':'#e1cec0','ink':'#594237','flow':['Swahili text','Speech model','Generated speech','Audio experience'],'stack':['Swahili','Speech synthesis','Lab collaboration'],'role':'Team lab project','status':'Lab text-to-speech project'}
+gallery=[
+ {'title':'Nena AI','subtitle':'Swahili speech · Lab team project','href':'/robotics#nena-ai','image':panel(nena,0)},
+ {'title':'3D Solutions & Robotics','subtitle':'Backend · Former chairperson','href':'/robotics','image':DATA['lab']['cover']},
+ {'title':'TanStack Tanzania','subtitle':'Backend development','href':'/tanstack-tanzania','image':'/assets/personal/tanstack-live.png'},
+ {'title':'GloboExpats','subtitle':'Mainly frontend development','href':'/globoexpats','image':'/assets/personal/globoexpats-live.png'}
+]
 out('personal.js','''
 (() => {
-  const posters = '''+json.dumps(posters)+''';
+  const gallery = '''+json.dumps(gallery)+''';
+  const projects = '''+json.dumps([{k:p.get(k) for k in ['slug','name','role','url','cover']} for p in DATA['projects']])+''';
   let pending = false;
   function update() {
     pending = false;
@@ -395,13 +438,46 @@ out('personal.js','''
       video.pause();
       video.removeAttribute('autoplay');
       const holder = video.parentElement;
-      holder.style.backgroundImage = `url("${posters[i % posters.length]}")`;
+      const item = gallery[i % gallery.length];
+      holder.style.backgroundImage = `url("${item.image}")`;
       holder.style.backgroundSize = 'cover';
       holder.style.backgroundPosition = 'center';
       video.setAttribute('aria-hidden', 'true');
       video.style.visibility = 'hidden';
       video.removeAttribute('src');
       video.load();
+      holder.dataset.personalGallery = item.href;
+      holder.dataset.personalGalleryLabel = item.title + '\\n' + item.subtitle;
+      holder.setAttribute('role', 'link'); holder.tabIndex = 0;
+      holder.setAttribute('aria-label', item.title + ' — ' + item.subtitle);
+      holder.addEventListener('click', event => { event.stopPropagation(); location.assign(item.href); }, true);
+      holder.addEventListener('keydown', event => { if (event.key === 'Enter') location.assign(item.href); });
+    });
+    const project = projects.find(p => location.pathname === '/' + p.slug);
+    if (project && !document.querySelector('.personal-live-link')) {
+      const heading = document.querySelector('h1');
+      const paragraphs = [...document.querySelectorAll('#main p')];
+      const intro = paragraphs.find(p => p.textContent.length > 90);
+      if (heading && intro) {
+        const link = document.createElement('a');
+        link.className = 'personal-live-link'; link.href = project.url;
+        link.target = '_blank'; link.rel = 'noopener noreferrer';
+        link.textContent = project.slug === 'falco' ? 'Company website ↗' : 'View live website ↗';
+        const role = document.createElement('span');
+        role.className = 'personal-project-role';
+        role.textContent = 'My contribution: ' + project.role;
+        intro.insertAdjacentElement('afterend', link);
+        link.insertAdjacentElement('afterend', role);
+      }
+    }
+    document.querySelectorAll('#main a').forEach(a => {
+      if (a.textContent.includes('Lab projects')) {
+        a.href = '/robotics'; a.dataset.personalLabLink = 'true';
+        if (!a.dataset.personalClickReady) {
+          a.dataset.personalClickReady = 'true';
+          a.addEventListener('click', event => event.stopPropagation(), true);
+        }
+      }
     });
     document.querySelectorAll('p').forEach(p => { if (p.textContent.startsWith('[CONFIRM]')) p.classList.add('personal-confirmation'); });
     document.querySelectorAll('a[href="#unused-social"]').forEach(a => a.setAttribute('aria-hidden', 'true'));
@@ -409,12 +485,48 @@ out('personal.js','''
     document.querySelectorAll('meta[name="p:domain_verify"]').forEach(m => m.remove());
   }
   function schedule() { if (!pending) { pending = true; requestAnimationFrame(update); } }
-  document.addEventListener('DOMContentLoaded', () => {
-    update();
-    new MutationObserver(schedule).observe(document.body, { childList:true, subtree:true, attributes:true, attributeFilter:['src'] });
-  });
+  function start() {
+    // Wait for the captured motion tree to mount before enhancing its DOM.
+    if (!window.MotionIsMounted) { requestAnimationFrame(start); return; }
+    requestAnimationFrame(() => {
+      update();
+      new MutationObserver(schedule).observe(document.body, { childList:true, subtree:true, attributes:true, attributeFilter:['src'] });
+    });
+  }
+  window.addEventListener('load', start, {once:true});
 })();
 ''')
-(ROOT/'content/REVIEW.md').write_text('# Content review\n\n'+ '\n'.join('- '+x for x in DATA['reviewNotes'])+'\n\nCase studies retain visible [CONFIRM] notes for unresolved scope and status.\n',encoding='utf8')
+(ROOT/'content/REVIEW.md').write_text('# Content review\n\n'+ '\n'.join('- '+x for x in DATA['reviewNotes'])+'\n',encoding='utf8')
+
+# The lab has its own editorial page, beyond the seven featured product slots.
+fonts='\n'.join(re.findall(r'@font-face\s*\{[^}]*\}',original('dist/index.html')))
+lab=DATA['lab']
+lab_style='''
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;color:#111;background:#fff;font:16px/1.65 Inter,Arial,sans-serif}
+header{height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 25px;border-bottom:1px solid #ddd;background:#fff;position:sticky;top:0;z-index:10}a{color:inherit}header a{text-decoration:none}header nav{display:flex;gap:20px}
+main{max-width:1200px;margin:auto;border-left:1px solid #ddd;border-right:1px solid #ddd}.lab-hero{padding:120px 48px 52px;background:radial-gradient(ellipse at 50% 0,#fff36b55,transparent 70%)}
+h1,h2{font-family:'LT Superior Serif Regular',Georgia,serif;font-weight:400;letter-spacing:-.04em;line-height:1.08}h1{font-size:clamp(42px,5.3vw,68px);max-width:1000px;margin:18px 0 26px}h2{font-size:42px;margin:10px 0 22px}p{max-width:760px}.eyebrow{font-size:12px;letter-spacing:.12em;text-transform:uppercase;opacity:.6}.lab-image{width:100%;display:block;border:1px solid #ddd;border-radius:12px}.lab-section{padding:48px;border-top:1px solid #ddd}.lab-grid{display:grid;grid-template-columns:1fr 1fr;gap:30px;align-items:center}.lab-grid img{width:100%;border-radius:12px}.lab-button{display:inline-flex;border-radius:8px;background:linear-gradient(#555,#111);color:#fff;text-decoration:none;padding:10px 16px;box-shadow:0 3px 8px #0003;font-size:14px}footer{max-width:1200px;margin:auto;padding:60px 30px;border-top:1px solid #ddd}footer a{font-size:clamp(24px,5vw,60px);font-family:'LT Superior Serif Regular',Georgia,serif;text-decoration:none}
+@media(max-width:640px){.lab-hero{padding:85px 20px 32px}.lab-section{padding:32px 20px}.lab-grid{grid-template-columns:1fr}header{padding:0 20px;font-size:14px}h2{font-size:34px}}
+@media(prefers-reduced-motion:no-preference){h1{animation:arrive .8s both}@keyframes arrive{from{opacity:0;filter:blur(8px);transform:translateY(8px)}to{opacity:1;filter:none;transform:none}}}
+'''
+lab_html=f'''<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Robotics, Nena AI & lab projects — {esc(DATA['name'])}</title><meta name="description" content="Former lab chairperson and backend contributor. Nena AI, TanStack Tanzania, and shared lab work."><link rel="icon" href="/assets/personal/mark-il.svg"><style>{fonts}\n{lab_style}</style></head><body>
+<header><a href="/">{esc(DATA['name'])}</a><nav><a href="/">Works</a><a href="/about">Story</a><a href="mailto:{esc(DATA['email'])}">Let's chat</a></nav></header>
+<main><section class="lab-hero"><span class="eyebrow">{esc(lab['role'])}</span><h1>Software, speech, and shared curiosity.</h1><p>{esc(lab['description'])}</p><a class="lab-button" href="{esc(lab['url'])}" target="_blank" rel="noopener noreferrer">Visit the lab website ↗</a></section>
+<section class="lab-section"><img class="lab-image" src="{esc(lab['cover'])}" alt="Public UDSM robotics lab website preview"><p class="eyebrow">Public lab website · My role: former chairperson and backend contributor</p></section>
+<section class="lab-section lab-grid" id="nena-ai"><div><span class="eyebrow">AI · Lab team project</span><h2>Nena AI</h2><p>{esc(lab['nena']['description'])}</p><p>The visual is a conceptual speech-processing sketch, rather than a product screenshot.</p></div><img src="{panel(nena,0)}" alt="Illustrative Nena AI text-to-speech flow"></section>
+<section class="lab-section lab-grid"><img src="/assets/personal/tanstack-live.png" alt="Public TanStack Tanzania website"><div><span class="eyebrow">Backend development</span><h2>TanStack Tanzania</h2><p>A platform connecting Tanzanian tech students with opportunities, resources, and career support. I contributed backend development as part of our lab project work.</p><a class="lab-button" href="/tanstack-tanzania">Explore the project ↗</a></div></section></main>
+<footer><p>Open to freelance projects & collaborations</p><a href="mailto:{esc(DATA['email'])}">{esc(DATA['email'])}</a></footer></body></html>'''
+(DIST/'robotics.html').write_text(lab_html,encoding='utf8')
+
+# Redirect superseded project labels to the now-confirmed real project names.
+aliases={p['legacy']:p['slug'] for p in DATA['projects']}
+aliases.update({'rag-platform':'globoexpats','energyopt':'habitek','marketplace':'osher-market','infrastructure':'falco'})
+for old,new in aliases.items():
+    if old==new:continue
+    (DIST/(old+'.html')).write_text(f'<!doctype html><html><head><meta charset="utf-8"><meta http-equiv="refresh" content="0;url=/{new}"><link rel="canonical" href="{ORIGIN}/{new}"><title>Project moved — {esc(DATA["name"])}</title></head><body><a href="/{new}">Open {esc(new.replace("-"," "))}</a></body></html>',encoding='utf8')
+
+captures=[{'project':p['name'],'url':p.get('url'),'image':p.get('cover'),'contribution':p['role']} for p in DATA['projects']]
+captures.append({'project':lab['name'],'url':lab['url'],'image':lab['cover'],'contribution':lab['role']})
+(ROOT/'content/public-previews.json').write_text(json.dumps(captures,indent=2,ensure_ascii=False)+'\n',encoding='utf8')
 print('Personalized',len(pages),'captured pages and',len(DATA['projects']),'canonical case studies.')
 print('Replaced',len(ASSETS),'asset references and',len(MAPPINGS),'content strings.')

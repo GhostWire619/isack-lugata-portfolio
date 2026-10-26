@@ -1,0 +1,50 @@
+[
+  {
+    "project": "Ecofy Africa",
+    "url": "https://ecofy.co.tz/",
+    "image": "/assets/personal/ecofy-live.png",
+    "contribution": "Frontend & backend · Co-founder, CEO & AI Lead"
+  },
+  {
+    "project": "Wakili Msomi",
+    "url": "https://wakilimsomi.sheriakiganjani.co.tz/",
+    "image": "/assets/personal/wakili-msomi-live.png",
+    "contribution": "Frontend & backend development"
+  },
+  {
+    "project": "GloboExpats",
+    "url": "https://globoexpats.com/",
+    "image": "/assets/personal/globoexpats-live.png",
+    "contribution": "Mainly frontend development"
+  },
+  {
+    "project": "Habitek",
+    "url": "https://habitek.co.tz/",
+    "image": "/assets/personal/habitek-live.png",
+    "contribution": "Frontend & backend development"
+  },
+  {
+    "project": "Osher Market",
+    "url": "https://oshermarket.com/",
+    "image": "/assets/personal/osher-market-live.png",
+    "contribution": "Backend development"
+  },
+  {
+    "project": "Falco management backend",
+    "url": "https://falco.co.tz/",
+    "image": null,
+    "contribution": "Internal management backend development"
+  },
+  {
+    "project": "TanStack Tanzania",
+    "url": "https://tanstack.co.tz/",
+    "image": "/assets/personal/tanstack-live.png",
+    "contribution": "Backend development · Lab project"
+  },
+  {
+    "project": "3D Solutions & Robotics Lab",
+    "url": "https://robotics.udsm.ac.tz/",
+    "image": "/assets/personal/robotics-live.png",
+    "contribution": "Former chairperson · Backend development"
+  }
+]

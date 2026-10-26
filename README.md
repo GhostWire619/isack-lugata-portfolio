@@ -1,6 +1,6 @@
 # Isack Lugata — portfolio
 
-A freelance-focused portfolio for Isack Lugata, a backend and applied AI engineer in Dar es Salaam, Tanzania. The presentation retains the reference site's typography, responsive layouts, tactile project cards, animated navigation, character reveals, and motion runtime.
+A freelance-focused portfolio for Isack Lugata, a full-stack and mobile developer in Dar es Salaam, Tanzania. The presentation retains the reference site's typography, responsive layouts, tactile project cards, animated navigation, character reveals, and motion runtime.
 
 ## Run locally
 
@@ -26,27 +26,30 @@ The original files are compiled Framer output, rather than an editable Framer ca
 
 ## Pages
 
-- `/`: home, selected projects, services, experiments, and contact.
-- `/about`: personal story and experience.
-- `/ecofy`: agricultural intelligence and applied AI.
-- `/wakili-msomi`: bilingual legal-information assistant.
-- `/rag-platform`: multi-tenant retrieval backend.
-- `/energyopt`: energy-data analysis.
-- `/marketplace`: marketplace and payment workflows.
-- `/infrastructure`: deployment and operations.
-- `/robotics`: lab leadership and technical exploration.
+- `/`: freelance services and selected work.
+- `/about`: background, experience, and former robotics chairperson role.
+- `/ecofy`: frontend, backend, and applied AI.
+- `/globoexpats`: mainly frontend work.
+- `/wakili-msomi`: frontend and backend.
+- `/habitek`: frontend and backend.
+- `/osher-market`: backend work.
+- `/falco`: internal management backend, distinct from the public company site.
+- `/tanstack-tanzania`: backend development.
+- `/robotics`: former lab leadership, backend contribution, and Nena AI team work.
 
-Old template routes remain usable as aliases with personalized content. `/test-1` serves the personalized homepage. `/404` retains the reference's error presentation with updated contact information.
+Old project routes redirect to the current project names. The public project URLs, screenshot locations, and confirmed contribution scopes are recorded in `content/public-previews.json`.
 
-## Editorial choices and remaining details
+## Editorial choices
 
-The primary goal is freelance clients and project enquiries, as confirmed by Isack. Both supplied briefs informed the content. Conflicting funding amounts, unverified user counts, pilot targets, phone numbers, and original-template client relationships are excluded.
+The primary audience remains freelance clients. Isack confirmed frontend and backend work at Ecofy, Wakili Msomi, and Habitek; mainly frontend at GloboExpats; backend at Osher, TanStack, robotics, and Falco's internal management system.
 
-The public GitHub account name matches Isack Lugata. Its public avatar appears on the Story page. New project visuals are labeled illustrative technical sketches, rather than product screenshots or evidence of production deployments. The client's logos are replaced with a technology marquee. Original showreel footage is hidden and replaced with technical sketches in the same motion containers. Long design galleries are curated to a smaller set of engineering diagrams.
+Real public website captures replace the original generic covers. Public screenshots show product context; they do not imply frontend ownership on backend-only projects. Falco uses a conceptual backend diagram because the contribution was to an internal management system. No private dashboards or records are exposed.
 
-Case studies contain visible `[CONFIRM]` notes for unresolved attribution, deployment status, and sharing permissions. Unknown dates remain marked for confirmation. Formal degree conferral is not asserted. The old CV download is replaced by an email request for a current engineering CV.
+Mobile applications are included in the service offering without inventing a specific framework, app-store release, or mobile contribution to any listed project. Nena AI is attributed as a shared lab project. The lab page follows Isack's correction that he is the former chairperson, even if the public lab website still shows an older label.
 
-See `content/REVIEW.md` for remaining review items. Add reviewed project screenshots and an up-to-date résumé when available.
+Formal degree conferral, unsupported project metrics, funding amounts, phone numbers, and exact unknown historical role dates are not invented. The old CV download remains replaced with an email request for a current résumé.
+
+See `content/REVIEW.md` for source notes and remaining editorial details.
 
 ## Verification
 

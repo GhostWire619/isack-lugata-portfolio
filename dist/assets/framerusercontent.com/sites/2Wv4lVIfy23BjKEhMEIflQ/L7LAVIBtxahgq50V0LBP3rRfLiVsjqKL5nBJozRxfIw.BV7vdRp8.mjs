@@ -16,7 +16,7 @@ import{n as e}from"./rolldown-runtime.BgaNhQyE.mjs";async function t(e,t,i){let 
       "@type": "ProfilePage",
       "@id": "https://daniel-sun-portfolio-replica.darkseed8192.chatgpt.site/#profilepage",
       "url": "https://daniel-sun-portfolio-replica.darkseed8192.chatgpt.site/",
-      "name": "Isack Lugata — Backend & applied AI engineer in Tanzania",
+      "name": "Isack Lugata — Full-stack & Mobile Developer · Applied AI",
       "isPartOf": { "@id": "https://daniel-sun-portfolio-replica.darkseed8192.chatgpt.site/#website" },
       "dateModified": "2026-08-16T00:00:00+00:00",
       "inLanguage": "en",
@@ -53,11 +53,11 @@ import{n as e}from"./rolldown-runtime.BgaNhQyE.mjs";async function t(e,t,i){let 
         "address": { "@type": "Country", "name": "Spain" }
       },
       "knowsAbout": [
-        "Payments & messaging design",
-        "Backend & APIs",
+        "Backend & integrations design",
+        "Frontend & web apps",
         "Framer development",
         "Webflow development",
-        "Deployment & infrastructure",
+        "Applied AI",
         "Design systems",
         "Visual identity",
         "Product design",
@@ -73,7 +73,7 @@ import{n as e}from"./rolldown-runtime.BgaNhQyE.mjs";async function t(e,t,i){let 
         "https://www.linkedin.com/in/isack-lugata-a6356531a/",
         "#unused-social",
         "mailto:lugata619@gmail.com",
-        "https://3drobotics.space",
+        "https://robotics.udsm.ac.tz/",
         "https://pinterest.com/danielsundesign/"
       ]
     },
@@ -85,7 +85,7 @@ import{n as e}from"./rolldown-runtime.BgaNhQyE.mjs";async function t(e,t,i){let 
       "url": "https://daniel-sun-portfolio-replica.darkseed8192.chatgpt.site/",
       "logo": { "@id": "https://daniel-sun-portfolio-replica.darkseed8192.chatgpt.site/#primaryimage" },
       "image": { "@id": "https://daniel-sun-portfolio-replica.darkseed8192.chatgpt.site/#primaryimage" },
-      "description": "Payments & messaging, web design, development, and illustration for SaaS and Web3 startups, from seed to Series C.",
+      "description": "Backend & integrations, web design, development, and illustration for SaaS and Web3 startups, from seed to Series C.",
       "founder": { "@id": "https://daniel-sun-portfolio-replica.darkseed8192.chatgpt.site/#daniel" },
       "employee": { "@id": "https://daniel-sun-portfolio-replica.darkseed8192.chatgpt.site/#daniel" },
       "email": "mailto:lugata619@gmail.com",
@@ -109,7 +109,7 @@ import{n as e}from"./rolldown-runtime.BgaNhQyE.mjs";async function t(e,t,i){let 
             "@type": "Offer",
             "itemOffered": {
               "@type": "Service",
-              "name": "Backend & APIs",
+              "name": "Frontend & web apps",
               "description": "Site structure, navigation, and every UI element built around the single decision you want a visitor to make.",
               "provider": { "@id": "https://daniel-sun-portfolio-replica.darkseed8192.chatgpt.site/#daniel" }
             }
@@ -118,7 +118,7 @@ import{n as e}from"./rolldown-runtime.BgaNhQyE.mjs";async function t(e,t,i){let 
             "@type": "Offer",
             "itemOffered": {
               "@type": "Service",
-              "name": "Applied AI",
+              "name": "Mobile apps",
               "description": "Building the design in Framer or Webflow, handed over so the team can edit it without opening an engineering ticket.",
               "provider": { "@id": "https://daniel-sun-portfolio-replica.darkseed8192.chatgpt.site/#daniel" }
             }
@@ -127,7 +127,7 @@ import{n as e}from"./rolldown-runtime.BgaNhQyE.mjs";async function t(e,t,i){let 
             "@type": "Offer",
             "itemOffered": {
               "@type": "Service",
-              "name": "Payments & messaging",
+              "name": "Backend & integrations",
               "description": "Logo, type, color, patterns, and marketing collateral built as one system, handed over as a guide the team can actually use.",
               "provider": { "@id": "https://daniel-sun-portfolio-replica.darkseed8192.chatgpt.site/#daniel" }
             }
@@ -136,7 +136,7 @@ import{n as e}from"./rolldown-runtime.BgaNhQyE.mjs";async function t(e,t,i){let 
             "@type": "Offer",
             "itemOffered": {
               "@type": "Service",
-              "name": "Deployment & infrastructure",
+              "name": "Applied AI",
               "description": "Custom icons, product visuals, isometric scenes, and conceptual pieces.",
               "provider": { "@id": "https://daniel-sun-portfolio-replica.darkseed8192.chatgpt.site/#daniel" }
             }
@@ -151,13 +151,13 @@ import{n as e}from"./rolldown-runtime.BgaNhQyE.mjs";async function t(e,t,i){let 
       "itemListOrder": "https://schema.org/ItemListOrderAscending",
       "numberOfItems": 7,
       "itemListElement": [
-        { "@type": "ListItem", "position": 1, "item": { "@type": "CreativeWork", "name": "Ecofy Africa", "url": "https://daniel-sun-portfolio-replica.darkseed8192.chatgpt.site/ecofy", "creator": { "@id": "https://daniel-sun-portfolio-replica.darkseed8192.chatgpt.site/#daniel" }, "about": "Backend & APIs and marketing design for a San Francisco developer-tools company" } },
-        { "@type": "ListItem", "position": 2, "item": { "@type": "CreativeWork", "name": "Marketplace systems", "url": "https://daniel-sun-portfolio-replica.darkseed8192.chatgpt.site/marketplace", "creator": { "@id": "https://daniel-sun-portfolio-replica.darkseed8192.chatgpt.site/#daniel" }, "about": "Payments & messaging and bilingual platform design for a Qatari fintech" } },
+        { "@type": "ListItem", "position": 1, "item": { "@type": "CreativeWork", "name": "Ecofy Africa", "url": "https://daniel-sun-portfolio-replica.darkseed8192.chatgpt.site/ecofy", "creator": { "@id": "https://daniel-sun-portfolio-replica.darkseed8192.chatgpt.site/#daniel" }, "about": "Frontend & web apps and marketing design for a San Francisco developer-tools company" } },
+        { "@type": "ListItem", "position": 2, "item": { "@type": "CreativeWork", "name": "Osher Market", "url": "https://daniel-sun-portfolio-replica.darkseed8192.chatgpt.site/osher-market", "creator": { "@id": "https://daniel-sun-portfolio-replica.darkseed8192.chatgpt.site/#daniel" }, "about": "Backend & integrations and bilingual platform design for a Qatari fintech" } },
         { "@type": "ListItem", "position": 3, "item": { "@type": "CreativeWork", "name": "Wakili Msomi", "url": "https://daniel-sun-portfolio-replica.darkseed8192.chatgpt.site/wakili-msomi", "creator": { "@id": "https://daniel-sun-portfolio-replica.darkseed8192.chatgpt.site/#daniel" }, "about": "Systems, web design, and development" } },
-        { "@type": "ListItem", "position": 4, "item": { "@type": "CreativeWork", "name": "Infrastructure & DevOps", "url": "https://daniel-sun-portfolio-replica.darkseed8192.chatgpt.site/infrastructure", "creator": { "@id": "https://daniel-sun-portfolio-replica.darkseed8192.chatgpt.site/#daniel" }, "about": "Systems and platform design for a blockchain infrastructure network" } },
-        { "@type": "ListItem", "position": 5, "item": { "@type": "CreativeWork", "name": "EnergyOpt", "url": "https://daniel-sun-portfolio-replica.darkseed8192.chatgpt.site/energyopt", "creator": { "@id": "https://daniel-sun-portfolio-replica.darkseed8192.chatgpt.site/#daniel" }, "about": "Systems and platform design" } },
-        { "@type": "ListItem", "position": 6, "item": { "@type": "CreativeWork", "name": "Robotics & experiments", "url": "https://daniel-sun-portfolio-replica.darkseed8192.chatgpt.site/robotics", "creator": { "@id": "https://daniel-sun-portfolio-replica.darkseed8192.chatgpt.site/#daniel" }, "about": "Systems, web design, and development" } },
-        { "@type": "ListItem", "position": 7, "item": { "@type": "CreativeWork", "name": "Multi-tenant RAG", "url": "https://daniel-sun-portfolio-replica.darkseed8192.chatgpt.site/rag-platform", "creator": { "@id": "https://daniel-sun-portfolio-replica.darkseed8192.chatgpt.site/#daniel" }, "about": "Backend & APIs and development for a personal brand site" } }
+        { "@type": "ListItem", "position": 4, "item": { "@type": "CreativeWork", "name": "Falco management backend", "url": "https://daniel-sun-portfolio-replica.darkseed8192.chatgpt.site/falco", "creator": { "@id": "https://daniel-sun-portfolio-replica.darkseed8192.chatgpt.site/#daniel" }, "about": "Systems and platform design for a blockchain infrastructure network" } },
+        { "@type": "ListItem", "position": 5, "item": { "@type": "CreativeWork", "name": "Habitek", "url": "https://daniel-sun-portfolio-replica.darkseed8192.chatgpt.site/habitek", "creator": { "@id": "https://daniel-sun-portfolio-replica.darkseed8192.chatgpt.site/#daniel" }, "about": "Systems and platform design" } },
+        { "@type": "ListItem", "position": 6, "item": { "@type": "CreativeWork", "name": "TanStack Tanzania", "url": "https://daniel-sun-portfolio-replica.darkseed8192.chatgpt.site/tanstack-tanzania", "creator": { "@id": "https://daniel-sun-portfolio-replica.darkseed8192.chatgpt.site/#daniel" }, "about": "Systems, web design, and development" } },
+        { "@type": "ListItem", "position": 7, "item": { "@type": "CreativeWork", "name": "GloboExpats", "url": "https://daniel-sun-portfolio-replica.darkseed8192.chatgpt.site/globoexpats", "creator": { "@id": "https://daniel-sun-portfolio-replica.darkseed8192.chatgpt.site/#daniel" }, "about": "Frontend & web apps and development for a personal brand site" } }
       ]
     }
   ]

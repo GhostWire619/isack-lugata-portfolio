@@ -3,123 +3,342 @@
   "fullName": "Isack Madaha Lugata",
   "email": "lugata619@gmail.com",
   "location": "Dar es Salaam, Tanzania",
-  "hero": "Hey! I'm Isack Lugata. I build backends and AI systems for real-world problems, in Tanzania and beyond.",
-  "intro": "Backend & applied AI engineer in Dar es Salaam. Co-founder of Ecofy Africa. Available for freelance projects.",
+  "hero": "Hey! I'm Isack Lugata. I build websites, mobile apps, and AI-powered products that work for real people.",
+  "intro": "Full-stack & mobile developer in Dar es Salaam. Co-founder of Ecofy Africa. Open to freelance projects.",
   "aboutHero": "I take ideas apart, figure out how the pieces fit, and build software that works for people.",
   "about": [
-    "I'm Isack Lugata, a backend and applied AI engineer based in Dar es Salaam, Tanzania. My Computer Science studies at the University of Dar es Salaam have taken me into APIs, intelligent assistants, infrastructure, and the practical work of turning an idea into a useful system.",
-    "I co-founded Ecofy Africa, where we're building agricultural intelligence for smallholder farmers. Working on a product has taught me to look beyond the code: who will use it, what information they need, and how the system fits the way they already work.",
-    "My work spans backend development, retrieval-augmented generation, document processing, and deployment. I also lead the 3D Solutions & Robotics Lab at UDSM CoICT, where software meets physical computing and experimentation.",
-    "I work with founders and teams who need a backend, an AI feature, or an integration built with care. Outside the terminal: chess, basketball, video editing, and the occasional experiment that starts with 'what if?'."
+    "I'm Isack Lugata, a full-stack and mobile developer based in Dar es Salaam, Tanzania. I work across frontend interfaces, backend services, mobile applications, and applied AI, taking an idea from the screen to the systems behind it.",
+    "I co-founded Ecofy Africa, where I work on both the frontend and backend alongside the AI and product direction. My other work spans marketplaces, legal technology, property platforms, and internal business systems.",
+    "I am the former chairperson of the 3D Solutions & Robotics Lab at UDSM CoICT. My contribution there included backend development, and our team worked on projects such as Nena AI and TanStack Tanzania. That experience brought software, research, and collaboration into the same room.",
+    "Different projects need different contributions. At GloboExpats, mine is mainly frontend; at Osher Market and TanStack, it is backend. I also develop mobile apps and help connect interfaces, APIs, data, and AI into a working product. Outside work: chess, basketball, video editing, and experiments driven by curiosity."
   ],
   "services": [
-    {"title":"Backend & APIs","description":"Python APIs with FastAPI, Django, or Flask. Data models, authentication, PostgreSQL, and the integrations that keep your product moving."},
-    {"title":"Applied AI","description":"Useful AI features: document extraction, domain assistants, and retrieval over your own documents, with English and Swahili users in mind."},
-    {"title":"Payments & messaging","description":"Local payment and messaging integrations, including ClickPesa and Beem SMS, with clear transaction tracking and reconciliation workflows."},
-    {"title":"Deployment & infrastructure","description":"Docker, nginx, reverse proxies, and Linux servers. I help take your application from a working build to a system you can run and maintain."}
+    {
+      "title": "Frontend & web apps",
+      "description": "Responsive websites, product interfaces, and web applications. Clear user journeys, thoughtful interaction, and frontend work connected to real APIs."
+    },
+    {
+      "title": "Mobile apps",
+      "description": "Mobile applications built around clear interfaces, reliable APIs, and practical everyday workflows, from the first screen to the services behind it."
+    },
+    {
+      "title": "Backend & integrations",
+      "description": "Python APIs, authentication, databases, payments, messaging, and internal management systems. Built with deployment and maintenance in mind."
+    },
+    {
+      "title": "Applied AI",
+      "description": "AI assistants, retrieval over your documents, document processing, and language-model integrations for useful English and Swahili experiences."
+    }
   ],
   "projects": [
     {
-      "legacy":"clerk","slug":"ecofy","oldName":"Clerk","name":"Ecofy Africa","shortName":"Ecofy","tags":["Applied AI","Backend","Founder"],"color":"#dbe6a0","ink":"#263d22",
-      "summary":"Ecofy Africa is an agricultural intelligence platform for smallholder farmers in Tanzania. As co-founder, CEO and AI Lead, I contribute to the AI services and technical product direction, working with a team to turn farm information into useful decisions.",
-      "story":[
-        "Smallholder farmers need information they can act on, in a form that fits their context. At Ecofy Africa, that means thinking about local users, their growing seasons, and the gap between collecting data and making a useful recommendation.",
-        "My contribution focuses on applied AI and backend services: agricultural analysis, conversational assistance, document extraction, and the architecture behind a crop journey that can change as new events happen on a farm. This is a team product; I do not claim sole ownership of the platform.",
-        "The work brings together Python services, a React PWA, PostgreSQL, Gemini integration, and agricultural data. The planning direction is event-driven: update crop state when something changes, then revisit the plan rather than follow a fixed checklist.",
-        "Building Ecofy has made research and product judgment part of my engineering practice. The next question is not just whether a feature works, but whether it helps a farmer make a better decision.",
-        "[CONFIRM] Current public demo URL, launch status, and exact individual implementation scope. Funding amounts, pilot targets, user counts, and impact claims are intentionally not included until verified."
+      "legacy": "clerk",
+      "slug": "ecofy",
+      "oldName": "Clerk",
+      "name": "Ecofy Africa",
+      "shortName": "Ecofy",
+      "tags": [
+        "Full-stack",
+        "Applied AI",
+        "Founder"
       ],
-      "stack":["Python","FastAPI","PostgreSQL","React PWA","Gemini","Agricultural data"],
-      "flow":["Farm information","Python services","AI assistance","Season planning"],
-      "role":"Co-founder, CEO & AI Lead","status":"Active product development; public status to confirm"
+      "color": "#dbe6a0",
+      "ink": "#263d22",
+      "summary": "Ecofy Africa brings farm planning, activity records, and agricultural guidance into one product for Tanzanian farmers. I am a co-founder, CEO and AI Lead, and work on both the frontend and backend.",
+      "story": [
+        "Ecofy helps farmers plan their season, record work, monitor costs, and understand the next useful action on their farm.",
+        "My contribution spans the frontend and backend, alongside AI services and technical product direction. I work with a team across the product.",
+        "The public experience is designed around Swahili-speaking users, with farm information, growing-season tasks, weather, and market information presented together.",
+        "The engineering work connects product interfaces, APIs, data, and AI assistance. I care about how those parts work together for the person using them.",
+        "The live website is at ecofy.co.tz, with a linked farm application. The preview shown here is captured from the public site."
+      ],
+      "stack": [
+        "Frontend",
+        "Python APIs",
+        "React PWA",
+        "PostgreSQL",
+        "Applied AI"
+      ],
+      "flow": [
+        "Farm information",
+        "Web application",
+        "Backend & AI",
+        "Farmer guidance"
+      ],
+      "role": "Frontend & backend · Co-founder, CEO & AI Lead",
+      "status": "Public website and linked farm application",
+      "url": "https://ecofy.co.tz/",
+      "cover": "/assets/personal/ecofy-live.png",
+      "sections": [
+        "Product experience",
+        "Backend & AI services",
+        "Engineering contribution"
+      ]
     },
     {
-      "legacy":"stimulate","slug":"wakili-msomi","oldName":"Stimulate","name":"Wakili Msomi","shortName":"Wakili","tags":["Legal AI","RAG","Swahili"],"color":"#cbd4ee","ink":"#243451",
-      "summary":"Wakili Msomi explores how retrieval and conversational AI can make Tanzanian legal information easier to navigate in English and Swahili. My involvement began during practical training at Bluefin Solutions, in collaboration with Sheria Kiganjani.",
-      "story":[
-        "Legal information is difficult to navigate when it is scattered across documents or written in unfamiliar language. This project explores a bilingual assistant for finding and working with relevant Tanzanian legal information.",
-        "The engineering focus is the connection between document retrieval and a useful response: processing source material, finding relevant context, and presenting an answer in English or Swahili. It is an information assistant, not a substitute for professional legal advice.",
-        "My contribution sits in backend and AI development during practical training. The broader system discussions covered document handling, authentication, conversation history, and language-model integration. Exact implementation attribution still needs a final review.",
-        "[CONFIRM] The final model, retrieval stack, deployment status, permission to share screenshots, and team attribution. No public adoption or law-firm deployment is claimed here."
+      "legacy": "stimulate",
+      "slug": "wakili-msomi",
+      "oldName": "Stimulate",
+      "name": "Wakili Msomi",
+      "shortName": "Wakili",
+      "tags": [
+        "Full-stack",
+        "Legal AI",
+        "Swahili"
       ],
-      "stack":["Python","Document processing","Retrieval","LLM integration","English / Swahili"],
-      "flow":["Legal documents","Retrieval","Relevant context","Bilingual response"],
-      "role":"Backend & AI development; team attribution to confirm","status":"Project work; public deployment unconfirmed"
+      "color": "#cbd4ee",
+      "ink": "#243451",
+      "summary": "Wakili Msomi is an AI-powered legal-information application for the Tanzanian context. I worked on both its frontend and backend, connecting the user-facing experience with the services behind it.",
+      "story": [
+        "The application brings legal-information assistance and document workflows into a digital interface for Tanzanian users.",
+        "My contribution covered both frontend and backend development, rather than only the AI layer. The interface and its underlying services are part of the same product experience.",
+        "The work builds on my practical-training experience at Bluefin Solutions in collaboration with Sheria Kiganjani, with English and Swahili users in mind.",
+        "The linked public application currently presents sign-in and registration. The screenshot shows that public entry point, without exposing private conversations or documents."
+      ],
+      "stack": [
+        "Frontend",
+        "Backend APIs",
+        "Document processing",
+        "Retrieval",
+        "AI integration"
+      ],
+      "flow": [
+        "User interface",
+        "Application APIs",
+        "Relevant information",
+        "AI assistance"
+      ],
+      "role": "Frontend & backend development",
+      "status": "Public application sign-in available",
+      "url": "https://wakilimsomi.sheriakiganjani.co.tz/",
+      "cover": "/assets/personal/wakili-msomi-live.png",
+      "sections": [
+        "Product experience",
+        "Frontend & backend"
+      ]
     },
     {
-      "legacy":"artem-astakhov","slug":"rag-platform","oldName":"Artem Astakhov","name":"Multi-tenant RAG","shortName":"RAG","tags":["AI systems","Retrieval","Backend"],"color":"#ddd4eb","ink":"#463459",
-      "summary":"A retrieval backend for knowledge-aware AI assistants, with separate document collections and configurable assistant behavior. The focus is document ingestion, tenant isolation, and bringing the right context into a language-model response.",
-      "story":[
-        "An assistant becomes more useful when it can work with an organization's own information. The challenge is to make documents searchable while keeping one tenant's knowledge separate from another's.",
-        "The ingestion workflow takes source documents, extracts their text, splits it into chunks, and indexes it for semantic retrieval. At query time, the system retrieves relevant context before asking a language model to respond.",
-        "The technical direction uses Python, Weaviate, LangChain, and model APIs. Configurable assistant behavior and optional citations make the retrieval layer adaptable to different knowledge collections.",
-        "My focus is the backend and AI workflow: how material enters the system, how it is separated, and how retrieved context reaches the assistant. The diagram shows the conceptual flow, not a production benchmark.",
-        "[CONFIRM] Repository sharing permission and current deployment status. There are no claims here about organizations served, production throughput, or measured retrieval quality."
+      "legacy": "artem-astakhov",
+      "slug": "globoexpats",
+      "oldName": "Artem Astakhov",
+      "name": "GloboExpats",
+      "shortName": "Globo",
+      "tags": [
+        "Frontend",
+        "Marketplace",
+        "Web app"
       ],
-      "stack":["Python","Weaviate","LangChain","Document loaders","Model APIs"],
-      "flow":["Documents","Chunk & index","Tenant retrieval","Context-aware answer"],
-      "role":"Backend & AI system development","status":"Development work; production availability unconfirmed"
+      "color": "#ddd4eb",
+      "ink": "#463459",
+      "summary": "GloboExpats is a marketplace for the expat community in Tanzania. My work is mainly on the frontend: the interfaces people use to browse, discover, buy, and sell.",
+      "story": [
+        "The public marketplace brings goods, services, homes, vehicles, and community requests into a browsing experience centered on Dar es Salaam.",
+        "My contribution is mainly frontend development, working on the interfaces people use to explore the marketplace and move between product workflows.",
+        "The interface brings together category browsing, listings, seller information, and the paths into buying and selling.",
+        "For a marketplace, frontend work is about helping people understand what is available and move naturally from browsing into the next step.",
+        "The screenshot is from the live public marketplace. The link opens GloboExpats directly."
+      ],
+      "stack": [
+        "Frontend development",
+        "Responsive UI",
+        "Marketplace workflows",
+        "API integration"
+      ],
+      "flow": [
+        "Browse categories",
+        "Explore listings",
+        "Seller information",
+        "User action"
+      ],
+      "role": "Mainly frontend development",
+      "status": "Public marketplace",
+      "url": "https://globoexpats.com/",
+      "cover": "/assets/personal/globoexpats-live.png",
+      "sections": [
+        "Frontend experience"
+      ]
     },
     {
-      "legacy":"reward-point","slug":"energyopt","oldName":"Reward Point","name":"EnergyOpt","shortName":"EnergyOpt","tags":["Data","Analytics","Backend"],"color":"#ecd6ad","ink":"#584329",
-      "summary":"An energy-data analysis workflow that turns uploaded electrical measurements into structured information for dashboards. The backend work centers on file ingestion, column mapping, normalization, and analysis over time.",
-      "story":[
-        "Raw electrical data is not immediately useful. Files arrive with different column names and formats, and measurements need to be mapped and normalized before they can support meaningful analysis.",
-        "The backend workflow handles CSV and spreadsheet ingestion, maps timestamp and measurement columns, and prepares data for hourly, daily, and weekly views. The goal is to make consumption patterns and periods of high demand easier to inspect.",
-        "[CONFIRM] Current demo, deployment status, and the final database configuration. This is backend and analytics development; commercial use and measurable energy savings have not been verified."
+      "legacy": "reward-point",
+      "slug": "habitek",
+      "oldName": "Reward Point",
+      "name": "Habitek",
+      "shortName": "Habitek",
+      "tags": [
+        "Full-stack",
+        "Property",
+        "Web app"
       ],
-      "stack":["Python","FastAPI","Data processing","CSV / Excel","Dashboard APIs"],
-      "flow":["Measurement files","Map columns","Normalize & analyze","Dashboard data"],
-      "role":"Backend & analytics development","status":"Development work; deployment status to confirm"
+      "color": "#ecd6ad",
+      "ink": "#584329",
+      "summary": "Habitek combines property discovery with property and hospitality management in Tanzania. I worked on both the frontend and backend of the platform.",
+      "story": [
+        "The public experience helps people explore places to live or work, while the management side brings properties, units, tenants, and everyday operations together.",
+        "My contribution covers frontend and backend development: the interfaces and the application services that support them.",
+        "The linked website and captured preview show the public property-discovery experience. Internal management data and account screens are not included."
+      ],
+      "stack": [
+        "Frontend development",
+        "Backend services",
+        "Property workflows",
+        "Application APIs"
+      ],
+      "flow": [
+        "Property discovery",
+        "User interface",
+        "Backend services",
+        "Management workflows"
+      ],
+      "role": "Frontend & backend development",
+      "status": "Public property platform",
+      "url": "https://habitek.co.tz/",
+      "cover": "/assets/personal/habitek-live.png",
+      "sections": [
+        "Frontend & backend"
+      ]
     },
     {
-      "legacy":"dibsy","slug":"marketplace","oldName":"Dibsy","name":"Marketplace systems","shortName":"Commerce","tags":["Commerce","Payments","APIs"],"color":"#c5ddd6","ink":"#254c44",
-      "summary":"Backend work and system planning for marketplace products: seller roles, product operations, inventory, and local payment workflows. The focus is on clear permissions, useful APIs, and transaction tracking for Tanzanian businesses.",
-      "story":[
-        "A marketplace connects several different workflows: what a customer sees, what a seller manages, and what an administrator needs to reconcile. A useful backend keeps those responsibilities clear.",
-        "My work has included product-management APIs, seller and administrator roles, authentication, and payment-integration planning. Local payment and messaging requirements shape the design alongside the core commerce data model.",
-        "Related exploration includes ClickPesa, Selcom, Beem SMS, and fiscal-receipt requirements. These are separate integration contexts, not a claim that one completed platform already runs every service.",
-        "[CONFIRM] Which work can be named publicly, my exact role on OsherCRM / Osher Market, and which integrations are implemented versus proposed. No licensed payment gateway, operational escrow system, or verified client outcome is claimed."
+      "legacy": "dibsy",
+      "slug": "osher-market",
+      "oldName": "Dibsy",
+      "name": "Osher Market",
+      "shortName": "Osher",
+      "tags": [
+        "Backend",
+        "Commerce",
+        "APIs"
       ],
-      "stack":["Python","REST APIs","Authentication","Seller roles","Payment APIs"],
-      "flow":["Seller operations","Role-based APIs","Orders & payments","Reconciliation"],
-      "role":"Backend development & system planning","status":"Project and integration status varies; details to confirm"
+      "color": "#c5ddd6",
+      "ink": "#254c44",
+      "summary": "Osher Market is a commerce and business platform. My contribution is backend development: the application services behind the marketplace experience.",
+      "story": [
+        "The public storefront organizes products into categories and gives buyers and sellers an entry point into the platform.",
+        "My contribution is backend development. The public storefront preview shows the product that those application services support.",
+        "This work sits behind the interface, in the services and application logic that support a commerce product.",
+        "The live link opens Osher Market. Detailed internal service design can be discussed in a project enquiry without publishing private operational information."
+      ],
+      "stack": [
+        "Backend development",
+        "Application services",
+        "Commerce workflows",
+        "APIs"
+      ],
+      "flow": [
+        "Storefront requests",
+        "Application APIs",
+        "Business logic",
+        "Commerce data"
+      ],
+      "role": "Backend development",
+      "status": "Public commerce platform",
+      "url": "https://oshermarket.com/",
+      "cover": "/assets/personal/osher-market-live.png",
+      "sections": [
+        "Backend services",
+        "Commerce workflows"
+      ]
     },
     {
-      "legacy":"caldera","slug":"infrastructure","oldName":"Caldera","name":"Infrastructure & DevOps","shortName":"Infrastructure","tags":["Docker","Linux","Deployment"],"color":"#d2d7de","ink":"#303c4a",
-      "summary":"Deploying and operating applications with Docker, nginx, PostgreSQL, and Linux. This work covers service configuration, reverse proxies, health checks, and the troubleshooting needed to keep the pieces talking to one another.",
-      "story":[
-        "A backend needs more than working endpoints. Routing, containers, database connections, certificates, and health checks all have to work together when an application leaves a development machine.",
-        "My infrastructure work includes Docker-based services, nginx and reverse proxies, Linux administration, and application troubleshooting. In lab work, I have investigated how network configuration and health checks affect service availability.",
-        "The useful part of this work is often unglamorous: isolate a failure, understand which layer owns it, make the smallest reliable fix, and check that the service behaves as expected afterwards.",
-        "[CONFIRM] The public name and purpose of the A.M.A.R.M.S lab project and which deployment details can be shared. Internal hostnames, customer data, credentials, and server configurations are not published here."
+      "legacy": "caldera",
+      "slug": "falco",
+      "oldName": "Caldera",
+      "name": "Falco management backend",
+      "shortName": "Falco",
+      "tags": [
+        "Backend",
+        "Internal systems",
+        "Business"
       ],
-      "stack":["Docker","nginx","Linux","FastAPI","PostgreSQL","Reverse proxies"],
-      "flow":["Incoming request","Reverse proxy","Application service","Database"],
-      "role":"Application deployment & infrastructure troubleshooting","status":"Ongoing engineering work; sanitized overview"
+      "color": "#d2d7de",
+      "ink": "#303c4a",
+      "summary": "Falco management backend supports internal management workflows. I contributed backend development for the company, separately from its public marketing website.",
+      "story": [
+        "This project centers on an internal business-management system, rather than a public-facing website.",
+        "My contribution is backend development for management workflows and the application logic behind them.",
+        "The visual is a conceptual backend sketch, not a screenshot of Falco's internal system. It contains no real accounts, records, or operational data.",
+        "The external link is Falco's public company website for context. It should not be read as a claim that I built that website or its frontend."
+      ],
+      "stack": [
+        "Backend development",
+        "Internal systems",
+        "Management workflows",
+        "Business logic"
+      ],
+      "flow": [
+        "Internal requests",
+        "Management services",
+        "Business rules",
+        "Operational records"
+      ],
+      "role": "Internal management backend development",
+      "status": "Internal management-system work",
+      "url": "https://falco.co.tz/",
+      "cover": null,
+      "sections": [
+        "Management backend"
+      ]
     },
     {
-      "legacy":"ruby","slug":"robotics","oldName":"Ruby","name":"Robotics & experiments","shortName":"Robotics","tags":["Computer vision","AI","Exploration"],"color":"#e1cec0","ink":"#594237",
-      "summary":"Exploring the point where software meets the physical world: computer vision, voice interfaces, robotics integration, and experiments at the UDSM 3D Solutions & Robotics Lab. This is a space for prototypes and learning.",
-      "story":[
-        "I chair the 3D Solutions & Robotics Lab at UDSM CoICT. The lab connects interests in software, prototyping, AI, and physical computing, with room to test ideas beyond a browser window.",
-        "My technical explorations include MediaPipe and OpenCV for webcam-based interaction, along with ideas for conversational interfaces and Swahili-language interaction. These are experiments, not finished autonomous robotics products.",
-        "Curiosity is the common thread: start with a question, build a small version, see what fails, and use that feedback to decide what to try next. The technical sketches stand in for photos and demonstrations that still need to be selected.",
-        "[CONFIRM] Lab leadership dates, the public scope of individual experiments, and permission to share lab photographs or demos. Personal contributions should remain distinct from the lab team's work."
+      "legacy": "ruby",
+      "slug": "tanstack-tanzania",
+      "oldName": "Ruby",
+      "name": "TanStack Tanzania",
+      "shortName": "TanStack",
+      "tags": [
+        "Backend",
+        "Community",
+        "Platform"
       ],
-      "stack":["Python","MediaPipe","OpenCV","Voice interfaces","Prototyping"],
-      "flow":["Camera / voice input","Perception","Application logic","Human interaction"],
-      "role":"Lab chairperson & software experimentation","status":"Exploration and prototypes"
+      "color": "#e1cec0",
+      "ink": "#594237",
+      "summary": "TanStack Tanzania connects tech students with opportunities, learning resources, and career support. I worked on its backend as part of our lab's project work.",
+      "story": [
+        "The platform brings opportunities, resources, a company directory, and CV support into one place for Tanzanian tech students.",
+        "My contribution is backend development for the platform. The public preview gives context to the student-facing product.",
+        "TanStack is one of the projects associated with our work at the 3D Solutions & Robotics Lab, alongside Nena AI.",
+        "The live website is available at tanstack.co.tz. The screenshot shows its public interface; individual student records and private account information are not shown."
+      ],
+      "stack": [
+        "Backend development",
+        "Platform services",
+        "Community workflows",
+        "APIs"
+      ],
+      "flow": [
+        "Student requests",
+        "Platform APIs",
+        "Resources & opportunities",
+        "Career support"
+      ],
+      "role": "Backend development · Lab project",
+      "status": "Public student-career platform",
+      "url": "https://tanstack.co.tz/",
+      "cover": "/assets/personal/tanstack-live.png",
+      "sections": [
+        "Platform backend"
+      ]
     }
   ],
   "reviewNotes": [
-    "Display name is Isack Lugata; the full name is retained for formal use.",
-    "Primary audience is freelance clients and project enquiries, as confirmed in this chat.",
-    "BSc Computer Science, UDSM (2026): formal degree conferral remains unconfirmed.",
-    "Do not publish either phone number, grant amounts, adoption metrics, or pilot targets without confirmation.",
-    "GitHub account name matches Isack Lugata. Ecofy's supplied .africa domain did not resolve during verification, so no live demo link is shown.",
-    "Project visuals are illustrative technical sketches, not screenshots, product evidence, or representations of production deployments.",
-    "No old résumé is linked. The résumé action requests a current CV by email.",
-    "Replace the project sketches with reviewed screenshots and add a current engineering CV when available."
-  ]
+    "User confirmed frontend and backend work at Ecofy, Wakili Msomi, and Habitek; mainly frontend at GloboExpats; backend at Osher, TanStack, robotics, and Falco’s internal management system.",
+    "User confirmed that the robotics chairperson role is a previous role. The public lab site may still show an older current-chairperson label; the portfolio follows the user’s correction.",
+    "All eight supplied public project domains were opened successfully. Public screenshots document the public interface only, not private systems or the full scope of individual ownership.",
+    "Falco’s card uses a conceptual backend sketch. Its public company website is linked for context, not represented as Isack’s frontend work.",
+    "Frontend and mobile applications are offered as services. No specific mobile framework, app-store release, or mobile contribution to an individual listed project is invented.",
+    "Nena AI is attributed as a team lab project. A standalone public demo or repository was not supplied.",
+    "Formal degree conferral, exact historical role dates, phone number, grant amounts, and adoption metrics remain unconfirmed and are not invented.",
+    "A current engineering résumé is still requested by email; the old CV is not published."
+  ],
+  "title": "Full-stack & Mobile Developer · Applied AI",
+  "lab": {
+    "name": "3D Solutions & Robotics Lab",
+    "url": "https://robotics.udsm.ac.tz/",
+    "role": "Former chairperson · Backend development",
+    "cover": "/assets/personal/robotics-live.png",
+    "description": "I am the former chairperson of the 3D Solutions & Robotics Lab at UDSM CoICT. I contributed backend work, and our team worked on projects including Nena AI and TanStack Tanzania.",
+    "nena": {
+      "name": "Nena AI",
+      "description": "A Swahili text-to-speech project developed by our lab team, turning text into Tanzanian Swahili speech."
+    }
+  }
 }

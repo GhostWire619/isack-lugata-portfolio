@@ -2,7 +2,7 @@
   "name": "isack-lugata-portfolio",
   "private": true,
   "version": "1.0.0",
-  "description": "Isack Lugata's freelance backend and applied AI portfolio, preserving the reference presentation and motion.",
+  "description": "Isack Lugata's freelance portfolio: frontend, mobile, backend, and applied AI.",
   "type": "module",
   "scripts": {
     "dev": "node server.mjs",
