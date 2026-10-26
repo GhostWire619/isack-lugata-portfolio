@@ -1,0 +1,18 @@
+
+/* Small content-specific corrections; the original Framer layout and motion remain. */
+a[href="#unused-social"], div[class*="-container"]:has(>a[href="#unused-social"]) { display:none !important; }
+video { object-fit:cover !important; visibility:hidden !important; }
+img[src^="/assets/personal/"][src$=".svg"] { object-fit:contain !important; object-position:center !important; }
+[data-framer-name="cards"] > [data-framer-name="block"] > :nth-child(n+3) { display:none !important; }
+.personal-confirmation { border-left:2px solid currentColor; padding-left:16px; opacity:.7; }
+@media (prefers-reduced-motion:reduce) {
+  html { scroll-behavior:auto !important; }
+  *, *::before, *::after { animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; }
+}
+a[href="./ecofy"] [data-framer-name="cover"] { background:#dbe6a0; }
+a[href="./wakili-msomi"] [data-framer-name="cover"] { background:#cbd4ee; }
+a[href="./rag-platform"] [data-framer-name="cover"] { background:#ddd4eb; }
+a[href="./energyopt"] [data-framer-name="cover"] { background:#ecd6ad; }
+a[href="./marketplace"] [data-framer-name="cover"] { background:#c5ddd6; }
+a[href="./infrastructure"] [data-framer-name="cover"] { background:#d2d7de; }
+a[href="./robotics"] [data-framer-name="cover"] { background:#e1cec0; }

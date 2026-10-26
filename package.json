@@ -1,12 +1,13 @@
 {
-  "name": "daniel-sun-portfolio-clone",
+  "name": "isack-lugata-portfolio",
   "private": true,
   "version": "1.0.0",
-  "description": "Faithful local capture of the Daniel Sun portfolio with original published motion and assets.",
+  "description": "Isack Lugata's freelance backend and applied AI portfolio, preserving the reference presentation and motion.",
   "type": "module",
   "scripts": {
     "dev": "node server.mjs",
     "start": "node server.mjs",
-    "refresh": "python scripts/mirror.py"
+    "content": "python scripts/personalize.py",
+    "capture:reference": "python scripts/mirror.py"
   }
 }

@@ -1,42 +1,55 @@
-# Daniel Sun portfolio replica
+# Isack Lugata — portfolio
 
-A faithful capture of https://danielsun.space/, retrieved on October 26, 2026. The original published HTML, styling, fonts, images, video, Lottie files, and Framer animation runtime are retained. Assets and runtime modules are served locally. The original analytics script and editor preload are removed.
+A freelance-focused portfolio for Isack Lugata, a backend and applied AI engineer in Dar es Salaam, Tanzania. The presentation retains the reference site's typography, responsive layouts, tactile project cards, animated navigation, character reveals, and motion runtime.
 
-## Run
+## Run locally
 
-Requires Node.js. No package installation is needed.
+Requires Node.js; no npm packages are needed to serve the site.
 
 ```sh
 npm run dev
 ```
 
-Open http://localhost:5173. Set `PORT` to use a different port.
+Open http://localhost:5173. Set `PORT` to change the port.
 
-## Contents
+## Edit the content
 
-- `dist/index.html`: home page.
-- `dist/about.html`: Story page.
-- `dist/{clerk,dibsy,stimulate,caldera,reward-point,ruby,artem-astakhov}.html`: seven project pages.
-- `dist/404.html` and `dist/test-1.html`: additional published pages.
-- `dist/assets/`: original published assets and modules.
-- `asset-manifest.json`: source URLs, local file names, and download sizes.
-- `server.mjs`: static server with extensionless routes and video range requests.
-- `scripts/mirror.py`: repeatable capture and URL rewriting workflow. Requires Python 3.
-
-## Refresh
+The editable content is in `content/portfolio.json`. It contains the identity, introduction, services, seven project summaries, case-study narratives, technical stacks, and review notes. After editing it, run:
 
 ```sh
-npm run refresh
+npm run content
 ```
 
-This replaces the captured pages with the current public versions. The ignored `.mirror-cache/` stores downloaded originals; remove that folder before refreshing if you need to re-fetch all remote assets.
+Content generation requires Python 3 with Beautiful Soup 4 (`beautifulsoup4`). It reads the immutable reference capture from Git commit `d644207659b68a8a866714bf4216042a9229802a`, applies personal content to both static HTML and hydrated Framer modules, and generates technical sketches. Keep that commit in the repository's history.
 
-## Editing and scope
+The original files are compiled Framer output, rather than an editable Framer canvas. The content layer makes the personalized material easier to maintain without replacing the layout and motion system.
 
-This is the deployed site's captured output, including its compiled Framer modules. It is not the original editable Framer canvas or an uncompiled component project. HTML and CSS can be edited directly; changes to hydrated components may also require changing their compiled modules.
+## Pages
 
-The original names, contact addresses, project descriptions, social links, and external CV link are intentionally preserved to match the reference. External destination links continue to point to the original destinations.
+- `/`: home, selected projects, services, experiments, and contact.
+- `/about`: personal story and experience.
+- `/ecofy`: agricultural intelligence and applied AI.
+- `/wakili-msomi`: bilingual legal-information assistant.
+- `/rag-platform`: multi-tenant retrieval backend.
+- `/energyopt`: energy-data analysis.
+- `/marketplace`: marketplace and payment workflows.
+- `/infrastructure`: deployment and operations.
+- `/robotics`: lab leadership and technical exploration.
+
+Old template routes remain usable as aliases with personalized content. `/test-1` serves the personalized homepage. `/404` retains the reference's error presentation with updated contact information.
+
+## Editorial choices and remaining details
+
+The primary goal is freelance clients and project enquiries, as confirmed by Isack. Both supplied briefs informed the content. Conflicting funding amounts, unverified user counts, pilot targets, phone numbers, and original-template client relationships are excluded.
+
+The public GitHub account name matches Isack Lugata. Its public avatar appears on the Story page. New project visuals are labeled illustrative technical sketches, rather than product screenshots or evidence of production deployments. The client's logos are replaced with a technology marquee. Original showreel footage is hidden and replaced with technical sketches in the same motion containers. Long design galleries are curated to a smaller set of engineering diagrams.
+
+Case studies contain visible `[CONFIRM]` notes for unresolved attribution, deployment status, and sharing permissions. Unknown dates remain marked for confirmation. Formal degree conferral is not asserted. The old CV download is replaced by an email request for a current engineering CV.
+
+See `content/REVIEW.md` for remaining review items. Add reviewed project screenshots and an up-to-date résumé when available.
 
 ## Verification
 
-The home page, Story navigation, and Clerk project navigation were checked in the browser. Fonts, project imagery, motion runtime, and page transitions rendered without browser warnings or errors in those checks. All captured page routes and downloaded asset routes were checked over local HTTP. This does not assert an automated pixel comparison at every screen size.
+Check the homepage, Story navigation, project cards, clean project routes, back navigation, contact links, and image loading after changing content. Because content appears in both HTML and hydrated modules, regenerate both with `npm run content`.
+
+`scripts/mirror.py` is retained for provenance. `npm run capture:reference` captures the reference again and overwrites generated files; it is not the content-editing command.

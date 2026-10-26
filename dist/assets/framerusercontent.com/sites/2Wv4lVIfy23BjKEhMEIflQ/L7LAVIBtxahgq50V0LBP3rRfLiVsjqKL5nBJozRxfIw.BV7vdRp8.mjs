@@ -1,47 +1,47 @@
-import{n as e}from"./rolldown-runtime.BgaNhQyE.mjs";async function t(e,t,i){let a=r[e],o=a?await a(t,i):void 0,s={bodyEnd:[],bodyStart:[],headEnd:[],headStart:[]};for(let t of n){if(t.pageIds&&!t.pageIds.has(e))continue;let n=t.code(o);n&&s[t.placement].push({...t,code:n})}return s}var n,r,i,a;e((()=>{n=[{code:e=>`<meta name="p:domain_verify" content="c530996c8a764740c1d0044b11f5bc3b"/>`,id:`sOW9zLbFN`,loadMode:`always`,name:`Pinterest Site Verification`,placement:`headStart`},{code:e=>`<script type="application/ld+json">
+import{n as e}from"./rolldown-runtime.BgaNhQyE.mjs";async function t(e,t,i){let a=r[e],o=a?await a(t,i):void 0,s={bodyEnd:[],bodyStart:[],headEnd:[],headStart:[]};for(let t of n){if(t.pageIds&&!t.pageIds.has(e))continue;let n=t.code(o);n&&s[t.placement].push({...t,code:n})}return s}var n,r,i,a;e((()=>{n=[{code:e=>``,id:`sOW9zLbFN`,loadMode:`always`,name:`Pinterest Site Verification`,placement:`headStart`},{code:e=>`<script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@graph": [
     {
       "@type": "WebSite",
-      "@id": "https://danielsun.space/#website",
-      "url": "https://danielsun.space/",
-      "name": "Daniel Sun",
+      "@id": "https://daniel-sun-portfolio-replica.darkseed8192.chatgpt.site/#website",
+      "url": "https://daniel-sun-portfolio-replica.darkseed8192.chatgpt.site/",
+      "name": "Isack Lugata",
       "description": "Web and brand designer for SaaS and Web3 founders. Identities and websites founders can finally be proud of.",
       "inLanguage": "en",
-      "publisher": { "@id": "https://danielsun.space/#daniel" },
-      "about": { "@id": "https://danielsun.space/#daniel" }
+      "publisher": { "@id": "https://daniel-sun-portfolio-replica.darkseed8192.chatgpt.site/#daniel" },
+      "about": { "@id": "https://daniel-sun-portfolio-replica.darkseed8192.chatgpt.site/#daniel" }
     },
     {
       "@type": "ProfilePage",
-      "@id": "https://danielsun.space/#profilepage",
-      "url": "https://danielsun.space/",
-      "name": "Daniel Sun — Web & brand designer for SaaS and Web3 founders",
-      "isPartOf": { "@id": "https://danielsun.space/#website" },
+      "@id": "https://daniel-sun-portfolio-replica.darkseed8192.chatgpt.site/#profilepage",
+      "url": "https://daniel-sun-portfolio-replica.darkseed8192.chatgpt.site/",
+      "name": "Isack Lugata — Backend & applied AI engineer in Tanzania",
+      "isPartOf": { "@id": "https://daniel-sun-portfolio-replica.darkseed8192.chatgpt.site/#website" },
       "dateModified": "2026-08-16T00:00:00+00:00",
       "inLanguage": "en",
-      "primaryImageOfPage": { "@id": "https://danielsun.space/#primaryimage" },
-      "mainEntity": { "@id": "https://danielsun.space/#daniel" }
+      "primaryImageOfPage": { "@id": "https://daniel-sun-portfolio-replica.darkseed8192.chatgpt.site/#primaryimage" },
+      "mainEntity": { "@id": "https://daniel-sun-portfolio-replica.darkseed8192.chatgpt.site/#daniel" }
     },
     {
       "@type": "ImageObject",
-      "@id": "https://danielsun.space/#primaryimage",
+      "@id": "https://daniel-sun-portfolio-replica.darkseed8192.chatgpt.site/#primaryimage",
       "url": "/assets/framerusercontent.com/images/lbsbUx2GE8xpHox9nbxwXz4J8.png",
       "width": 2400,
       "height": 1260,
-      "caption": "Daniel Sun — web and brand designer"
+      "caption": "Isack Lugata — web and brand designer"
     },
     {
       "@type": "Person",
-      "@id": "https://danielsun.space/#daniel",
-      "name": "Daniel Sun",
+      "@id": "https://daniel-sun-portfolio-replica.darkseed8192.chatgpt.site/#daniel",
+      "name": "Isack Lugata",
       "givenName": "Daniel",
       "familyName": "Sun",
       "jobTitle": "Senior Web & Brand Designer",
-      "description": "Daniel Sun is a senior web and brand designer for SaaS and Web3 founders, with 6+ years designing identities, websites, and visual systems for tech companies from seed to Series C. He works across fintech, developer tools, Web3, and SaaS, and builds what he designs in Framer and Webflow. Based in Valencia, Spain.",
-      "image": { "@id": "https://danielsun.space/#primaryimage" },
-      "url": "https://danielsun.space/",
-      "email": "mailto:hello@danielsun.space",
+      "description": "Isack Lugata is a senior web and brand designer for SaaS and Web3 founders, with 6+ years designing identities, websites, and visual systems for tech companies from seed to Series C. He works across fintech, developer tools, Web3, and SaaS, and builds what he designs in Framer and Webflow. Based in Valencia, Spain.",
+      "image": { "@id": "https://daniel-sun-portfolio-replica.darkseed8192.chatgpt.site/#primaryimage" },
+      "url": "https://daniel-sun-portfolio-replica.darkseed8192.chatgpt.site/",
+      "email": "mailto:lugata619@gmail.com",
       "address": {
         "@type": "PostalAddress",
         "addressLocality": "Valencia",
@@ -53,42 +53,42 @@ import{n as e}from"./rolldown-runtime.BgaNhQyE.mjs";async function t(e,t,i){let 
         "address": { "@type": "Country", "name": "Spain" }
       },
       "knowsAbout": [
-        "Brand identity design",
-        "Web design",
+        "Payments & messaging design",
+        "Backend & APIs",
         "Framer development",
         "Webflow development",
-        "Illustration",
+        "Deployment & infrastructure",
         "Design systems",
         "Visual identity",
-        "Marketing design",
+        "Product design",
         "SaaS",
         "Web3",
         "Fintech",
         "Developer tools",
         "Startup branding"
       ],
-      "worksFor": { "@id": "https://danielsun.space/#service" },
+      "worksFor": { "@id": "https://daniel-sun-portfolio-replica.darkseed8192.chatgpt.site/#service" },
       "sameAs": [
-        "https://x.com/danielsun_ui",
-        "https://www.linkedin.com/in/daniel-sun-design/",
-        "https://dribbble.com/daniel_sun",
-        "https://www.instagram.com/daniel.sun_design/",
-        "https://www.threads.com/@daniel.sun_design",
+        "https://github.com/GhostWire619",
+        "https://www.linkedin.com/in/isack-lugata-a6356531a/",
+        "#unused-social",
+        "mailto:lugata619@gmail.com",
+        "https://3drobotics.space",
         "https://pinterest.com/danielsundesign/"
       ]
     },
     {
       "@type": ["Organization", "ProfessionalService"],
-      "@id": "https://danielsun.space/#service",
-      "name": "Daniel Sun — Web & Brand Design",
-      "alternateName": "Daniel Sun Design",
-      "url": "https://danielsun.space/",
-      "logo": { "@id": "https://danielsun.space/#primaryimage" },
-      "image": { "@id": "https://danielsun.space/#primaryimage" },
-      "description": "Brand identity, web design, development, and illustration for SaaS and Web3 startups, from seed to Series C.",
-      "founder": { "@id": "https://danielsun.space/#daniel" },
-      "employee": { "@id": "https://danielsun.space/#daniel" },
-      "email": "mailto:hello@danielsun.space",
+      "@id": "https://daniel-sun-portfolio-replica.darkseed8192.chatgpt.site/#service",
+      "name": "Isack Lugata — Web & Brand Design",
+      "alternateName": "Isack Lugata Design",
+      "url": "https://daniel-sun-portfolio-replica.darkseed8192.chatgpt.site/",
+      "logo": { "@id": "https://daniel-sun-portfolio-replica.darkseed8192.chatgpt.site/#primaryimage" },
+      "image": { "@id": "https://daniel-sun-portfolio-replica.darkseed8192.chatgpt.site/#primaryimage" },
+      "description": "Payments & messaging, web design, development, and illustration for SaaS and Web3 startups, from seed to Series C.",
+      "founder": { "@id": "https://daniel-sun-portfolio-replica.darkseed8192.chatgpt.site/#daniel" },
+      "employee": { "@id": "https://daniel-sun-portfolio-replica.darkseed8192.chatgpt.site/#daniel" },
+      "email": "mailto:lugata619@gmail.com",
       "priceRange": "$$$",
       "address": {
         "@type": "PostalAddress",
@@ -97,9 +97,9 @@ import{n as e}from"./rolldown-runtime.BgaNhQyE.mjs";async function t(e,t,i){let 
       },
       "areaServed": { "@type": "Place", "name": "Worldwide" },
       "sameAs": [
-        "https://x.com/danielsun_ui",
-        "https://www.linkedin.com/in/daniel-sun-design/",
-        "https://dribbble.com/daniel_sun"
+        "https://github.com/GhostWire619",
+        "https://www.linkedin.com/in/isack-lugata-a6356531a/",
+        "#unused-social"
       ],
       "hasOfferCatalog": {
         "@type": "OfferCatalog",
@@ -109,36 +109,36 @@ import{n as e}from"./rolldown-runtime.BgaNhQyE.mjs";async function t(e,t,i){let 
             "@type": "Offer",
             "itemOffered": {
               "@type": "Service",
-              "name": "Web design",
+              "name": "Backend & APIs",
               "description": "Site structure, navigation, and every UI element built around the single decision you want a visitor to make.",
-              "provider": { "@id": "https://danielsun.space/#daniel" }
+              "provider": { "@id": "https://daniel-sun-portfolio-replica.darkseed8192.chatgpt.site/#daniel" }
             }
           },
           {
             "@type": "Offer",
             "itemOffered": {
               "@type": "Service",
-              "name": "Development",
+              "name": "Applied AI",
               "description": "Building the design in Framer or Webflow, handed over so the team can edit it without opening an engineering ticket.",
-              "provider": { "@id": "https://danielsun.space/#daniel" }
+              "provider": { "@id": "https://daniel-sun-portfolio-replica.darkseed8192.chatgpt.site/#daniel" }
             }
           },
           {
             "@type": "Offer",
             "itemOffered": {
               "@type": "Service",
-              "name": "Brand identity",
+              "name": "Payments & messaging",
               "description": "Logo, type, color, patterns, and marketing collateral built as one system, handed over as a guide the team can actually use.",
-              "provider": { "@id": "https://danielsun.space/#daniel" }
+              "provider": { "@id": "https://daniel-sun-portfolio-replica.darkseed8192.chatgpt.site/#daniel" }
             }
           },
           {
             "@type": "Offer",
             "itemOffered": {
               "@type": "Service",
-              "name": "Illustration",
+              "name": "Deployment & infrastructure",
               "description": "Custom icons, product visuals, isometric scenes, and conceptual pieces.",
-              "provider": { "@id": "https://danielsun.space/#daniel" }
+              "provider": { "@id": "https://daniel-sun-portfolio-replica.darkseed8192.chatgpt.site/#daniel" }
             }
           }
         ]
@@ -146,18 +146,18 @@ import{n as e}from"./rolldown-runtime.BgaNhQyE.mjs";async function t(e,t,i){let 
     },
     {
       "@type": "ItemList",
-      "@id": "https://danielsun.space/#work",
+      "@id": "https://daniel-sun-portfolio-replica.darkseed8192.chatgpt.site/#work",
       "name": "Selected work",
       "itemListOrder": "https://schema.org/ItemListOrderAscending",
       "numberOfItems": 7,
       "itemListElement": [
-        { "@type": "ListItem", "position": 1, "item": { "@type": "CreativeWork", "name": "Clerk", "url": "https://danielsun.space/clerk", "creator": { "@id": "https://danielsun.space/#daniel" }, "about": "Web design and marketing design for a San Francisco developer-tools company" } },
-        { "@type": "ListItem", "position": 2, "item": { "@type": "CreativeWork", "name": "Dibsy", "url": "https://danielsun.space/dibsy", "creator": { "@id": "https://danielsun.space/#daniel" }, "about": "Brand identity and bilingual platform design for a Qatari fintech" } },
-        { "@type": "ListItem", "position": 3, "item": { "@type": "CreativeWork", "name": "Stimulate", "url": "https://danielsun.space/stimulate", "creator": { "@id": "https://danielsun.space/#daniel" }, "about": "Branding, web design, and development" } },
-        { "@type": "ListItem", "position": 4, "item": { "@type": "CreativeWork", "name": "Caldera", "url": "https://danielsun.space/caldera", "creator": { "@id": "https://danielsun.space/#daniel" }, "about": "Branding and platform design for a blockchain infrastructure network" } },
-        { "@type": "ListItem", "position": 5, "item": { "@type": "CreativeWork", "name": "Reward Point", "url": "https://danielsun.space/reward-point", "creator": { "@id": "https://danielsun.space/#daniel" }, "about": "Branding and platform design" } },
-        { "@type": "ListItem", "position": 6, "item": { "@type": "CreativeWork", "name": "Ruby", "url": "https://danielsun.space/ruby", "creator": { "@id": "https://danielsun.space/#daniel" }, "about": "Branding, web design, and development" } },
-        { "@type": "ListItem", "position": 7, "item": { "@type": "CreativeWork", "name": "Artem Astakhov", "url": "https://danielsun.space/artem-astakhov", "creator": { "@id": "https://danielsun.space/#daniel" }, "about": "Web design and development for a personal brand site" } }
+        { "@type": "ListItem", "position": 1, "item": { "@type": "CreativeWork", "name": "Ecofy Africa", "url": "https://daniel-sun-portfolio-replica.darkseed8192.chatgpt.site/ecofy", "creator": { "@id": "https://daniel-sun-portfolio-replica.darkseed8192.chatgpt.site/#daniel" }, "about": "Backend & APIs and marketing design for a San Francisco developer-tools company" } },
+        { "@type": "ListItem", "position": 2, "item": { "@type": "CreativeWork", "name": "Marketplace systems", "url": "https://daniel-sun-portfolio-replica.darkseed8192.chatgpt.site/marketplace", "creator": { "@id": "https://daniel-sun-portfolio-replica.darkseed8192.chatgpt.site/#daniel" }, "about": "Payments & messaging and bilingual platform design for a Qatari fintech" } },
+        { "@type": "ListItem", "position": 3, "item": { "@type": "CreativeWork", "name": "Wakili Msomi", "url": "https://daniel-sun-portfolio-replica.darkseed8192.chatgpt.site/wakili-msomi", "creator": { "@id": "https://daniel-sun-portfolio-replica.darkseed8192.chatgpt.site/#daniel" }, "about": "Systems, web design, and development" } },
+        { "@type": "ListItem", "position": 4, "item": { "@type": "CreativeWork", "name": "Infrastructure & DevOps", "url": "https://daniel-sun-portfolio-replica.darkseed8192.chatgpt.site/infrastructure", "creator": { "@id": "https://daniel-sun-portfolio-replica.darkseed8192.chatgpt.site/#daniel" }, "about": "Systems and platform design for a blockchain infrastructure network" } },
+        { "@type": "ListItem", "position": 5, "item": { "@type": "CreativeWork", "name": "EnergyOpt", "url": "https://daniel-sun-portfolio-replica.darkseed8192.chatgpt.site/energyopt", "creator": { "@id": "https://daniel-sun-portfolio-replica.darkseed8192.chatgpt.site/#daniel" }, "about": "Systems and platform design" } },
+        { "@type": "ListItem", "position": 6, "item": { "@type": "CreativeWork", "name": "Robotics & experiments", "url": "https://daniel-sun-portfolio-replica.darkseed8192.chatgpt.site/robotics", "creator": { "@id": "https://daniel-sun-portfolio-replica.darkseed8192.chatgpt.site/#daniel" }, "about": "Systems, web design, and development" } },
+        { "@type": "ListItem", "position": 7, "item": { "@type": "CreativeWork", "name": "Multi-tenant RAG", "url": "https://daniel-sun-portfolio-replica.darkseed8192.chatgpt.site/rag-platform", "creator": { "@id": "https://daniel-sun-portfolio-replica.darkseed8192.chatgpt.site/#daniel" }, "about": "Backend & APIs and development for a personal brand site" } }
       ]
     }
   ]
