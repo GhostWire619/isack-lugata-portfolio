@@ -25,7 +25,7 @@ jobs:
           set -euo pipefail
           docker run -d --name portfolio-check -p 3100:3100 isack-portfolio:test
           trap 'docker logs portfolio-check; docker rm -f portfolio-check' EXIT
-          curl --fail --retry 15 --retry-connrefused --retry-delay 1 http://localhost:3100/healthz
+          curl --fail --retry 15 --retry-all-errors --retry-delay 1 http://localhost:3100/healthz
           for route in / /about /ecofy /globoexpats /wakili-msomi /habitek /osher-market /falco /tanstack-tanzania /robotics; do
             curl --fail --silent --show-error "http://localhost:3100$route" -o /tmp/portfolio-page.html
             grep -q 'Isack' /tmp/portfolio-page.html
