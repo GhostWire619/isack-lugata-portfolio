@@ -14,6 +14,8 @@ from PIL import Image
 from wagtail.images import get_image_model
 from wagtail.models import PageViewRestriction
 from .models import JournalIndexPage, ArticlePage, Category
+from django.urls import reverse
+from wagtail.test.utils.form_data import nested_form_data, streamfield, rich_text
 
 
 TEST_STORAGE = {'default': {'BACKEND': 'django.core.files.storage.FileSystemStorage'},
@@ -178,3 +180,59 @@ class AdminSecurityTests(TestCase):
         response = self.client.post('/security/verify/', {'token': 'not-a-valid-code'})
         self.assertContains(response, 'could not be verified')
         self.assertFalse(TOTPDevice.objects.get(user=self.user).confirmed)
+
+    def login_verified(self):
+        self.client.force_login(self.user)
+        device = TOTPDevice.objects.create(user=self.user, confirmed=True)
+        session = self.client.session
+        session['otp_device_id'] = device.persistent_id
+        session.save()
+
+    def test_editor_is_discoverable_and_ready_to_write(self):
+        self.login_verified()
+        dashboard = self.client.get('/admin/')
+        self.assertContains(dashboard, 'Your articles')
+        self.assertContains(dashboard, 'Write an article')
+        self.assertContains(dashboard, '/admin/articles/new/')
+        redirect = self.client.get('/admin/articles/new/')
+        self.assertEqual(redirect.status_code, 302)
+        form = self.client.get(redirect.url)
+        self.assertContains(form, 'Write your article')
+        self.assertContains(form, 'Search &amp; sharing')
+        self.assertContains(form, 'data-a11y-dialog-show="schedule-publishing-dialog"')
+        self.assertContains(form, 'journal-editor-actions')
+        self.assertContains(form, 'name="action-publish"')
+        self.assertEqual(form.context['form'].instance.body[0].block_type, 'paragraph')
+
+    def test_owner_can_save_and_publish_an_article_through_the_actual_editor(self):
+        self.login_verified()
+        journal = JournalIndexPage.objects.first()
+        add_url = self.client.get('/admin/articles/new/').url
+        data = nested_form_data({'title': 'My first article', 'slug': 'my-first-article',
+            'intro': 'An introduction written through the actual publishing form.', 'author_name': 'Isack Lugata',
+            'body': streamfield([('paragraph', rich_text('<p>This is my article, written in the editor.</p>'))]),
+            'action-save-draft': 'Save draft', 'next': '/admin/articles/'})
+        response = self.client.post(add_url, data)
+        self.assertEqual(response.status_code, 302, getattr(response, 'context', None))
+        self.assertIn('/edit/?next=/admin/articles/', response.url)
+        article = ArticlePage.objects.get(slug='my-first-article')
+        self.assertFalse(article.live)
+        self.assertEqual(self.client.get('/blog/my-first-article/').status_code, 404)
+        self.assertContains(self.client.get('/admin/?status=draft'), 'My first article')
+        data.pop('action-save-draft')
+        data['action-publish'] = 'Publish'
+        response = self.client.post(reverse('wagtailadmin_pages:edit', args=[article.pk]), data)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, '/admin/articles/')
+        article.refresh_from_db()
+        self.assertTrue(article.live)
+        self.assertContains(self.client.get('/blog/my-first-article/'), 'This is my article, written in the editor.')
+
+    def test_write_destination_survives_two_factor_verification(self):
+        self.client.force_login(self.user)
+        self.client.get('/admin/articles/new/')
+        self.client.get('/security/verify/')
+        device = TOTPDevice.objects.get(user=self.user)
+        token = str(totp(device.bin_key, step=device.step, t0=device.t0, digits=device.digits)).zfill(device.digits)
+        response = self.client.post('/security/verify/', {'token': token})
+        self.assertContains(response, 'href="/admin/articles/new/"')

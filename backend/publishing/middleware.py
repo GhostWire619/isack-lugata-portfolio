@@ -9,6 +9,8 @@ class RequireAdminOTP:
     def __call__(self, request):
         private = request.path.startswith(('/admin/', '/security/'))
         if request.path.startswith('/admin/') and request.path != '/admin/logout/' and request.user.is_authenticated and request.user.is_staff and not request.user.is_verified():
+            if request.method == 'GET' and (request.path in ['/admin/', '/admin/articles/', '/admin/articles/new/'] or request.path.endswith('/edit/')):
+                request.session['journal_admin_next'] = request.get_full_path()
             response = redirect('/security/verify/')
         else:
             response = self.get_response(request)

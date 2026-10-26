@@ -12,4 +12,4 @@
 <script defer src="{% static 'sidenotes/journal.js' %}"></script>{% block extra_head %}{% endblock %}</head><body>
 {% if request.is_preview %}<div class="preview-note">Unpublished article preview. Only authorized editors can view this version.</div>{% elif development %}<div class="preview-note">Local development journal · Example articles are demonstration content</div>{% endif %}
 <a class="skip-content" href="#content">Skip to content</a><div class="wrap">{% block header %}{% endblock %}{% block content %}{% endblock %}
-<footer><span>© {% now 'Y' %} {{ publication.name }}</span><nav><a href="/blog/">Journal</a><a href="{% url 'journal_feed' %}">RSS feed</a><a href="mailto:{{ publication.contact_email }}">Contact</a></nav></footer></div><div class="toast" role="status" hidden></div></body></html>
+<footer><span>© {% now 'Y' %} {{ publication.name }}</span><nav><a href="/blog/">Journal</a><a href="{% url 'journal_feed' %}">RSS feed</a><a href="mailto:{{ publication.contact_email }}">Contact</a><a href="{% url 'journal_studio' %}">Publishing studio</a></nav></footer></div><div class="toast" role="status" hidden></div></body></html>

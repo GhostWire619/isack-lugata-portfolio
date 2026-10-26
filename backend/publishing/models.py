@@ -5,7 +5,7 @@ from django.core.paginator import Paginator
 from django.db.models import Q
 from django.utils.html import strip_tags
 from wagtail import blocks
-from wagtail.admin.panels import FieldPanel
+from wagtail.admin.panels import FieldPanel, MultiFieldPanel, ObjectList, TabbedInterface
 from wagtail.fields import RichTextField, StreamField
 from wagtail.images.blocks import ImageChooserBlock
 from wagtail.models import Page
@@ -72,7 +72,14 @@ class JournalIndexPage(Page):
         return context
 
 
+def new_article_body():
+    return [('paragraph', '')]
+
+
 class ArticlePage(Page):
+    class Meta:
+        verbose_name = 'article'
+        verbose_name_plural = 'articles'
     intro = models.TextField(max_length=350)
     category = models.ForeignKey(Category, null=True, blank=True, on_delete=models.SET_NULL)
     author_name = models.CharField(max_length=100, default='Isack Lugata')
@@ -86,11 +93,20 @@ class ArticlePage(Page):
         ('gallery', blocks.ListBlock(PictureBlock(), min_num=2, max_num=12)),
         ('quote', QuoteBlock()),
         ('code', blocks.TextBlock()),
-    ], use_json_field=True)
+    ], use_json_field=True, default=new_article_body)
     parent_page_types = ['publishing.JournalIndexPage']
     subpage_types = []
-    content_panels = Page.content_panels + [FieldPanel('intro'), FieldPanel('category'), FieldPanel('author_name'),
-        FieldPanel('cover'), FieldPanel('cover_alt'), FieldPanel('cover_caption'), FieldPanel('body')]
+    content_panels = [
+        MultiFieldPanel([FieldPanel('title', help_text='The headline readers will see.'), FieldPanel('intro', heading='Short introduction', help_text='One or two sentences that introduce the article.'), FieldPanel('category')], heading='Article details'),
+        FieldPanel('body', heading='Write your article', help_text='Start typing in the text block below. Use + to add a heading, image, gallery, quote, or code block.'),
+        MultiFieldPanel([FieldPanel('cover'), FieldPanel('cover_alt', heading='Image description', help_text='Describe the cover for readers who cannot see it.'), FieldPanel('cover_caption')], heading='Cover image (optional)', help_text='Choose or upload an image to appear with your article. Add an image description for accessibility.'),
+        FieldPanel('author_name'),
+    ]
+    edit_handler = TabbedInterface([
+        ObjectList(content_panels, heading='Article'),
+        ObjectList(Page.promote_panels, heading='Search & sharing'),
+        ObjectList(Page.settings_panels, heading='Publishing settings'),
+    ])
     search_fields = Page.search_fields + [index.SearchField('intro'), index.SearchField('body')]
     def clean(self):
         super().clean()

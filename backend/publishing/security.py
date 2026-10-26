@@ -12,6 +12,11 @@ from django_otp.plugins.otp_totp.models import TOTPDevice
 from django_otp.plugins.otp_static.models import StaticDevice, StaticToken
 
 
+def studio_destination(request):
+    destination = request.session.pop('journal_admin_next', '/admin/')
+    return destination if destination.startswith('/admin/') and not destination.startswith('/admin/login') else '/admin/'
+
+
 @never_cache
 @login_required
 @require_http_methods(['GET', 'POST'])
@@ -19,7 +24,7 @@ def verify(request):
     if not request.user.is_active or not request.user.is_staff:
         return redirect('/admin/login/')
     if request.user.is_verified():
-        return redirect('/admin/')
+        return redirect(studio_destination(request))
     confirmed = TOTPDevice.objects.filter(user=request.user, confirmed=True).first()
     device = confirmed or TOTPDevice.objects.get_or_create(user=request.user, name='Journal authenticator', confirmed=False)[0]
     error = ''
@@ -43,8 +48,8 @@ def verify(request):
                     recovery.token_set.all().delete()
                     codes = [StaticToken.random_token() for _ in range(10)]
                     StaticToken.objects.bulk_create([StaticToken(device=recovery, token=code) for code in codes])
-                    return render(request, 'security/recovery.html', {'codes': codes})
-                return redirect('/admin/')
+                    return render(request, 'security/recovery.html', {'codes': codes, 'continue_url': studio_destination(request)})
+                return redirect(studio_destination(request))
         error = 'That code could not be verified. Check your authenticator, or use a recovery code. Repeated attempts are temporarily throttled.'
     qr = None
     if not confirmed:

@@ -15,6 +15,14 @@ Django 5.2 + Wagtail 8.0 serve the journal at `/blog/` and the publishing studio
 
 Not yet connected: real analytics, custom analytics dashboard, OAuth/MCP tools and AI content automation. The old `design/blog/admin.html` is an illustrative prototype, not the real admin. Production never seeds sample posts or creates a shared default administrator.
 
+## Writing and publishing
+
+Open `/admin/` and sign in. Studio opens directly to **Your articles**. Use **Write an article** to open an article editor with a text block already ready for typing. Add a title, short introduction and article content; images and a topic are optional.
+
+The editor exposes **Preview**, **Save draft**, **Publish**, and **Schedule** as visible controls. Saving a draft keeps you in the editor. Publishing returns you to the article list with its live status. To publish later, choose Schedule, save the date/time, then choose Schedule to publish. Drafts and existing articles can be resumed from the list. The public journal links to Studio in its header and footer.
+
+The old design preview on port 5174 links to the real Studio; its illustrative editor is not used to publish database content.
+
 ## Local development (Windows)
 
 From the repository root, using Python 3.13:
