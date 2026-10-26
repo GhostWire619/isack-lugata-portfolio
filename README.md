@@ -122,6 +122,10 @@ Works/Story links load fresh pages so the captured router cannot retain slow blu
 
 The Works cards retain their original mobile dimensions and proportions. Page tabs use fresh documents on every screen size, with short native transitions where supported.
 
+Works/Story navigation uses an eclipse reveal from the clicked tab. The old page stays opaque beneath the reveal; the destination sets its light/dark canvas before first paint and waits for its SSR markup to be parsed before the snapshot. This avoids both a white flash and an empty-frame transition without waiting for images. Browsers without cross-document transitions use a brief dark bridge; reduced-motion settings skip the animation. Incoming hero text stays readable instead of starting another blur intro.
+
+The captured Lottie player's file-type detection reads the URL pathname, so versioned JSON animation URLs still load as JSON rather than being mistaken for ZIP files. This keeps the original sun/moon hover animations working with browser caching.
+
 ## Loading performance
 
 The final content build runs `scripts/optimize_site.py`. It creates high-quality WebP copies of raster assets and optimizes embedded rasters inside SVG artwork without changing image dimensions or the layouts. Original raster sources remain available. Case-study screenshots include smaller phone variants and dimensions to reserve their layout space.

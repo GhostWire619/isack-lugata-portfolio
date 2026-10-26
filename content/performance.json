@@ -1,12 +1,12 @@
 {
-  "version": "18b110fea435234d",
+  "version": "edcbd969365f51e4",
   "optimizedRasterFiles": 100,
   "rasterBytesBefore": 22664064,
   "rasterBytesAfter": 8633738,
-  "svgBytesBefore": 18073139,
-  "svgBytesAfter": 7479998,
-  "textBytesBeforeGzip": 12110983,
-  "textBytesAfterGzip": 5786028,
-  "homepageBytes": 784172,
-  "homepageGzipBytes": 50882
+  "svgBytesBefore": 18073087,
+  "svgBytesAfter": 7479946,
+  "textBytesBeforeGzip": 12152197,
+  "textBytesAfterGzip": 5805245,
+  "homepageBytes": 785533,
+  "homepageGzipBytes": 51410
 }

@@ -1,5 +1,29 @@
 (() => {
   const caseRoutes = new Set(["/ecofy", "/wakili-msomi", "/globoexpats", "/habitek", "/osher-market", "/falco", "/tanstack-tanzania"]);
+  let navigating = false;
+  function navigate(destination, a) {
+    if (navigating) return;
+    navigating = true;
+    const rect = a.getBoundingClientRect();
+    const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const nativeTransition = 'onpageswap' in window && 'onpagereveal' in window;
+    const mode = reduceMotion ? 'none' : nativeTransition ? 'native' : 'fallback';
+    try {
+      sessionStorage.setItem('portfolio-page-transition', JSON.stringify({
+        path:destination.pathname.replace(/\/$/, '') || '/',
+        x:Math.round(rect.left + rect.width / 2),
+        y:Math.round(rect.top + rect.height / 2),
+        time:Date.now(), mode
+      }));
+    } catch (_) {}
+    if (mode !== 'fallback') { location.assign(destination.href); return; }
+    const veil = document.createElement('div');
+    veil.className = 'portfolio-transition-bridge';
+    veil.setAttribute('aria-hidden','true');
+    document.body.append(veil);
+    const animation = veil.animate([{opacity:0},{opacity:1}], {duration:130, easing:'ease-out', fill:'forwards'});
+    animation.finished.catch(()=>{}).then(()=>location.assign(destination.href));
+  }
   function fixLinks() {
     document.querySelectorAll('a').forEach(a => {
       const label = a.textContent.trim();
@@ -45,7 +69,8 @@
       window.scrollTo({top:0, left:0, behavior:'instant'});
       return;
     }
-    location.assign(destination.href);
+    if (destination.hash) { location.assign(destination.href); return; }
+    navigate(destination, a);
   }, true);
   function start() {
     if (document.querySelector('[data-framer-appear-id]') && !window.MotionIsMounted) { requestAnimationFrame(start); return; }
@@ -58,4 +83,11 @@
     }).observe(document.body, {childList:true, subtree:true});
   }
   start();
+  window.addEventListener('pageshow', () => {
+    navigating = false;
+    document.querySelectorAll('.portfolio-transition-bridge').forEach(el=>el.remove());
+    setTimeout(()=>{
+      if (document.documentElement.hasAttribute('data-portfolio-entry')) document.documentElement.dataset.portfolioEntry = 'settled';
+    },700);
+  });
 })();

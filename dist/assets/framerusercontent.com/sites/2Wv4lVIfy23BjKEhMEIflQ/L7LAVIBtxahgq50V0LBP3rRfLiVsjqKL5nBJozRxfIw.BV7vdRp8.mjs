@@ -1,4 +1,4 @@
-import{n as e}from"./rolldown-runtime.BgaNhQyE.mjs?v=18b110fea435234d";async function t(e,t,i){let a=r[e],o=a?await a(t,i):void 0,s={bodyEnd:[],bodyStart:[],headEnd:[],headStart:[]};for(let t of n){if(t.pageIds&&!t.pageIds.has(e))continue;let n=t.code(o);n&&s[t.placement].push({...t,code:n})}return s}var n,r,i,a;e((()=>{n=[{code:e=>``,id:`sOW9zLbFN`,loadMode:`always`,name:`Pinterest Site Verification`,placement:`headStart`},{code:e=>`<script type="application/ld+json">
+import{n as e}from"./rolldown-runtime.BgaNhQyE.mjs?v=edcbd969365f51e4";async function t(e,t,i){let a=r[e],o=a?await a(t,i):void 0,s={bodyEnd:[],bodyStart:[],headEnd:[],headStart:[]};for(let t of n){if(t.pageIds&&!t.pageIds.has(e))continue;let n=t.code(o);n&&s[t.placement].push({...t,code:n})}return s}var n,r,i,a;e((()=>{n=[{code:e=>``,id:`sOW9zLbFN`,loadMode:`always`,name:`Pinterest Site Verification`,placement:`headStart`},{code:e=>`<script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@graph": [
@@ -26,7 +26,7 @@ import{n as e}from"./rolldown-runtime.BgaNhQyE.mjs?v=18b110fea435234d";async fun
     {
       "@type": "ImageObject",
       "@id": "https://isack.space/#primaryimage",
-      "url": "/assets/framerusercontent.com/images/lbsbUx2GE8xpHox9nbxwXz4J8.opt.webp?v=18b110fea435234d",
+      "url": "/assets/framerusercontent.com/images/lbsbUx2GE8xpHox9nbxwXz4J8.opt.webp?v=edcbd969365f51e4",
       "width": 2400,
       "height": 1260,
       "caption": "Isack Lugata — web and brand designer"

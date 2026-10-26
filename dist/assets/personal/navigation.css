@@ -1,8 +1,18 @@
 @view-transition { navigation:auto; }
-::view-transition-old(root) { animation:portfolio-out .1s ease-out both; }
-::view-transition-new(root) { animation:portfolio-in .2s cubic-bezier(.2,.7,.2,1) both; }
-@keyframes portfolio-out { to { opacity:0; } }
-@keyframes portfolio-in { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:none; } }
+::view-transition-group(root) { animation-duration:.52s; }
+::view-transition-old(root) { animation:none; opacity:1; mix-blend-mode:normal; z-index:1; }
+::view-transition-new(root) { animation:portfolio-eclipse .52s cubic-bezier(.22,.7,.2,1) both; mix-blend-mode:normal; z-index:2; }
+@keyframes portfolio-eclipse {
+  from { clip-path:circle(0px at var(--portfolio-wipe-x,50vw) var(--portfolio-wipe-y,26px)); }
+  to { clip-path:circle(150vmax at var(--portfolio-wipe-x,50vw) var(--portfolio-wipe-y,26px)); }
+}
+.framer-QEZlT,.case-header { view-transition-name:portfolio-header; }
+::view-transition-group(portfolio-header) { animation-duration:.2s; }
+.portfolio-transition-bridge,html[data-portfolio-entry="fallback"]::after { position:fixed; inset:0; z-index:10000; background:#101010; pointer-events:none; }
+html[data-portfolio-entry="fallback"]::after { content:""; animation:portfolio-bridge-out .24s .06s ease-out both; }
+@keyframes portfolio-bridge-out { from { opacity:1; } to { opacity:0; } }
+/* The destination snapshot is readable immediately, without a second blur intro. */
+html[data-portfolio-entry] #hero h1 span { opacity:1 !important; filter:none !important; transform:none !important; }
 .portfolio-mobile-jumps { display:none; }
 /* The captured template's full-screen preloader adds an artificial wait. */
 .framer-BQ9ux,div[class*="-container"]:has(> .framer-BQ9ux) { display:none !important; pointer-events:none !important; }
@@ -12,8 +22,6 @@
   #hero > div { height:auto !important; min-height:0 !important; padding-top:112px !important; padding-bottom:28px !important; gap:24px !important; }
   #hero h1 { font-size:34px !important; line-height:1.12 !important; letter-spacing:-1.4px !important; text-wrap:balance; }
   #hero h1 span { opacity:1 !important; filter:none !important; transform:none !important; }
-  .framer-QEZlT,.case-header { view-transition-name:portfolio-header; }
-  ::view-transition-group(portfolio-header) { animation-duration:.16s; }
   .portfolio-project-card { touch-action:pan-y; }
   .portfolio-project-card:active { filter:brightness(.94); }
   [data-framer-name="areas"] > .framer-ocy3gl,[data-framer-name="explorations"] > .framer-tbci47 { padding-top:64px !important; padding-bottom:28px !important; }
@@ -31,5 +39,6 @@
   a { -webkit-tap-highlight-color:transparent; }
 }
 @media(prefers-reduced-motion:reduce) {
-  ::view-transition-old(root),::view-transition-new(root),::view-transition-group(portfolio-header) { animation:none; }
+  ::view-transition-old(root),::view-transition-new(root),::view-transition-group(root),::view-transition-group(portfolio-header),::view-transition-old(portfolio-header),::view-transition-new(portfolio-header) { animation:none; }
+  .portfolio-transition-bridge,html[data-portfolio-entry="fallback"]::after { display:none; }
 }

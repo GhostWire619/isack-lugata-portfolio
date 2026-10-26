@@ -139,7 +139,11 @@ for path in DIST.glob('*.html'):
     for img in soup.select('img'):
         first_card = img.find_parent('a', href='./ecofy') or img.find_parent('a', href='./osher-market')
         hero = img.find_parent(attrs={'data-framer-name':'hero'}) or img.find_parent('figure', class_='case-media')
-        if not first_card and not hero:
+        header = img.find_parent(class_='framer-QEZlT')
+        if header:
+            img['loading'] = 'eager'
+            img['decoding'] = 'async'
+        elif not first_card and not hero:
             img['loading'] = 'lazy'
             img['decoding'] = 'async'
         if img.get('src', '').startswith('/assets/'):

@@ -413,6 +413,9 @@ paths=subprocess.check_output(['git','ls-tree','-r','--name-only',BASE,'dist'],c
 for filename in paths:
     if filename.endswith('.mjs'):
         raw=original(filename)
+        if '/dotlottie-player.' in filename:
+            # The captured player mistakes .json?v=... for a ZIP animation.
+            raw=raw.replace('let j=D.split(`.`).pop()?.toLowerCase(),F=!1;', 'let j=new URL(D,window.location.href).pathname.split(`.`).pop()?.toLowerCase(),F=!1;')
         raw=clean_snippets(raw)
         raw=replace_all(raw)
         # Tool names are literal text children, never framework identifiers.
