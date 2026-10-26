@@ -1,3 +1,4 @@
 {% extends 'wagtailadmin/admin_base.html' %}{% load static %}
 {% block branding_title %}{{ publication.name }} Studio{% endblock %}
+{% block css %}<script src="{% static 'sidenotes/theme-init.js' %}"></script>{{ block.super }}<link rel="stylesheet" href="{% static 'sidenotes/theme.css' %}">{% endblock %}
 {% block branding_favicon %}<link rel="icon" href="{% static 'sidenotes/assets/favicon.svg' %}" type="image/svg+xml">{% endblock %}

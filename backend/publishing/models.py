@@ -168,3 +168,13 @@ class MCPDraftRequest(models.Model):
 
     class Meta:
         constraints = [models.UniqueConstraint(fields=['connection', 'request_key'], name='unique_mcp_draft_request')]
+
+
+class MCPImageUpload(models.Model):
+    connection = models.ForeignKey(MCPConnection, on_delete=models.CASCADE)
+    content_hash = models.CharField(max_length=64)
+    image = models.ForeignKey('wagtailimages.Image', on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [models.UniqueConstraint(fields=['connection', 'content_hash'], name='unique_mcp_image_upload')]

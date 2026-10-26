@@ -70,7 +70,7 @@ Recovery codes are shown once, are consumed on use and should be stored in a pas
 
 ## MCP: read articles and create drafts
 
-`/mcp/` is an authenticated, stateless Streamable HTTP MCP endpoint. It supports `initialize`, `ping`, `tools/list`, `tools/call` and initialization notifications, with JSON responses and protocol versions 2025-03-26, 2025-06-18 and 2025-11-25. There are no server-initiated streams. The tools are `list_categories`, `list_articles`, `get_article` and, with write access, `create_article_draft`. Draft creation never publishes or schedules an article. Publication remains a Studio action.
+`/mcp/` is an authenticated, stateless Streamable HTTP MCP endpoint. It supports `initialize`, `ping`, `tools/list`, `tools/call` and initialization notifications, with JSON responses and protocol versions 2025-03-26, 2025-06-18 and 2025-11-25. There are no server-initiated streams. The tools are `list_categories`, `list_articles`, `get_article` and, with write access, `create_article_draft` and `upload_image`. Draft creation never publishes or schedules an article. Publication remains a Studio action.
 
 Connections use individual expiring bearer tokens, stored only as hashes in the database, tied to an active staff account and its current article permissions. Browser login cookies cannot authenticate MCP requests. Cross-origin browser requests are rejected. Keep the endpoint behind HTTPS in production. Tokens must be treated as passwords; do not commit them or paste them into public configuration.
 
@@ -103,9 +103,19 @@ Add `--article-file /private/article.json` to create and read back a draft. The 
 }
 ```
 
-Sections support `heading`, `paragraph` and `code`. Use `list_categories` for category slugs, or omit the category. Keep the same `request_key` and content when retrying; changing content with an existing key is rejected. Responses include a Studio editor link. Drafts remain excluded from public pages, feeds and sitemaps. The draft-request record links creation to its connection for traceability.
+Sections support `heading`, `paragraph`, `code`, `quote` and `image`. A quotation uses `{"type":"quote","text":"Original or verified quotation","attribution":"Source or attribution"}`. An image uses `{"type":"image","image_id":123,"alt":"Accessible description","caption":"Optional caption"}`. Covers use the top-level fields `cover_image_id`, `cover_alt` and `cover_caption`.
 
-This is a token-authenticated connection, **not yet an OAuth connector for ChatGPT or Claude**. Their sign-in flow, discovery metadata, scheduling tools, media uploads and analytics tools are still pending. The optional test client does not dynamically install a tool into either application.
+`upload_image` accepts `title` and `image_base64`: JPEG, PNG or WebP up to 2 MiB and 40 megapixels. It checks image collection permissions, strips metadata, scales to at most 2560 pixels and stores compressed WebP. No server-side fetching of arbitrary URLs or local files is exposed. Repeated identical uploads on the same connection reuse the image. Article references also check image permissions. The gateway and Django permit the bounded 3 MB JSON request.
+
+The client can upload local images through MCP with `--image-file cover=/private/cover.webp --image-file inline=/private/inline.webp`. Use `"cover_image_id":"@cover"` or `"image_id":"@inline"` in the article JSON; the client replaces these references with the returned image IDs before calling the draft tool.
+
+Use `list_categories` for category slugs, or omit the category. Keep the same `request_key` and content when retrying; changing content with an existing key is rejected. Responses include a Studio editor link. Drafts remain excluded from public pages, feeds and sitemaps. The draft-request record links creation to its connection for traceability.
+
+This is a token-authenticated connection, **not yet an OAuth connector for ChatGPT or Claude**. Their sign-in flow, discovery metadata, scheduling tools and analytics tools are still pending. The optional test client does not dynamically install a tool into either application.
+
+## Appearance
+
+The journal, article pages, login and Studio share paper/forest palettes and a light/dark appearance control. The choice persists in `localStorage` under `journal-theme`, synchronizes between tabs and defaults to the device setting. A tiny head script applies it before styles paint. Without JavaScript, content remains readable in light mode. Uploaded photographs retain their original colours; controls and backgrounds change together.
 
 ## Backups and restoration
 

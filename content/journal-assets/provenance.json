@@ -1,0 +1,14 @@
+{
+  "method": "Built-in image generation",
+  "assets": [
+    {
+      "file": "attention-desk.webp",
+      "prompt": "Create one horizontal 3:2 editorial photograph-style illustration for an independent journal article titled 'Good technology should leave room for attention'. A simple warm wood desk by a window, closed unbranded laptop, open blank ivory notebook and one pencil, soft side daylight, deep olive green and warm neutral palette, quiet authentic texture, restrained magazine photography, no people, no words, no logos, no UI, no collage. This is an illustrative scene, not documentation of a real event."
+    },
+    {
+      "file": "attention-shore.webp",
+      "prompt": "Create one horizontal 3:2 editorial photograph-style illustration for a journal article about attention and thoughtful digital products. Close view of gentle ocean water meeting pale textured stone at a quiet shoreline, soft overcast morning light, muted green-grey water, natural organic detail, contemplative magazine photography with subtle film grain. No people, buildings, text, logos or collage. Composition readable at mobile size. Illustrative scene, not a specific named location."
+    }
+  ],
+  "disclosure": "AI-generated editorial illustrations; not photographs of a real event or named location."
+}

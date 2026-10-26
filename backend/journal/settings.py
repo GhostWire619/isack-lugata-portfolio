@@ -105,6 +105,8 @@ WAGTAILADMIN_USER_LOGIN_FORM = 'wagtail.admin.forms.auth.LoginForm'
 WAGTAIL_ENABLE_UPDATE_CHECK = False
 WAGTAIL_PASSWORD_RESET_ENABLED = True
 LOGIN_URL = '/admin/login/'
+# Allow the bounded MCP JSON envelope for a base64 image up to 2 MiB.
+DATA_UPLOAD_MAX_MEMORY_SIZE = 3_000_000
 SESSION_COOKIE_NAME = 'journal_session'
 CSRF_COOKIE_NAME = 'journal_csrf'
 SESSION_COOKIE_HTTPONLY = True

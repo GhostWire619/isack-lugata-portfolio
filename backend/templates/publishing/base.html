@@ -1,5 +1,6 @@
 {% load static wagtailcore_tags wagtailimages_tags %}<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<script src="{% static 'sidenotes/theme-init.js' %}"></script>
 <title>{% block title %}{{ page.seo_title|default:page.title }} · {{ publication.name }}{% endblock %}</title>
 <meta name="description" content="{{ description }}">
 {% if request.is_preview or filtered or development %}<meta name="robots" content="noindex,follow">{% endif %}
@@ -9,6 +10,7 @@
 <link rel="icon" href="{% static 'sidenotes/assets/favicon.svg' %}" type="image/svg+xml">
 <link rel="alternate" type="application/rss+xml" title="{{ publication.name }}" href="{% url 'journal_feed' %}">
 <link rel="stylesheet" href="{% static 'sidenotes/site.css' %}"><link rel="stylesheet" href="{% static 'sidenotes/journal.css' %}">
+<link rel="stylesheet" href="{% static 'sidenotes/theme.css' %}">
 <script defer src="{% static 'sidenotes/journal.js' %}"></script>{% block extra_head %}{% endblock %}</head><body>
 {% if request.is_preview %}<div class="preview-note">Unpublished article preview. Only authorized editors can view this version.</div>{% elif development %}<div class="preview-note">Local development journal · Example articles are demonstration content</div>{% endif %}
 <a class="skip-content" href="#content">Skip to content</a><div class="wrap">{% block header %}{% endblock %}{% block content %}{% endblock %}

@@ -26,6 +26,23 @@ async def main(options):
             print('Tools: ' + ', '.join(tool.name for tool in tools.tools))
             if options.article_file:
                 arguments = json.loads(Path(options.article_file).read_text(encoding='utf-8'))
+                images = {}
+                for item in options.image_file:
+                    import base64
+                    key, filename = item.split('=', 1)
+                    payload = {'title': Path(filename).stem.replace('-', ' '),
+                        'image_base64': base64.b64encode(Path(filename).read_bytes()).decode('ascii')}
+                    upload = await session.call_tool('upload_image', payload)
+                    if upload.isError:
+                        raise RuntimeError(upload.content[0].text)
+                    image = upload.structuredContent or json.loads(upload.content[0].text)
+                    images[key] = image['image_id']
+                    print(f"Uploaded {key}: image #{image['image_id']}")
+                if isinstance(arguments.get('cover_image_id'), str):
+                    arguments['cover_image_id'] = images[arguments['cover_image_id'].removeprefix('@')]
+                for section in arguments.get('sections', []):
+                    if section['type'] == 'image' and isinstance(section.get('image_id'), str):
+                        section['image_id'] = images[section['image_id'].removeprefix('@')]
                 result = await session.call_tool('create_article_draft', arguments)
                 if result.isError:
                     raise RuntimeError(result.content[0].text)
@@ -50,4 +67,5 @@ if __name__ == '__main__':
     parser.add_argument('--token-file', required=True)
     parser.add_argument('--article-file', help='JSON draft arguments. Omit to only connect and list tools.')
     parser.add_argument('--result-file', help='Optional JSON readback output file.')
+    parser.add_argument('--image-file', action='append', default=[], help='KEY=PATH to upload via MCP; use @KEY for image IDs in the article JSON.')
     asyncio.run(main(parser.parse_args()))

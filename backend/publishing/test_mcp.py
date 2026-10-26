@@ -1,4 +1,7 @@
 import hashlib
+import base64
+from io import BytesIO
+from tempfile import TemporaryDirectory
 import json
 from datetime import timedelta
 
@@ -6,6 +9,7 @@ from django.contrib.auth import get_user_model
 from django.core.management import call_command
 from django.test import Client, TestCase, override_settings
 from django.utils import timezone
+from PIL import Image
 
 from .models import ArticlePage, MCPConnection, MCPDraftRequest
 from .tests import TEST_STORAGE
@@ -19,6 +23,11 @@ class MCPTests(TestCase):
         cls.owner = get_user_model().objects.create_superuser('mcp-owner', 'mcp@example.test', 'test-only-password')
 
     def setUp(self):
+        self.media = TemporaryDirectory()
+        self.media_override = override_settings(MEDIA_ROOT=self.media.name)
+        self.media_override.enable()
+        self.addCleanup(self.media.cleanup)
+        self.addCleanup(self.media_override.disable)
         self.connection, self.token = MCPConnection.issue(user=self.owner, name='Test', can_write=True,
             expires_at=timezone.now() + timedelta(hours=1))
         self.client = Client(enforce_csrf_checks=True)
@@ -100,5 +109,37 @@ class MCPTests(TestCase):
             content_type='application/json', HTTP_AUTHORIZATION='Bearer ' + self.token)
         self.assertEqual(response.status_code, 202)
         self.assertEqual(self.rpc('nonexistent').json()['error']['code'], -32601)
-        response = self.client.post('/mcp/', 'x' * 131073, content_type='application/json', HTTP_AUTHORIZATION='Bearer ' + self.token)
+        response = self.client.post('/mcp/', 'x' * 3000001, content_type='application/json', HTTP_AUTHORIZATION='Bearer ' + self.token)
         self.assertEqual(response.status_code, 413)
+
+    def test_upload_image_and_create_rich_draft(self):
+        output = BytesIO()
+        Image.new('RGB', (180, 120), '#355a36').save(output, format='PNG')
+        arguments = {'title': 'Test editorial image', 'image_base64': base64.b64encode(output.getvalue()).decode()}
+        upload = self.rpc('tools/call', {'name': 'upload_image', 'arguments': arguments}).json()['result']
+        self.assertFalse(upload['isError'], upload)
+        image_id = upload['structuredContent']['image_id']
+        retry = self.rpc('tools/call', {'name': 'upload_image', 'arguments': arguments}).json()['result']
+        self.assertEqual(retry['structuredContent']['image_id'], image_id)
+        self.assertTrue(retry['structuredContent']['reused'])
+        result = self.draft(cover_image_id=image_id, cover_alt='An editorial illustration',
+            sections=[{'type': 'quote', 'text': 'An original thought.', 'attribution': 'From this article'},
+                {'type': 'image', 'image_id': image_id, 'alt': 'An accessible description', 'caption': 'Illustration.'}])
+        self.assertFalse(result['isError'], result)
+        article = ArticlePage.objects.get(pk=result['structuredContent']['article']['id'])
+        self.assertFalse(article.live)
+        self.assertEqual(article.cover_id, image_id)
+        self.assertTrue(article.cover.file.name.endswith('.webp'))
+        draft = article.get_latest_revision_as_object()
+        self.assertEqual(draft.body[0].value['attribution'], 'From this article')
+        self.assertEqual(draft.body[1].value['image'].pk, image_id)
+        self.assertTrue(self.draft(request_key='no-alt', cover_image_id=image_id)['isError'])
+
+    def test_upload_validation_and_permissions(self):
+        for data in ['not-base64', base64.b64encode(b'<svg>invalid</svg>').decode()]:
+            result = self.rpc('tools/call', {'name': 'upload_image', 'arguments': {'title': 'Invalid', 'image_base64': data}}).json()['result']
+            self.assertTrue(result['isError'])
+        self.connection.can_write = False
+        self.connection.save()
+        result = self.rpc('tools/call', {'name': 'upload_image', 'arguments': {'title': 'Blocked', 'image_base64': 'AAAA'}}).json()['result']
+        self.assertTrue(result['isError'])

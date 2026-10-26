@@ -1,0 +1,83 @@
+{
+  "request_key": "attention-rich-article-20261026",
+  "title": "Good technology should leave room for attention",
+  "intro": "A useful digital product helps us do what we came to do, then gives us our time back. What would change if we treated attention as something to protect?",
+  "category_slug": "ideas",
+  "cover_image_id": "@desk",
+  "cover_alt": "A closed laptop and open notebook on a wooden desk beside a sunlit window.",
+  "cover_caption": "A pause between tasks. AI-generated editorial illustration.",
+  "sections": [
+    {
+      "type": "paragraph",
+      "text": "A familiar moment: you open an app to do one small thing and find yourself somewhere else entirely. A message becomes a feed. A useful check becomes another round of refreshing. The original task has disappeared, but the interface is still offering reasons to stay."
+    },
+    {
+      "type": "paragraph",
+      "text": "It is easy to describe this as a failure of self-control. There is another question worth asking: what did the product make easy, and what did it make difficult? The shape of an interface can support an intention or quietly replace it with a different one."
+    },
+    {
+      "type": "heading",
+      "text": "A product can have a stopping point"
+    },
+    {
+      "type": "paragraph",
+      "text": "Consider a reading experience with a clear ending. The article finishes, the sources are available, and a few relevant links sit nearby without demanding another click. The reader can continue if they choose. They can also leave with the feeling that they have completed something."
+    },
+    {
+      "type": "quote",
+      "text": "A useful product should be able to say: you have done what you came here to do.",
+      "attribution": "An original reflection from this article"
+    },
+    {
+      "type": "paragraph",
+      "text": "A stopping point does not make a product less useful. It makes its purpose easier to understand. For a service that helps someone book a visit, pay an invoice or read an explanation, the successful moment may be the one in which the interface is no longer needed."
+    },
+    {
+      "type": "heading",
+      "text": "Clarity is a form of respect"
+    },
+    {
+      "type": "paragraph",
+      "text": "The details are ordinary: labels that explain what happens next, buttons that remain where people expect them, a form that preserves progress, and a page that becomes readable without waiting for an elaborate entrance. None of these needs to announce itself. Together, they reduce the effort of using the product."
+    },
+    {
+      "type": "paragraph",
+      "text": "Visual character still matters. Good typography, a considered colour palette and a thoughtful transition can make an experience feel welcoming. The question is whether those choices help someone understand the page or compete with the reason they opened it."
+    },
+    {
+      "type": "image",
+      "image_id": "@shore",
+      "alt": "Gentle green-grey water washing against pale textured shoreline stone.",
+      "caption": "A quieter visual rhythm. AI-generated editorial illustration; not a specific location."
+    },
+    {
+      "type": "heading",
+      "text": "Leave some things quiet"
+    },
+    {
+      "type": "paragraph",
+      "text": "Not every event needs a notification. Not every empty space needs a recommendation. Not every action needs a celebration. A screen can contain useful information without asking the reader to respond to all of it at once."
+    },
+    {
+      "type": "quote",
+      "text": "Quiet is not the absence of design. It can be one of its most deliberate choices.",
+      "attribution": "An original reflection from this article"
+    },
+    {
+      "type": "paragraph",
+      "text": "This is a practical design question rather than a rule to make every product minimal. A busy working tool may need dense information; a journal may need room for a photograph or a long argument. The useful measure is how well the experience supports the person using it in that moment."
+    },
+    {
+      "type": "heading",
+      "text": "Build for a good return"
+    },
+    {
+      "type": "paragraph",
+      "text": "People can return to a product because they trust it. They know where to find their work. They expect the page to load promptly and the controls to behave consistently. They can choose how it looks without relearning how it works."
+    },
+    {
+      "type": "paragraph",
+      "text": "That kind of return feels different from being pulled back by an interruption. It comes from a relationship in which the product remains useful over time. A calmer experience can still be memorable, expressive and enjoyable. It simply leaves room for the rest of a person’s day."
+    }
+  ]
+}

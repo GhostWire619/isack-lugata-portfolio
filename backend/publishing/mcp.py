@@ -4,12 +4,17 @@ Only read and draft creation are exposed: publishing remains an authenticated
 Studio action. JSON responses are used; server-initiated streams are not needed.
 """
 import hashlib
+import base64
+import binascii
+from io import BytesIO
 import json
 import logging
-from typing import Literal
+import warnings
+from typing import Annotated, Literal, Union
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.core.files.base import ContentFile
 from django.db import transaction
 from django.http import HttpResponse, JsonResponse
 from django.urls import reverse
@@ -19,8 +24,10 @@ from django.utils.text import slugify
 from django.views.decorators.csrf import csrf_exempt
 from pydantic import BaseModel, ConfigDict, Field, ValidationError as InputError
 from wagtail.permission_policies.pages import PagePermissionPolicy
+from wagtail.images import get_image_model, get_permission_policy
+from PIL import Image, ImageOps, UnidentifiedImageError
 
-from .models import ArticlePage, Category, JournalIndexPage, MCPConnection, MCPDraftRequest
+from .models import ArticlePage, Category, JournalIndexPage, MCPConnection, MCPDraftRequest, MCPImageUpload
 from .studio import can_write
 
 logger = logging.getLogger(__name__)
@@ -40,9 +47,30 @@ class GetArguments(Arguments):
     article_id: int = Field(gt=0)
 
 
-class Section(Arguments):
+class TextSection(Arguments):
     type: Literal['heading', 'paragraph', 'code']
     text: str = Field(min_length=1, max_length=10000)
+
+
+class QuoteSection(Arguments):
+    type: Literal['quote']
+    text: str = Field(min_length=1, max_length=2000)
+    attribution: str = Field(default='', max_length=250)
+
+
+class ImageSection(Arguments):
+    type: Literal['image']
+    image_id: int = Field(gt=0)
+    alt: str = Field(min_length=1, max_length=250)
+    caption: str = Field(default='', max_length=350)
+
+
+class UploadArguments(Arguments):
+    title: str = Field(min_length=1, max_length=250)
+    image_base64: str = Field(min_length=4, max_length=2800000)
+
+
+Section = Annotated[Union[TextSection, QuoteSection, ImageSection], Field(discriminator='type')]
 
 
 class DraftArguments(Arguments):
@@ -50,14 +78,73 @@ class DraftArguments(Arguments):
     title: str = Field(min_length=1, max_length=200)
     intro: str = Field(min_length=1, max_length=350)
     category_slug: str | None = Field(default=None, max_length=100)
+    cover_image_id: int | None = Field(default=None, gt=0)
+    cover_alt: str = Field(default='', max_length=250)
+    cover_caption: str = Field(default='', max_length=350)
     sections: list[Section] = Field(min_length=1, max_length=80)
 
 
 TOOLS = {
     'list_articles': (ListArguments, 'List articles accessible to this connection, including drafts. Use after_id for pagination.'),
     'get_article': (GetArguments, 'Read the latest saved draft of an accessible article.'),
-    'create_article_draft': (DraftArguments, 'Create an unpublished article for review in Studio. Plain text sections only. Reuse request_key for safe retries; never publishes.'),
+    'create_article_draft': (DraftArguments, 'Create an unpublished article for review in Studio. Supports text, attributed quotations, images and a cover. Upload images first. Reuse request_key for safe retries; never publishes.'),
+    'upload_image': (UploadArguments, 'Upload a base64 JPEG, PNG or WebP image (maximum 2 MB, 40 megapixels). Images are resized, stripped of metadata and compressed to WebP. Identical retries reuse the image. Returns image_id for covers and image sections.'),
 }
+
+WRITE_TOOLS = {'create_article_draft', 'upload_image'}
+
+
+def choose_image(user, image_id):
+    image = get_permission_policy().instances_user_has_any_permission_for(user, {'choose', 'change'}).filter(pk=image_id).first()
+    if not image:
+        raise ValueError('Image was not found or access is denied.')
+    return image
+
+
+def upload_image(connection, args):
+    if not args.title.strip():
+        raise ValueError('The image title must contain text.')
+    policy = get_permission_policy()
+    collection = policy.collections_user_has_permission_for(connection.user, 'add').order_by('depth', 'pk').first()
+    if not collection or not can_write(connection.user, JournalIndexPage.objects.first()):
+        raise ValueError('This account cannot upload journal images.')
+    try:
+        source = base64.b64decode(args.image_base64, validate=True)
+    except (ValueError, binascii.Error):
+        raise ValueError('Invalid base64 image.')
+    if len(source) > 2 * 1024 * 1024:
+        raise ValueError('Image exceeds 2 MB. Compress it before uploading.')
+    digest = hashlib.sha256(source).hexdigest()
+    with warnings.catch_warnings():
+        warnings.simplefilter('error', Image.DecompressionBombWarning)
+        try:
+            picture = Image.open(BytesIO(source))
+            if picture.format not in {'JPEG', 'PNG', 'WEBP'} or picture.width * picture.height > 40000000:
+                raise ValueError('Use JPEG, PNG or WebP images up to 40 megapixels.')
+            picture.load()
+            picture = ImageOps.exif_transpose(picture).convert('RGB')
+            picture.thumbnail((2560, 2560))
+            output = BytesIO()
+            picture.save(output, format='WEBP', quality=85, method=6)
+        except (UnidentifiedImageError, OSError, Image.DecompressionBombError, Image.DecompressionBombWarning):
+            raise ValueError('The image could not be decoded safely.')
+    with transaction.atomic():
+        MCPConnection.objects.select_for_update().get(pk=connection.pk)
+        previous = MCPImageUpload.objects.filter(connection=connection, content_hash=digest).first()
+        if previous:
+            image = choose_image(connection.user, previous.image_id)
+        else:
+            image = get_image_model()(title=args.title.strip(), collection=collection, uploaded_by_user=connection.user,
+                width=picture.width, height=picture.height)
+            filename = f'journal-{digest[:20]}.webp'
+            image.file.save(filename, ContentFile(output.getvalue(), name=filename), save=False)
+            try:
+                image.save()
+                MCPImageUpload.objects.create(connection=connection, content_hash=digest, image=image)
+            except Exception:
+                image.file.delete(save=False)
+                raise
+    return {'image_id': image.pk, 'title': image.title, 'width': image.width, 'height': image.height, 'reused': bool(previous)}
 
 
 def accessible(user):
@@ -70,16 +157,19 @@ def serialize(article, include_body=False):
         'live': article.live, 'has_unpublished_changes': article.has_unpublished_changes,
         'editor_url': settings.PUBLIC_URL.rstrip('/') + reverse('wagtailadmin_pages:edit', args=[article.pk]),
         'category_slug': draft.category.slug if draft.category_id else None}
+    result.update({'cover_image_id': draft.cover_id, 'cover_alt': draft.cover_alt, 'cover_caption': draft.cover_caption})
     if include_body:
         result['body'] = draft.body.get_prep_value()
     return result
 
 
 def call_tool(connection, name, raw):
-    if name not in TOOLS or (name == 'create_article_draft' and not connection.can_write):
+    if name not in TOOLS or (name in WRITE_TOOLS and not connection.can_write):
         raise ValueError('Tool is unavailable for this connection.')
     args = TOOLS[name][0].model_validate(raw)
     user = connection.user
+    if name == 'upload_image':
+        return upload_image(connection, args)
     if name == 'list_articles':
         articles = list(accessible(user).filter(pk__gt=args.after_id).order_by('pk')[:args.limit])
         return {'articles': [serialize(article) for article in articles],
@@ -108,17 +198,29 @@ def call_tool(connection, name, raw):
             category = Category.objects.filter(slug=args.category_slug).first()
             if not category:
                 raise ValueError('Unknown category. Use list_categories to choose an existing category.')
-        if not args.title.strip() or not args.intro.strip() or any(not s.text.strip() for s in args.sections):
+        if not args.title.strip() or not args.intro.strip() or any(not s.text.strip() for s in args.sections if hasattr(s, 'text')):
             raise ValueError('Title, introduction and sections must contain text.')
         slug_base = slugify(args.title)[:180] or 'article'
         slug, suffix = slug_base, 2
         while journal.get_children().filter(slug=slug).exists():
             slug = f'{slug_base}-{suffix}'
             suffix += 1
-        body = [(s.type, '<p>' + str(escape(s.text)).replace('\n\n', '</p><p>').replace('\n', '<br/>') + '</p>'
-            if s.type == 'paragraph' else s.text) for s in args.sections]
+        body = []
+        for section in args.sections:
+            if section.type == 'image':
+                if not section.alt.strip():
+                    raise ValueError('Each image needs an accessible description.')
+                body.append(('image', {'image': choose_image(user, section.image_id), 'alt': section.alt, 'caption': section.caption}))
+            elif section.type == 'quote':
+                body.append(('quote', {'quote': section.text, 'attribution': section.attribution}))
+            elif section.type == 'paragraph':
+                body.append(('paragraph', '<p>' + str(escape(section.text)).replace('\n\n', '</p><p>').replace('\n', '<br/>') + '</p>'))
+            else:
+                body.append((section.type, section.text))
+        cover = choose_image(user, args.cover_image_id) if args.cover_image_id else None
         article = ArticlePage(title=args.title.strip(), slug=slug, intro=args.intro.strip(),
-            category=category, owner=user, live=False, body=body, search_description=args.intro.strip()[:255])
+            category=category, owner=user, live=False, body=body, search_description=args.intro.strip()[:255],
+            cover=cover, cover_alt=args.cover_alt, cover_caption=args.cover_caption)
         article.full_clean(exclude=['path', 'depth'])
         journal.add_child(instance=article)
         article.save_revision(user=user, log_action=True)
@@ -158,10 +260,10 @@ def rpc(request, connection):
         return result({})
     if method == 'tools/list':
         definitions = [{'name': name, 'description': description, 'inputSchema': model.model_json_schema(),
-            'annotations': {'readOnlyHint': name != 'create_article_draft', 'destructiveHint': False,
+            'annotations': {'readOnlyHint': name not in WRITE_TOOLS, 'destructiveHint': False,
                 'idempotentHint': True, 'openWorldHint': False}}
             for name, (model, description) in TOOLS.items()
-            if name != 'create_article_draft' or connection.can_write]
+            if name not in WRITE_TOOLS or connection.can_write]
         definitions.append({'name': 'list_categories', 'description': 'List available article categories.',
             'inputSchema': Arguments.model_json_schema(), 'annotations': {'readOnlyHint': True, 'openWorldHint': False}})
         return result({'tools': definitions})
@@ -193,7 +295,7 @@ def endpoint(request):
         response = HttpResponse('Origin is not allowed.', status=403)
     elif request.content_type != 'application/json':
         response = HttpResponse('Use application/json.', status=415)
-    elif int(request.META.get('CONTENT_LENGTH') or 0) > 131072:
+    elif int(request.META.get('CONTENT_LENGTH') or 0) > 3000000:
         response = HttpResponse('Request is too large.', status=413)
     else:
         auth = request.headers.get('Authorization', '')
