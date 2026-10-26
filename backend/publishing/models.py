@@ -1,6 +1,9 @@
 import math
+import hashlib
+import secrets
 
 from django.db import models
+from django.conf import settings
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.utils.html import strip_tags
@@ -136,3 +139,32 @@ class PublicationSettings(BaseSiteSetting):
     about = models.TextField(default='Articles and perspectives on technology, science, culture, and the ideas shaping our world. A space to look closer, ask better questions, and explore beyond the familiar.')
     contact_email = models.EmailField(default='lugata619@gmail.com')
     panels = [FieldPanel('name'), FieldPanel('tagline'), FieldPanel('about'), FieldPanel('contact_email')]
+
+
+class MCPConnection(models.Model):
+    name = models.CharField(max_length=100)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    token_hash = models.CharField(max_length=64, unique=True, editable=False)
+    can_write = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+    last_used_at = models.DateTimeField(null=True, blank=True)
+    revoked_at = models.DateTimeField(null=True, blank=True)
+
+    @classmethod
+    def issue(cls, *, user, name, expires_at, can_write=False):
+        token = 'journal_' + secrets.token_urlsafe(40)
+        connection = cls.objects.create(user=user, name=name, expires_at=expires_at,
+            can_write=can_write, token_hash=hashlib.sha256(token.encode()).hexdigest())
+        return connection, token
+
+
+class MCPDraftRequest(models.Model):
+    connection = models.ForeignKey(MCPConnection, on_delete=models.CASCADE)
+    request_key = models.CharField(max_length=100)
+    payload_hash = models.CharField(max_length=64)
+    article = models.ForeignKey(ArticlePage, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [models.UniqueConstraint(fields=['connection', 'request_key'], name='unique_mcp_draft_request')]

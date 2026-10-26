@@ -12,8 +12,9 @@ Django 5.2 + Wagtail 8.0 serve the journal at `/blog/` and the publishing studio
 - Initial HTML includes article content, canonical/OG metadata and BlogPosting structured data.
 - Password login, password strength checks, login throttling, authenticator-based two-factor setup and single-use recovery codes. All `/admin/` routes require a verified second factor after password login.
 - Production PostgreSQL and persistent media volumes, separate scheduler and database health checks.
+- Authenticated MCP tools to read articles and create private, editable drafts, with expiring/revocable connections and safe retries.
 
-Not yet connected: real analytics, custom analytics dashboard, OAuth/MCP tools and AI content automation. The old `design/blog/admin.html` is an illustrative prototype, not the real admin. Production never seeds sample posts or creates a shared default administrator.
+Not yet connected: real analytics, custom analytics dashboard, ChatGPT/Claude OAuth sign-in and AI content scheduling. The old `design/blog/admin.html` is an illustrative prototype, not the real admin. Production never seeds sample posts or creates a shared default administrator.
 
 ## Writing and publishing
 
@@ -67,7 +68,46 @@ Configure `EMAIL_HOST`, `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD`, `EMAIL_PORT`, 
 
 Recovery codes are shown once, are consumed on use and should be stored in a password manager. Keep the production signing key stable so existing sessions and signed links remain valid across deployments.
 
-## Backups
+## MCP: read articles and create drafts
+
+`/mcp/` is an authenticated, stateless Streamable HTTP MCP endpoint. It supports `initialize`, `ping`, `tools/list`, `tools/call` and initialization notifications, with JSON responses and protocol versions 2025-03-26, 2025-06-18 and 2025-11-25. There are no server-initiated streams. The tools are `list_categories`, `list_articles`, `get_article` and, with write access, `create_article_draft`. Draft creation never publishes or schedules an article. Publication remains a Studio action.
+
+Connections use individual expiring bearer tokens, stored only as hashes in the database, tied to an active staff account and its current article permissions. Browser login cookies cannot authenticate MCP requests. Cross-origin browser requests are rejected. Keep the endpoint behind HTTPS in production. Tokens must be treated as passwords; do not commit them or paste them into public configuration.
+
+Create a connection from the server, choosing an existing Studio username and a private, persistent output location (the container's `/app/data/` is ephemeral unless you mount it):
+
+```sh
+python manage.py journal_mcp_token --username isack --name "My AI client" --write --hours 24 --output /tmp/journal-mcp-token.json
+```
+
+Omit `--write` for a read-only connection. The command prints the connection ID, never the token. Transfer the private output file securely if running a client elsewhere. Revoke access with `python manage.py journal_mcp_token --revoke CONNECTION_ID`; deleting a local credential file does not revoke the connection. A token lasts at most 30 days.
+
+To verify with the official Python MCP SDK, install `scripts/requirements-mcp.txt` in a separate client environment and run from the repository root:
+
+```sh
+python scripts/journal_mcp_client.py --url https://isack.space/mcp/ --token-file /private/journal-mcp-token.json
+```
+
+Add `--article-file /private/article.json` to create and read back a draft. The client verifies an identical retry returns the same article. The file format is:
+
+```json
+{
+  "request_key": "my-unique-article-request",
+  "title": "An article headline",
+  "intro": "A short introduction, up to 350 characters.",
+  "category_slug": "technology",
+  "sections": [
+    {"type": "heading", "text": "A section heading"},
+    {"type": "paragraph", "text": "Plain text is safely escaped."}
+  ]
+}
+```
+
+Sections support `heading`, `paragraph` and `code`. Use `list_categories` for category slugs, or omit the category. Keep the same `request_key` and content when retrying; changing content with an existing key is rejected. Responses include a Studio editor link. Drafts remain excluded from public pages, feeds and sitemaps. The draft-request record links creation to its connection for traceability.
+
+This is a token-authenticated connection, **not yet an OAuth connector for ChatGPT or Claude**. Their sign-in flow, discovery metadata, scheduling tools, media uploads and analytics tools are still pending. The optional test client does not dynamically install a tool into either application.
+
+## Backups and restoration
 
 Back up both named volumes and the private `.env.blog`. A database-only backup does not include images. Store backups outside this server and test restoring them before relying on them. Example database dump:
 

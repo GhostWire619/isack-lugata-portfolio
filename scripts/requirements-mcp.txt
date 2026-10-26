@@ -1,0 +1,2 @@
+# Optional verification client, separate from the production server dependencies.
+mcp==1.26.0
