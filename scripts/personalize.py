@@ -407,6 +407,7 @@ out('personal.css','''
 a[href="#unused-social"], div[class*="-container"]:has(>a[href="#unused-social"]) { display:none !important; }
 video { object-fit:cover !important; visibility:hidden !important; }
 img[src^="/assets/personal/"][src$=".svg"] { object-fit:contain !important; object-position:center !important; }
+img[src^="/assets/personal/"][src$="-live.png"] { object-fit:contain !important; object-position:center !important; }
 [data-framer-name="cards"] > [data-framer-name="block"] > :nth-child(n+3) { display:none !important; }
 .personal-confirmation { border-left:2px solid currentColor; padding-left:16px; opacity:.7; }
 .personal-live-link { display:inline-flex; width:fit-content; align-self:flex-start; padding:10px 15px; margin-top:16px; border-radius:8px; background:linear-gradient(#555,#111); box-shadow:inset 0 0 0 1px #000,0 3px 6px #0003; color:white !important; font:14px Inter,sans-serif !important; text-decoration:none !important; }
@@ -429,10 +430,20 @@ gallery=[
 out('personal.js','''
 (() => {
   const gallery = '''+json.dumps(gallery)+''';
-  const projects = '''+json.dumps([{k:p.get(k) for k in ['slug','name','role','url','cover']} for p in DATA['projects']])+''';
+  const projects = '''+json.dumps([{**{k:p.get(k) for k in ['slug','name','role','url']},'cover':cover(p)} for p in DATA['projects']])+''';
   let pending = false;
   function update() {
     pending = false;
+    function setCover(img, project) {
+      if (img.getAttribute('src') !== project.cover) img.setAttribute('src', project.cover);
+      if (img.hasAttribute('srcset')) img.removeAttribute('srcset');
+      img.alt = project.name + ' — ' + project.role;
+    }
+    projects.forEach(project => {
+      document.querySelectorAll(`a[href="./${project.slug}"],a[href="/${project.slug}"]`).forEach(a => {
+        a.querySelectorAll('img').forEach(img => setCover(img, project));
+      });
+    });
     // Original showreels are replaced with labeled engineering sketches.
     document.querySelectorAll('video[src]').forEach((video, i) => {
       video.pause();
@@ -454,6 +465,10 @@ out('personal.js','''
       holder.addEventListener('keydown', event => { if (event.key === 'Enter') location.assign(item.href); });
     });
     const project = projects.find(p => location.pathname === '/' + p.slug);
+    if (project) {
+      const heroImage = [...document.querySelectorAll('#main [data-framer-name="project stack"] img')].find(img => !img.closest('a') && img.getBoundingClientRect().width > 250);
+      if (heroImage) setCover(heroImage, project);
+    }
     if (project && !document.querySelector('.personal-live-link')) {
       const heading = document.querySelector('h1');
       const paragraphs = [...document.querySelectorAll('#main p')];
