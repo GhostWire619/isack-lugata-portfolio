@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "node server.mjs",
     "start": "node server.mjs",
-    "content": "python scripts/personalize.py",
+    "content": "python scripts/build_portfolio.py",
     "capture:reference": "python scripts/mirror.py"
   }
 }

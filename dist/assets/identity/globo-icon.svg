@@ -1,0 +1,6 @@
+<svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+  <rect width="32" height="32" fill="#1e40af" rx="4"/>
+  <text x="50%" y="50%" text-anchor="middle" dy=".35em" font-family="system-ui, -apple-system, sans-serif" font-size="22" font-weight="bold">
+    <tspan fill="white">G</tspan><tspan fill="#f59e0b">E</tspan>
+  </text>
+</svg>

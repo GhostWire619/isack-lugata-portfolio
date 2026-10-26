@@ -52,6 +52,8 @@ def monogram(label, color='#e8e8e8', ink='#111'):
 
 def panel(project, variant=0):
     """Editorial technical diagrams, explicitly presented as illustrative sketches."""
+    if project.get('detailAssets'):
+        return project['detailAssets'][variant%len(project['detailAssets'])]
     p=project
     mode=variant%5
     bg=p['color']; ink=p['ink']
@@ -125,7 +127,7 @@ def add(old,new):
     if old and old!=new:MAPPINGS[old]=new
 
 def cover(project):
-    image=project.get('cover')
+    image=project.get('artwork') or project.get('cover')
     return image if image and (DIST/image.lstrip('/')).is_file() else panel(project,0)
 
 def long_paragraphs(soup):
@@ -155,10 +157,8 @@ for name,soup in pages.items():
         if meta.get('content'):asset(meta['content'],panel(DATA['projects'][0],0))
 
 add(home.h1.get_text(),DATA['hero'])
-add('Everything your product needs to be taken seriously','What I can build for your business')
-add('Pushing my limits through curiosity','Lab projects. Shared curiosity.')
 add(about.h1.get_text(),DATA['aboutHero'])
-add('Ready for the next adventures','Curious about what we could build?')
+# Keep the reference's adventure heading and paper-collage composition.
 
 for old,new in zip(long_paragraphs(about),DATA['about']):add(old.get_text(),new)
 
@@ -229,7 +229,7 @@ shared={
  '6+ years designing for tech founders. Seed to Series C, across fintech, dev tools, and Web3.':DATA['intro'],
  '6+ years designing for tech founders. ':'Full-stack & mobile developer. ',
  'Seed to Series C, across fintech, dev tools, and Web3.':'Dar es Salaam. Co-founder of Ecofy Africa.',
- 'Companies I helped:':'Tools I build with:',
+ 'Companies I helped:':'Companies I helped:',
  'Brand identity':DATA['services'][2]['title'],
  'Illustration':DATA['services'][3]['title'],
  'Web design':DATA['services'][0]['title'],
@@ -240,21 +240,13 @@ shared={
  'Web platform':'Backend architecture',
  'Visual direction & Web design':'Implementation & architecture',
  'Events and swag':'Engineering decisions',
- 'Other projects':'More engineering work',
- 'More projects coming soon':'More experiments coming soon',
- 'More projects ':'Lab projects ',
- 'coming soon':'Nena AI & robotics',
  'Currently open to collaborations':'Open to freelance projects & collaborations',
- 'Connect on socials':'Find me online',
- 'Long story short':'The engineering story',
- 'How I got here':'A little about me',
- 'Where I stand':'What I care about',
  'Download my CV':'Request my CV',
  'Senior Web & Brand designer':'Co-founder, CEO & AI Lead',
  'Senior Brand & Web designer':'Backend Developer',
  'Senior Web Designer':'Practical Training',
  'Middle Web Designer':'Former chairperson, Robotics Lab',
- 'Junior Web Designer':'BSc Computer Science',
+ 'Junior Web Designer':'Computer Science studies',
  'at O0 Design':'at TanStack Tanzania',
  'at Ooze':'at Bluefin Solutions',
  'at Heartbeat':'at UDSM CoICT',
@@ -265,7 +257,7 @@ shared={
  'Mar 2024 - Dec 2024':'2026 - present',
  'Mar 2023 - Feb 2024':'Practical training',
  'Dec 2020 - Feb 2023':'Previous leadership role',
- 'May 2020 - Dec 2020':'2023 - 2026; award pending',
+ 'May 2020 - Dec 2020':'2023 - 2026',
  'Jan 2021 - Now':'Project-based',
  'hello@danielsun.space':DATA['email'],
  'Daniel Sun':DATA['name'],
@@ -304,6 +296,47 @@ for soup in pages.values():
 
 for soup in pages.values():
     for a in soup.select('a[href*="drive.google.com"]'):add(a['href'],'mailto:'+DATA['email']+'?subject=Current%20engineering%20CV')
+
+# Faithful visual pass: genuine identities and the reference's dimensional artwork.
+def restore_asset(src):
+    for path in groups.get(reverse.get(src),[src]):ASSETS.pop(path,None)
+
+visuals=DATA.get('visuals',{})
+if visuals:
+    for i,img in enumerate(aboutimgs[2:7]):asset(img.get('src'),visuals['photos'][i])
+    for i,img in enumerate(aboutimgs[7:12]):asset(img.get('src'),f'/assets/identity/career-{i}.svg')
+    restore_asset(aboutimgs[12].get('src'))
+    for img in aboutimgs[14:23]:
+        name=img.get('src','')
+        if 'SVpEFYyf' in name:asset(name,visuals['readyNote'])
+        elif 'ksM1tOjo' in name:asset(name,visuals['readyPhoto'])
+        else:restore_asset(name)
+    service_images=home.select('#main img')[35:50]
+    for img in service_images:
+        src=img.get('src','')
+        if 'fuMe9' in src:restore_asset(src)
+        elif '94BIn' in src:asset(src,visuals['services'][1])
+        elif 'lPKpA' in src:asset(src,'/assets/identity/blank.svg')
+        elif 'ii9hv' in src:asset(src,visuals['services'][2])
+        elif 'YcxPf' in src:asset(src,visuals['services'][3])
+    for soup in pages.values():
+        for a in soup.select('a[href]'):
+            url=a['href'];icon=None
+            if 'x.com/danielsun_ui' in url:icon='github'
+            elif 'instagram.com/daniel.sun_design' in url:icon='envelope'
+            elif 'threads.com/@daniel.sun_design' in url:icon='globe'
+            if icon:
+                for img in a.select('img'):
+                    dark=img.get('src') in {x.get('src') for x in about.select('a[href="'+url+'"] img')}
+                    asset(img.get('src'),f'/assets/identity/icon-{icon}-'+('dark' if dark else 'light')+'.svg')
+    for project in DATA['projects']:
+        if project.get('icon'):
+            first=pages[project['legacy']].select_one('#main img')
+            if first:asset(first.get('src'),project['icon'])
+    for i,img in enumerate([x for x in home.select('img') if ' logo' in x.get('alt','')]):
+        company=DATA['companies'][i%len(DATA['companies'])]
+        asset(img.get('src'),company['logo'])
+        MAPPINGS[img.get('alt')]=company['name']
 
 # Replace project-image descriptions rather than leaving another person's work in alt text.
 for soup in pages.values():
@@ -404,10 +437,17 @@ for filename in paths:
 (DIST/'test-1.html').write_text((DIST/'index.html').read_text(encoding='utf8'),encoding='utf8')
 out('personal.css','''
 /* Small content-specific corrections; the original Framer layout and motion remain. */
-a[href="#unused-social"], div[class*="-container"]:has(>a[href="#unused-social"]) { display:none !important; }
+a[href*="unused-social"],a[href*="pinterest.com"],a[href*="dribbble.com"],div[class*="-container"]:has(>a[href*="unused-social"]),div[class*="-container"]:has(>a[href*="pinterest.com"]),div[class*="-container"]:has(>a[href*="dribbble.com"]) { display:none !important; }
 video { object-fit:cover !important; visibility:hidden !important; }
 img[src^="/assets/personal/"][src$=".svg"] { object-fit:contain !important; object-position:center !important; }
-img[src^="/assets/personal/"][src$="-live.png"] { object-fit:contain !important; object-position:center !important; }
+img[src^="/assets/identity/cover-"] { object-fit:cover !important; object-position:center !important; }
+img[src^="/assets/identity/story-"],img[src^="/assets/identity/ready-"],img[src^="/assets/identity/icon-"],img[src^="/assets/identity/career-"] { object-fit:contain !important; object-position:center !important; }
+.personal-companies-grid { display:grid !important; grid-template-columns:repeat(4,minmax(0,1fr)) !important; grid-template-rows:none !important; grid-auto-rows:132px !important; height:auto !important; }
+.personal-company-cell { height:132px !important; min-width:0 !important; display:flex !important; justify-content:center !important; align-items:center !important; }
+.personal-company-hidden { display:none !important; }
+.personal-companies-grid [data-framer-name="image 3"] { width:72% !important; max-width:180px !important; height:48px !important; }
+.personal-companies-grid img { object-fit:contain !important; object-position:center !important; filter:grayscale(1); }
+@media(max-width:640px) { .personal-companies-grid { grid-template-columns:repeat(2,minmax(0,1fr)) !important; grid-auto-rows:108px !important; } .personal-company-cell { height:108px !important; } }
 [data-framer-name="cards"] > [data-framer-name="block"] > :nth-child(n+3) { display:none !important; }
 .personal-confirmation { border-left:2px solid currentColor; padding-left:16px; opacity:.7; }
 .personal-live-link { display:inline-flex; width:fit-content; align-self:flex-start; padding:10px 15px; margin-top:16px; border-radius:8px; background:linear-gradient(#555,#111); box-shadow:inset 0 0 0 1px #000,0 3px 6px #0003; color:white !important; font:14px Inter,sans-serif !important; text-decoration:none !important; }
@@ -420,7 +460,7 @@ img[src^="/assets/personal/"][src$="-live.png"] { object-fit:contain !important;
   *, *::before, *::after { animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; }
 }
 '''+ '\n'.join('a[href="./'+p['slug']+'"] [data-framer-name="cover"] { background:'+p['color']+'; }' for p in DATA['projects']))
-nena={'slug':'nena-ai','name':'Nena AI','color':'#e1cec0','ink':'#594237','flow':['Swahili text','Speech model','Generated speech','Audio experience'],'stack':['Swahili','Speech synthesis','Lab collaboration'],'role':'Team lab project','status':'Lab text-to-speech project'}
+nena={'slug':'nena-ai','name':'Nena AI','color':'#e1cec0','ink':'#594237','flow':['Swahili text','Speech model','Generated speech','Audio experience'],'stack':['Swahili','Speech synthesis','Lab collaboration'],'role':'Team lab project','status':'Lab text-to-speech project','detailAssets':['/assets/identity/cover-nena.svg']}
 gallery=[
  {'title':'Nena AI','subtitle':'Swahili speech · Lab team project','href':'/robotics#nena-ai','image':panel(nena,0)},
  {'title':'3D Solutions & Robotics','subtitle':'Backend · Former chairperson','href':'/robotics','image':DATA['lab']['cover']},
@@ -431,6 +471,7 @@ out('personal.js','''
 (() => {
   const gallery = '''+json.dumps(gallery)+''';
   const projects = '''+json.dumps([{**{k:p.get(k) for k in ['slug','name','role','url']},'cover':cover(p)} for p in DATA['projects']])+''';
+  const companies = '''+json.dumps(DATA.get('companies',[]))+''';
   let pending = false;
   function update() {
     pending = false;
@@ -444,6 +485,20 @@ out('personal.js','''
         a.querySelectorAll('img').forEach(img => setCover(img, project));
       });
     });
+    const companyGrid = document.querySelector('.framer-1yix6hu');
+    if (companyGrid && companies.length) {
+      companyGrid.classList.add('personal-companies-grid');
+      [...companyGrid.children].forEach((cell,index) => {
+        if (index >= companies.length) { cell.classList.add('personal-company-hidden'); return; }
+        cell.classList.add('personal-company-cell');
+        const img = cell.querySelector('img');
+        if (img) {
+          const company=companies[index];
+          if (img.getAttribute('src') !== company.logo) img.src=company.logo;
+          img.removeAttribute('srcset'); img.alt=company.name;
+        }
+      });
+    }
     // Original showreels are replaced with labeled engineering sketches.
     document.querySelectorAll('video[src]').forEach((video, i) => {
       video.pause();
@@ -485,13 +540,15 @@ out('personal.js','''
         link.insertAdjacentElement('afterend', role);
       }
     }
+    document.querySelectorAll('a[href*="pinterest.com"],a[href*="dribbble.com"],a[href*="unused-social"]').forEach(a => {
+      a.style.display='none';
+      if (a.parentElement.className.includes('-container')) a.parentElement.style.display='none';
+    });
     document.querySelectorAll('#main a').forEach(a => {
-      if (a.textContent.includes('Lab projects')) {
-        a.href = '/robotics'; a.dataset.personalLabLink = 'true';
-        if (!a.dataset.personalClickReady) {
-          a.dataset.personalClickReady = 'true';
-          a.addEventListener('click', event => event.stopPropagation(), true);
-        }
+      if (a.textContent.includes('More projects') && !a.dataset.personalPlaceholder) {
+        a.dataset.personalPlaceholder='true'; a.setAttribute('aria-disabled','true');
+        a.style.cursor='default'; a.tabIndex=-1;
+        a.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();},true);
       }
     });
     document.querySelectorAll('p').forEach(p => { if (p.textContent.startsWith('[CONFIRM]')) p.classList.add('personal-confirmation'); });
@@ -528,7 +585,7 @@ lab_html=f'''<!doctype html><html lang="en"><head><meta charset="utf-8"><meta na
 <header><a href="/">{esc(DATA['name'])}</a><nav><a href="/">Works</a><a href="/about">Story</a><a href="mailto:{esc(DATA['email'])}">Let's chat</a></nav></header>
 <main><section class="lab-hero"><span class="eyebrow">{esc(lab['role'])}</span><h1>Software, speech, and shared curiosity.</h1><p>{esc(lab['description'])}</p><a class="lab-button" href="{esc(lab['url'])}" target="_blank" rel="noopener noreferrer">Visit the lab website ↗</a></section>
 <section class="lab-section"><img class="lab-image" src="{esc(lab['cover'])}" alt="Public UDSM robotics lab website preview"><p class="eyebrow">Public lab website · My role: former chairperson and backend contributor</p></section>
-<section class="lab-section lab-grid" id="nena-ai"><div><span class="eyebrow">AI · Lab team project</span><h2>Nena AI</h2><p>{esc(lab['nena']['description'])}</p><p>The visual is a conceptual speech-processing sketch, rather than a product screenshot.</p></div><img src="{panel(nena,0)}" alt="Illustrative Nena AI text-to-speech flow"></section>
+<section class="lab-section lab-grid" id="nena-ai"><div><span class="eyebrow">AI · Lab team project</span><h2>Nena AI</h2><p>{esc(lab['nena']['description'])}</p><p>The project grew out of our lab's work on language technology and practical AI.</p></div><img src="{panel(nena,0)}" alt="Nena AI lab project artwork"></section>
 <section class="lab-section lab-grid"><img src="/assets/personal/tanstack-live.png" alt="Public TanStack Tanzania website"><div><span class="eyebrow">Backend development</span><h2>TanStack Tanzania</h2><p>A platform connecting Tanzanian tech students with opportunities, resources, and career support. I contributed backend development as part of our lab project work.</p><a class="lab-button" href="/tanstack-tanzania">Explore the project ↗</a></div></section></main>
 <footer><p>Open to freelance projects & collaborations</p><a href="mailto:{esc(DATA['email'])}">{esc(DATA['email'])}</a></footer></body></html>'''
 (DIST/'robotics.html').write_text(lab_html,encoding='utf8')

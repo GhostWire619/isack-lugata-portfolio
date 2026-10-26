@@ -5,12 +5,12 @@
   "location": "Dar es Salaam, Tanzania",
   "hero": "Hey! I'm Isack Lugata. I build websites, mobile apps, and AI-powered products that work for real people.",
   "intro": "Full-stack & mobile developer in Dar es Salaam. Co-founder of Ecofy Africa. Open to freelance projects.",
-  "aboutHero": "I take ideas apart, figure out how the pieces fit, and build software that works for people.",
+  "aboutHero": "I turn ambitious ideas into thoughtful digital products, from the interface to the systems behind it.",
   "about": [
-    "I'm Isack Lugata, a full-stack and mobile developer based in Dar es Salaam, Tanzania. I work across frontend interfaces, backend services, mobile applications, and applied AI, taking an idea from the screen to the systems behind it.",
-    "I co-founded Ecofy Africa, where I work on both the frontend and backend alongside the AI and product direction. My other work spans marketplaces, legal technology, property platforms, and internal business systems.",
-    "I am the former chairperson of the 3D Solutions & Robotics Lab at UDSM CoICT. My contribution there included backend development, and our team worked on projects such as Nena AI and TanStack Tanzania. That experience brought software, research, and collaboration into the same room.",
-    "Different projects need different contributions. At GloboExpats, mine is mainly frontend; at Osher Market and TanStack, it is backend. I also develop mobile apps and help connect interfaces, APIs, data, and AI into a working product. Outside work: chess, basketball, video editing, and experiments driven by curiosity."
+    "My route into software started with a simple habit: taking an idea apart until I understood how it worked. Computer Science at the University of Dar es Salaam gave that curiosity a foundation. Building real products taught me the rest: how to connect an interface to an API, untangle a backend, and turn a promising idea into something people can actually use.",
+    "Today I'm based in Dar es Salaam, working with founders and teams across agriculture, commerce, property, and legal technology. I co-founded Ecofy Africa and work across its frontend, backend, and AI. Elsewhere, my work has helped shape products including GloboExpats, Habitek, and Wakili Msomi, alongside backend systems for Osher Market, Falco, and TanStack Tanzania.",
+    "I work across frontend, mobile, backend, and applied AI, moving comfortably between the interface and the systems behind it. That range has taken me from community marketplaces and property platforms to legal assistants and internal management tools. My role changes with the project; the standard stays the same: understand the problem, make thoughtful decisions, and build something that holds together.",
+    "As chairperson of the UDSM 3D Solutions & Robotics Lab, I learned to bring people, ideas, and technical work into the same room. Our projects included Nena AI and TanStack Tanzania. I bring that same approach to client work today: collaborate closely, take ownership of my contribution, and care about the details that make a product feel finished."
   ],
   "services": [
     {
@@ -46,11 +46,11 @@
       "ink": "#263d22",
       "summary": "Ecofy Africa brings farm planning, activity records, and agricultural guidance into one product for Tanzanian farmers. I am a co-founder, CEO and AI Lead, and work on both the frontend and backend.",
       "story": [
-        "Ecofy helps farmers plan their season, record work, monitor costs, and understand the next useful action on their farm.",
-        "My contribution spans the frontend and backend, alongside AI services and technical product direction. I work with a team across the product.",
-        "The public experience is designed around Swahili-speaking users, with farm information, growing-season tasks, weather, and market information presented together.",
-        "The engineering work connects product interfaces, APIs, data, and AI assistance. I care about how those parts work together for the person using them.",
-        "The live website is at ecofy.co.tz, with a linked farm application. The preview shown here is captured from the public site."
+        "Ecofy starts with a practical challenge: helping a farmer understand what to do next. Planning a season, keeping records, and working with changing information all need to feel like one useful experience.",
+        "I work across the frontend and backend, alongside AI services and technical product direction. That means thinking about both the screen a farmer uses and the systems that turn information into guidance.",
+        "The product brings farm activity, seasonal tasks, weather, and market information together for Swahili-speaking users. Making those pieces work together requires attention to the farming context as well as the software.",
+        "Co-founding Ecofy has made product judgment part of my engineering work. I care about which problem a feature solves, how it fits into the rest of the platform, and what it asks of the person using it.",
+        "Ecofy is where my work as a developer and founder comes together: building a product, working with a team, and connecting technical decisions to an everyday need."
       ],
       "stack": [
         "Frontend",
@@ -73,6 +73,14 @@
         "Product experience",
         "Backend & AI services",
         "Engineering contribution"
+      ],
+      "logo": "/assets/identity/brand-ecofy.svg",
+      "icon": "/assets/identity/mark-ecofy.svg",
+      "artwork": "/assets/identity/cover-ecofy.svg",
+      "detailAssets": [
+        "/assets/identity/cover-ecofy-detail.svg",
+        "/assets/personal/ecofy-live.png",
+        "/assets/identity/cover-ecofy.svg"
       ]
     },
     {
@@ -90,10 +98,10 @@
       "ink": "#243451",
       "summary": "Wakili Msomi is an AI-powered legal-information application for the Tanzanian context. I worked on both its frontend and backend, connecting the user-facing experience with the services behind it.",
       "story": [
-        "The application brings legal-information assistance and document workflows into a digital interface for Tanzanian users.",
-        "My contribution covered both frontend and backend development, rather than only the AI layer. The interface and its underlying services are part of the same product experience.",
-        "The work builds on my practical-training experience at Bluefin Solutions in collaboration with Sheria Kiganjani, with English and Swahili users in mind.",
-        "The linked public application currently presents sign-in and registration. The screenshot shows that public entry point, without exposing private conversations or documents."
+        "Legal information is often difficult to navigate. Wakili Msomi brings AI-assisted legal information and document workflows into an application built for the Tanzanian context.",
+        "My contribution covered both the frontend and backend. I worked across the user-facing experience and the application services that support it, keeping the connection between the two in focus.",
+        "The project grew out of my practical-training experience at Bluefin Solutions, in collaboration with Sheria Kiganjani. English and Swahili users are part of the context behind the product.",
+        "The work brought together interfaces, APIs, document processing, and AI integration. It is the kind of project I enjoy: several technical layers serving one clear user experience."
       ],
       "stack": [
         "Frontend",
@@ -115,6 +123,14 @@
       "sections": [
         "Product experience",
         "Frontend & backend"
+      ],
+      "logo": "/assets/identity/wordmark-wakili.svg",
+      "icon": "/assets/identity/mark-wakili-msomi.svg",
+      "artwork": "/assets/identity/cover-wakili-msomi.svg",
+      "detailAssets": [
+        "/assets/identity/cover-wakili-msomi-detail.svg",
+        "/assets/personal/wakili-msomi-live.png",
+        "/assets/identity/cover-wakili-msomi.svg"
       ]
     },
     {
@@ -132,11 +148,11 @@
       "ink": "#463459",
       "summary": "GloboExpats is a marketplace for the expat community in Tanzania. My work is mainly on the frontend: the interfaces people use to browse, discover, buy, and sell.",
       "story": [
-        "The public marketplace brings goods, services, homes, vehicles, and community requests into a browsing experience centered on Dar es Salaam.",
-        "My contribution is mainly frontend development, working on the interfaces people use to explore the marketplace and move between product workflows.",
-        "The interface brings together category browsing, listings, seller information, and the paths into buying and selling.",
-        "For a marketplace, frontend work is about helping people understand what is available and move naturally from browsing into the next step.",
-        "The screenshot is from the live public marketplace. The link opens GloboExpats directly."
+        "GloboExpats is a marketplace built around the expat community in Tanzania, bringing goods, services, homes, vehicles, and community requests into one browsing experience.",
+        "My contribution is mainly frontend development. I work on the part of the product people navigate: turning platform features and data into interfaces that make sense together.",
+        "A marketplace has a lot to communicate at once. Categories, listings, seller information, and the next action all need enough space to be useful without competing for attention.",
+        "I approach that work through clarity and continuity: help someone understand what they are looking at, keep interactions predictable, and make the move from browsing to acting feel natural.",
+        "GloboExpats reflects the frontend side of my work: product interfaces connected to real services, with attention to both the broad journey and the small details along the way."
       ],
       "stack": [
         "Frontend development",
@@ -156,6 +172,14 @@
       "cover": "/assets/personal/globoexpats-live.png",
       "sections": [
         "Frontend experience"
+      ],
+      "logo": "/assets/identity/brand-globo.svg",
+      "icon": "/assets/identity/globo-icon.svg",
+      "artwork": "/assets/identity/cover-globoexpats.svg",
+      "detailAssets": [
+        "/assets/identity/cover-globoexpats-detail.svg",
+        "/assets/personal/globoexpats-live.png",
+        "/assets/identity/cover-globoexpats.svg"
       ]
     },
     {
@@ -173,9 +197,9 @@
       "ink": "#584329",
       "summary": "Habitek combines property discovery with property and hospitality management in Tanzania. I worked on both the frontend and backend of the platform.",
       "story": [
-        "The public experience helps people explore places to live or work, while the management side brings properties, units, tenants, and everyday operations together.",
-        "My contribution covers frontend and backend development: the interfaces and the application services that support them.",
-        "The linked website and captured preview show the public property-discovery experience. Internal management data and account screens are not included."
+        "Habitek connects property discovery with property and hospitality management in Tanzania. The product has to serve both someone looking for a place and the people responsible for managing it.",
+        "I worked on the frontend and backend, connecting the interfaces with the application services behind them. That shared view helps me think through a workflow from the first interaction to the underlying business logic.",
+        "From discovery to everyday management, the focus is a coherent product experience. Habitek is an example of how I work across the stack while keeping the user journey in view."
       ],
       "stack": [
         "Frontend development",
@@ -195,6 +219,14 @@
       "cover": "/assets/personal/habitek-live.png",
       "sections": [
         "Frontend & backend"
+      ],
+      "logo": "/assets/identity/wordmark-habitek.svg",
+      "icon": "/assets/identity/mark-habitek.svg",
+      "artwork": "/assets/identity/cover-habitek.svg",
+      "detailAssets": [
+        "/assets/identity/cover-habitek-detail.svg",
+        "/assets/personal/habitek-live.png",
+        "/assets/identity/cover-habitek.svg"
       ]
     },
     {
@@ -212,10 +244,10 @@
       "ink": "#254c44",
       "summary": "Osher Market is a commerce and business platform. My contribution is backend development: the application services behind the marketplace experience.",
       "story": [
-        "The public storefront organizes products into categories and gives buyers and sellers an entry point into the platform.",
-        "My contribution is backend development. The public storefront preview shows the product that those application services support.",
-        "This work sits behind the interface, in the services and application logic that support a commerce product.",
-        "The live link opens Osher Market. Detailed internal service design can be discussed in a project enquiry without publishing private operational information."
+        "Osher Market brings buyers, sellers, and business operations together in a commerce platform. Behind the storefront, the product depends on application services that keep those workflows connected.",
+        "My contribution is backend development. I work on the services and application logic that support the marketplace experience.",
+        "That work calls for clear boundaries between requests, business rules, and data. I focus on making the system understandable as a whole, rather than treating each endpoint as an isolated task.",
+        "Osher represents the operational side of my engineering work: building the foundations that allow a product interface to do something useful."
       ],
       "stack": [
         "Backend development",
@@ -236,13 +268,21 @@
       "sections": [
         "Backend services",
         "Commerce workflows"
+      ],
+      "logo": "/assets/identity/brand-osher.svg",
+      "icon": "/assets/identity/mark-osher-market.svg",
+      "artwork": "/assets/identity/cover-osher-market.svg",
+      "detailAssets": [
+        "/assets/identity/cover-osher-market-detail.svg",
+        "/assets/personal/osher-market-live.png",
+        "/assets/identity/cover-osher-market.svg"
       ]
     },
     {
       "legacy": "caldera",
       "slug": "falco",
       "oldName": "Caldera",
-      "name": "Falco management backend",
+      "name": "Falco Finance",
       "shortName": "Falco",
       "tags": [
         "Backend",
@@ -251,12 +291,12 @@
       ],
       "color": "#d2d7de",
       "ink": "#303c4a",
-      "summary": "Falco management backend supports internal management workflows. I contributed backend development for the company, separately from its public marketing website.",
+      "summary": "Falco Finance needed an internal management backend to support its day-to-day operations. I worked on the backend services and business logic behind that system.",
       "story": [
-        "This project centers on an internal business-management system, rather than a public-facing website.",
-        "My contribution is backend development for management workflows and the application logic behind them.",
-        "The visual is a conceptual backend sketch, not a screenshot of Falco's internal system. It contains no real accounts, records, or operational data.",
-        "The external link is Falco's public company website for context. It should not be read as a claim that I built that website or its frontend."
+        "My work with Falco focuses on its internal management system: the software supporting how the business organizes its everyday work.",
+        "I contributed backend development, working on the application services and business logic behind the management workflows.",
+        "Internal tools deserve the same care as public products. Clear rules, predictable behavior, and maintainable services make a difference to the people who rely on them.",
+        "The project reflects a part of my work that sits behind the scenes: turning business needs into a backend that a team can work with and build on."
       ],
       "stack": [
         "Backend development",
@@ -276,6 +316,14 @@
       "cover": null,
       "sections": [
         "Management backend"
+      ],
+      "logo": "/assets/identity/brand-falco.svg",
+      "icon": "/assets/identity/mark-falco.svg",
+      "artwork": "/assets/identity/cover-falco.svg",
+      "detailAssets": [
+        "/assets/identity/cover-falco-detail.svg",
+        "/assets/identity/cover-falco.svg",
+        "/assets/identity/cover-falco.svg"
       ]
     },
     {
@@ -293,10 +341,10 @@
       "ink": "#594237",
       "summary": "TanStack Tanzania connects tech students with opportunities, learning resources, and career support. I worked on its backend as part of our lab's project work.",
       "story": [
-        "The platform brings opportunities, resources, a company directory, and CV support into one place for Tanzanian tech students.",
-        "My contribution is backend development for the platform. The public preview gives context to the student-facing product.",
-        "TanStack is one of the projects associated with our work at the 3D Solutions & Robotics Lab, alongside Nena AI.",
-        "The live website is available at tanstack.co.tz. The screenshot shows its public interface; individual student records and private account information are not shown."
+        "TanStack Tanzania connects tech students with opportunities, learning resources, companies, and career support. It brings several useful starting points for a technical career into one platform.",
+        "My contribution is backend development for the platform. I work on the services behind its student-facing experience.",
+        "TanStack is also part of our work at the UDSM 3D Solutions & Robotics Lab, alongside projects such as Nena AI. It connects software development with a community I know first-hand.",
+        "For me, the project brings two interests together: building useful systems and making technical opportunities easier for people to find."
       ],
       "stack": [
         "Backend development",
@@ -316,6 +364,14 @@
       "cover": "/assets/personal/tanstack-live.png",
       "sections": [
         "Platform backend"
+      ],
+      "logo": "/assets/identity/tanstack-light.png",
+      "icon": "/assets/identity/tanstack-icon.svg",
+      "artwork": "/assets/identity/cover-tanstack-tanzania.svg",
+      "detailAssets": [
+        "/assets/identity/cover-tanstack-tanzania-detail.svg",
+        "/assets/personal/tanstack-live.png",
+        "/assets/identity/cover-tanstack-tanzania.svg"
       ]
     }
   ],
@@ -323,11 +379,12 @@
     "User confirmed frontend and backend work at Ecofy, Wakili Msomi, and Habitek; mainly frontend at GloboExpats; backend at Osher, TanStack, robotics, and Falco’s internal management system.",
     "User confirmed that the robotics chairperson role is a previous role. The public lab site may still show an older current-chairperson label; the portfolio follows the user’s correction.",
     "All eight supplied public project domains were opened successfully. Public screenshots document the public interface only, not private systems or the full scope of individual ownership.",
-    "Falco’s card uses a conceptual backend sketch. Its public company website is linked for context, not represented as Isack’s frontend work.",
+    "Falco’s cover uses genuine company branding for the internal management backend project. The public company link provides context; no private interface is fabricated.",
     "Frontend and mobile applications are offered as services. No specific mobile framework, app-store release, or mobile contribution to an individual listed project is invented.",
     "Nena AI is attributed as a team lab project. A standalone public demo or repository was not supplied.",
     "Formal degree conferral, exact historical role dates, phone number, grant amounts, and adoption metrics remain unconfirmed and are not invented.",
-    "A current engineering résumé is still requested by email; the old CV is not published."
+    "A current engineering résumé is still requested by email; the old CV is not published.",
+    "The reference section headings, original photo-stack/adventure composition, and More projects coming soon card are restored. Real company assets replace the technology grid; genuine icon-library glyphs replace text initials. New device compositions contain actual public interface captures and licensed hardware frames."
   ],
   "title": "Full-stack & Mobile Developer · Applied AI",
   "lab": {
@@ -340,5 +397,64 @@
       "name": "Nena AI",
       "description": "A Swahili text-to-speech project developed by our lab team, turning text into Tanzanian Swahili speech."
     }
+  },
+  "companies": [
+    {
+      "name": "Ecofy Africa",
+      "logo": "/assets/identity/brand-ecofy.svg",
+      "url": "https://ecofy.co.tz/"
+    },
+    {
+      "name": "GloboExpats",
+      "logo": "/assets/identity/brand-globo.svg",
+      "url": "https://globoexpats.com/"
+    },
+    {
+      "name": "Osher Market",
+      "logo": "/assets/identity/brand-osher.svg",
+      "url": "https://oshermarket.com/"
+    },
+    {
+      "name": "Habitek",
+      "logo": "/assets/identity/wordmark-habitek.svg",
+      "url": "https://habitek.co.tz/"
+    },
+    {
+      "name": "Falco Finance",
+      "logo": "/assets/identity/brand-falco.svg",
+      "url": "https://falco.co.tz/"
+    },
+    {
+      "name": "Wakili Msomi",
+      "logo": "/assets/identity/wordmark-wakili.svg",
+      "url": "https://wakilimsomi.sheriakiganjani.co.tz/"
+    },
+    {
+      "name": "TanStack Tanzania",
+      "logo": "/assets/identity/tanstack-light.png",
+      "url": "https://tanstack.co.tz/"
+    },
+    {
+      "name": "UDSM Robotics Lab",
+      "logo": "/assets/identity/brand-lab.svg",
+      "url": "https://robotics.udsm.ac.tz/"
+    }
+  ],
+  "visuals": {
+    "photos": [
+      "/assets/identity/story-portrait.svg",
+      "/assets/identity/story-team.svg",
+      "/assets/identity/story-ecofy.svg",
+      "/assets/identity/story-lab.svg",
+      "/assets/identity/story-products.svg"
+    ],
+    "readyPhoto": "/assets/identity/ready-portrait.svg",
+    "readyNote": "/assets/identity/ready-note.svg",
+    "services": [
+      "original",
+      "/assets/identity/phone-3d.png",
+      "/assets/identity/gear-3d.png",
+      "/assets/identity/robot-3d.png"
+    ]
   }
 }

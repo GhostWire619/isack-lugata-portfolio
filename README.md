@@ -20,7 +20,7 @@ The editable content is in `content/portfolio.json`. It contains the identity, i
 npm run content
 ```
 
-Content generation requires Python 3 with Beautiful Soup 4 (`beautifulsoup4`). It reads the immutable reference capture from Git commit `d644207659b68a8a866714bf4216042a9229802a`, applies personal content to both static HTML and hydrated Framer modules, and generates technical sketches. Keep that commit in the repository's history.
+Content generation requires Python 3 with Beautiful Soup 4 (`beautifulsoup4`) and Pillow (`Pillow`, used to inspect existing image bounds). It reads the immutable reference capture from Git commit `d644207659b68a8a866714bf4216042a9229802a`, applies personal content to both static HTML and hydrated Framer modules, and generates technical sketches. Keep that commit in the repository's history.
 
 The original files are compiled Framer output, rather than an editable Framer canvas. The content layer makes the personalized material easier to maintain without replacing the layout and motion system.
 
@@ -56,3 +56,13 @@ See `content/REVIEW.md` for source notes and remaining editorial details.
 Check the homepage, Story navigation, project cards, clean project routes, back navigation, contact links, and image loading after changing content. Because content appears in both HTML and hydrated modules, regenerate both with `npm run content`.
 
 `scripts/mirror.py` is retained for provenance. `npm run capture:reference` captures the reference again and overwrites generated files; it is not the content-editing command.
+
+## Visual assets
+
+The original reference section structure and headings are retained, including How I got here, Where I stand, Ready for the next adventures, Companies I helped, and More projects coming soon.
+
+`npm run content` regenerates code-native device mockups and paper compositions before applying the content. Real project screenshots, genuine company marks, the public GitHub portrait, and public lab photographs supply the imagery. The screenshots are composed inside licensed device frames; they are not generated product interfaces.
+
+Social icons use genuine Simple Icons and Phosphor SVG artwork with consistent optical padding. Service icons combine the original globe/cursor artwork with Microsoft Fluent 3D assets. Licensing files are deployed alongside assets under `dist/assets/identity/`, and public asset source URLs are recorded in `content/asset-sources.json`.
+
+Photo compositions retain real people and real photographs. Captions do not invent a family, pets, or personal events. The career timeline uses actual brand/university marks and a generic briefcase for practical training.

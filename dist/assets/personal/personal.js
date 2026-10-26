@@ -1,7 +1,8 @@
 
 (() => {
-  const gallery = [{"title": "Nena AI", "subtitle": "Swahili speech \u00b7 Lab team project", "href": "/robotics#nena-ai", "image": "/assets/personal/nena-ai-0.svg"}, {"title": "3D Solutions & Robotics", "subtitle": "Backend \u00b7 Former chairperson", "href": "/robotics", "image": "/assets/personal/robotics-live.png"}, {"title": "TanStack Tanzania", "subtitle": "Backend development", "href": "/tanstack-tanzania", "image": "/assets/personal/tanstack-live.png"}, {"title": "GloboExpats", "subtitle": "Mainly frontend development", "href": "/globoexpats", "image": "/assets/personal/globoexpats-live.png"}];
-  const projects = [{"slug": "ecofy", "name": "Ecofy Africa", "role": "Frontend & backend \u00b7 Co-founder, CEO & AI Lead", "url": "https://ecofy.co.tz/", "cover": "/assets/personal/ecofy-live.png"}, {"slug": "wakili-msomi", "name": "Wakili Msomi", "role": "Frontend & backend development", "url": "https://wakilimsomi.sheriakiganjani.co.tz/", "cover": "/assets/personal/wakili-msomi-live.png"}, {"slug": "globoexpats", "name": "GloboExpats", "role": "Mainly frontend development", "url": "https://globoexpats.com/", "cover": "/assets/personal/globoexpats-live.png"}, {"slug": "habitek", "name": "Habitek", "role": "Frontend & backend development", "url": "https://habitek.co.tz/", "cover": "/assets/personal/habitek-live.png"}, {"slug": "osher-market", "name": "Osher Market", "role": "Backend development", "url": "https://oshermarket.com/", "cover": "/assets/personal/osher-market-live.png"}, {"slug": "falco", "name": "Falco management backend", "role": "Internal management backend development", "url": "https://falco.co.tz/", "cover": "/assets/personal/falco-0.svg"}, {"slug": "tanstack-tanzania", "name": "TanStack Tanzania", "role": "Backend development \u00b7 Lab project", "url": "https://tanstack.co.tz/", "cover": "/assets/personal/tanstack-live.png"}];
+  const gallery = [{"title": "Nena AI", "subtitle": "Swahili speech \u00b7 Lab team project", "href": "/robotics#nena-ai", "image": "/assets/identity/cover-nena.svg"}, {"title": "3D Solutions & Robotics", "subtitle": "Backend \u00b7 Former chairperson", "href": "/robotics", "image": "/assets/personal/robotics-live.png"}, {"title": "TanStack Tanzania", "subtitle": "Backend development", "href": "/tanstack-tanzania", "image": "/assets/personal/tanstack-live.png"}, {"title": "GloboExpats", "subtitle": "Mainly frontend development", "href": "/globoexpats", "image": "/assets/personal/globoexpats-live.png"}];
+  const projects = [{"slug": "ecofy", "name": "Ecofy Africa", "role": "Frontend & backend \u00b7 Co-founder, CEO & AI Lead", "url": "https://ecofy.co.tz/", "cover": "/assets/identity/cover-ecofy.svg"}, {"slug": "wakili-msomi", "name": "Wakili Msomi", "role": "Frontend & backend development", "url": "https://wakilimsomi.sheriakiganjani.co.tz/", "cover": "/assets/identity/cover-wakili-msomi.svg"}, {"slug": "globoexpats", "name": "GloboExpats", "role": "Mainly frontend development", "url": "https://globoexpats.com/", "cover": "/assets/identity/cover-globoexpats.svg"}, {"slug": "habitek", "name": "Habitek", "role": "Frontend & backend development", "url": "https://habitek.co.tz/", "cover": "/assets/identity/cover-habitek.svg"}, {"slug": "osher-market", "name": "Osher Market", "role": "Backend development", "url": "https://oshermarket.com/", "cover": "/assets/identity/cover-osher-market.svg"}, {"slug": "falco", "name": "Falco Finance", "role": "Internal management backend development", "url": "https://falco.co.tz/", "cover": "/assets/identity/cover-falco.svg"}, {"slug": "tanstack-tanzania", "name": "TanStack Tanzania", "role": "Backend development \u00b7 Lab project", "url": "https://tanstack.co.tz/", "cover": "/assets/identity/cover-tanstack-tanzania.svg"}];
+  const companies = [{"name": "Ecofy Africa", "logo": "/assets/identity/brand-ecofy.svg", "url": "https://ecofy.co.tz/"}, {"name": "GloboExpats", "logo": "/assets/identity/brand-globo.svg", "url": "https://globoexpats.com/"}, {"name": "Osher Market", "logo": "/assets/identity/brand-osher.svg", "url": "https://oshermarket.com/"}, {"name": "Habitek", "logo": "/assets/identity/wordmark-habitek.svg", "url": "https://habitek.co.tz/"}, {"name": "Falco Finance", "logo": "/assets/identity/brand-falco.svg", "url": "https://falco.co.tz/"}, {"name": "Wakili Msomi", "logo": "/assets/identity/wordmark-wakili.svg", "url": "https://wakilimsomi.sheriakiganjani.co.tz/"}, {"name": "TanStack Tanzania", "logo": "/assets/identity/tanstack-light.png", "url": "https://tanstack.co.tz/"}, {"name": "UDSM Robotics Lab", "logo": "/assets/identity/brand-lab.svg", "url": "https://robotics.udsm.ac.tz/"}];
   let pending = false;
   function update() {
     pending = false;
@@ -15,6 +16,20 @@
         a.querySelectorAll('img').forEach(img => setCover(img, project));
       });
     });
+    const companyGrid = document.querySelector('.framer-1yix6hu');
+    if (companyGrid && companies.length) {
+      companyGrid.classList.add('personal-companies-grid');
+      [...companyGrid.children].forEach((cell,index) => {
+        if (index >= companies.length) { cell.classList.add('personal-company-hidden'); return; }
+        cell.classList.add('personal-company-cell');
+        const img = cell.querySelector('img');
+        if (img) {
+          const company=companies[index];
+          if (img.getAttribute('src') !== company.logo) img.src=company.logo;
+          img.removeAttribute('srcset'); img.alt=company.name;
+        }
+      });
+    }
     // Original showreels are replaced with labeled engineering sketches.
     document.querySelectorAll('video[src]').forEach((video, i) => {
       video.pause();
@@ -56,13 +71,15 @@
         link.insertAdjacentElement('afterend', role);
       }
     }
+    document.querySelectorAll('a[href*="pinterest.com"],a[href*="dribbble.com"],a[href*="unused-social"]').forEach(a => {
+      a.style.display='none';
+      if (a.parentElement.className.includes('-container')) a.parentElement.style.display='none';
+    });
     document.querySelectorAll('#main a').forEach(a => {
-      if (a.textContent.includes('Lab projects')) {
-        a.href = '/robotics'; a.dataset.personalLabLink = 'true';
-        if (!a.dataset.personalClickReady) {
-          a.dataset.personalClickReady = 'true';
-          a.addEventListener('click', event => event.stopPropagation(), true);
-        }
+      if (a.textContent.includes('More projects') && !a.dataset.personalPlaceholder) {
+        a.dataset.personalPlaceholder='true'; a.setAttribute('aria-disabled','true');
+        a.style.cursor='default'; a.tabIndex=-1;
+        a.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();},true);
       }
     });
     document.querySelectorAll('p').forEach(p => { if (p.textContent.startsWith('[CONFIRM]')) p.classList.add('personal-confirmation'); });
