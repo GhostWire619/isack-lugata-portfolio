@@ -2,7 +2,41 @@
 
 A freelance-focused portfolio for Isack Lugata, a full-stack and mobile developer in Dar es Salaam, Tanzania. The presentation retains the reference site's typography, responsive layouts, tactile project cards, animated navigation, character reveals, and motion runtime.
 
-## Run locally
+## Run on your server with Docker
+
+Requires Docker Engine and the Docker Compose plugin. The finished site and its assets are already included; no Node.js, Python, or content generation is needed on the server.
+
+```sh
+git clone https://github.com/GhostWire619/isack-lugata-portfolio.git
+cd isack-lugata-portfolio
+docker compose up -d --build
+```
+
+Open `http://YOUR_SERVER_IP:3100`. The host and container both use port **3100**. If the server has a firewall, allow inbound TCP port 3100. For a domain with HTTPS, point your existing reverse proxy to this port.
+
+```sh
+# Check status and logs
+docker compose ps
+docker compose logs --tail=100
+
+# Pull updates and rebuild
+git pull --ff-only
+docker compose up -d --build
+
+# Stop the site
+docker compose down
+```
+
+The repository is private, so clone it using an authorised GitHub account or a server deploy key. Nginx serves clean page URLs, fonts, JavaScript modules, and media directly. Container health is checked at `/healthz`. GitHub Actions builds the image and verifies the live container on port 3100 after each push.
+
+Without Compose:
+
+```sh
+docker build -t isack-portfolio .
+docker run -d --name isack-portfolio --restart unless-stopped -p 3100:3100 isack-portfolio
+```
+
+## Run locally without Docker
 
 Requires Node.js; no npm packages are needed to serve the site.
 

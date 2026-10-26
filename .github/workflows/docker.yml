@@ -1,0 +1,39 @@
+name: Docker verification
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  container:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build and check Nginx configuration
+        run: |
+          docker build -t isack-portfolio:test .
+          docker run --rm isack-portfolio:test nginx -t
+          docker compose config --quiet
+      - name: Verify the running site on port 3100
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker run -d --name portfolio-check -p 3100:3100 isack-portfolio:test
+          trap 'docker logs portfolio-check; docker rm -f portfolio-check' EXIT
+          curl --fail --retry 15 --retry-connrefused --retry-delay 1 http://localhost:3100/healthz
+          for route in / /about /ecofy /globoexpats /wakili-msomi /habitek /osher-market /falco /tanstack-tanzania /robotics; do
+            curl --fail --silent --show-error "http://localhost:3100$route" -o /tmp/portfolio-page.html
+            grep -q 'Isack' /tmp/portfolio-page.html
+          done
+          curl --fail --silent --show-error http://localhost:3100/assets/personal/contact.js -o /tmp/portfolio-contact.js
+          grep -q '255749498117' /tmp/portfolio-contact.js
+          grep -q 'zac_eye' /tmp/portfolio-contact.js
+          module=$(find dist/assets -name '*.mjs' -print -quit)
+          curl --fail --silent --show-error -D /tmp/module-headers "http://localhost:3100/${module#dist/}" -o /tmp/module.js
+          grep -qi 'content-type: application/javascript' /tmp/module-headers
+          test "$(curl --silent -o /dev/null -w '%{http_code}' http://localhost:3100/missing-page)" = '404'
