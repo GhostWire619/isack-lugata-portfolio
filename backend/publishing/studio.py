@@ -110,7 +110,9 @@ def ai_connections(request):
     response = render(request, 'publishing/studio_ai.html', {'connections': connections, 'oauth_failures': failures, 'form': form,
         'token': token, 'mcp_url': settings.PUBLIC_URL + '/mcp', 'claude_client': claude_application(request.user)})
     response['Cache-Control'] = 'no-store'
-    response['Referrer-Policy'] = 'no-referrer'
+    # Native form POSTs need their same-origin provenance for Django CSRF.
+    # no-referrer can produce Origin: null even with a valid form token.
+    response['Referrer-Policy'] = 'same-origin'
     return response
 
 

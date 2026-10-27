@@ -182,6 +182,26 @@ class ConnectionTests(TestCase):
         self.assertEqual(rpc.status_code, 200, rpc.content)
         self.assertIn('create_article_draft', [tool['name'] for tool in rpc.json()['result']['tools']])
 
+    @override_settings(PUBLIC_URL='https://isack.space', ALLOWED_HOSTS=['isack.space'],
+        CSRF_TRUSTED_ORIGINS=['https://isack.space'], CSRF_COOKIE_SECURE=True)
+    def test_studio_https_form_preserves_origin_and_rejects_foreign_submissions(self):
+        from .oauth import claude_application
+        headers = {'HTTP_HOST': 'isack.space', 'secure': True}
+        response = self.client.get('/admin/ai/', **headers)
+        self.assertEqual(response['Referrer-Policy'], 'same-origin')
+        csrf = BeautifulSoup(response.content, 'html.parser').select_one('input[name=csrfmiddlewaretoken]')['value']
+        form = {'action': 'setup_claude', 'csrfmiddlewaretoken': csrf}
+        # This is the request a native form can send under no-referrer.
+        for origin in ['null', 'https://untrusted.example']:
+            self.assertEqual(self.client.post('/admin/ai/', form, HTTP_ORIGIN=origin, **headers).status_code, 403)
+        self.assertIsNone(claude_application(self.owner))
+        response = self.client.post('/admin/ai/', form, HTTP_ORIGIN='https://isack.space', **headers)
+        self.assertEqual(response.status_code, 302)
+        self.assertIsNotNone(claude_application(self.owner))
+        # Browsers without an Origin header use Django's secure Referer check.
+        response = self.client.post('/admin/ai/', form, HTTP_REFERER='https://isack.space/admin/ai/', **headers)
+        self.assertEqual(response.status_code, 302)
+
     def test_metadata_failure_is_correlated_visible_and_redacted(self):
         from oauth2_provider.cimd import CIMDError
         from .models import OAuthFailure
