@@ -62,9 +62,18 @@ Never add unrelated stock imagery just to meet a count or repeat the same image
 throughout the article. Match portrait/landscape framing to the actual subject.
 
 Use `list_images` to find suitable existing images the account may access; inspect
-their returned URLs when the client supports viewing images. Otherwise
+their returned URLs when the client supports viewing images. If a filtered search
+returns nothing, list without a query and paginate before calling the library empty. Otherwise
 use permitted original, licensed or clearly disclosed AI-generated imagery, and
-`upload_image` when the client can provide image bytes. Do not invent an image ID,
+`import_image` with a direct public HTTPS JPEG, PNG or WebP URL (up to 10 MB),
+the source page URL, photographer credit and verified reuse license. Find suitable
+photos using available web tools; check the source license rather than assuming
+all web photos are forbidden or that attribution grants reuse permission. The
+server downloads and compresses the image even when your workspace cannot fetch it.
+Use the returned image_id and carry its credit into the article. This tool does not
+search for photos or independently verify permission. For local/generated images,
+use `upload_image` only if you can encode bytes programmatically; never manually
+reproduce or guess base64. A failed import is not a successful upload. Do not invent an image ID,
 use a broken remote URL as an image ID, or claim an image was uploaded when it was
 not. If no suitable image can be obtained, save a draft and report the missing asset
 rather than claiming the requested illustrated article is ready to publish.

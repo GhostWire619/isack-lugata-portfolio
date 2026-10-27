@@ -196,3 +196,23 @@ backend/.venv/Scripts/python.exe backend/manage.py test publishing --noinput
 ```
 
 CI additionally verifies PostgreSQL behavior and builds/runs the complete production Docker deployment. Tests cover draft/privacy exclusion, publish/unpublish visibility, scheduled posts, search escaping, pagination, image renditions, mandatory two-factor setup, one-use recovery codes and CSRF protection.
+
+
+### Import article photos through MCP
+
+`import_image` accepts `title`, `image_url` (direct HTTPS JPEG/PNG/WebP),
+`source_url` (the source/license page), `credit`, and `license` (verified reuse basis).
+It downloads up to 10 MB on the server, validates up to 40 megapixels, resizes to
+2560 pixels and stores WebP. It returns the image ID, URL and saved provenance;
+`list_images` also returns provenance. Include credits in the article caption and
+link the source in an adjacent paragraph. Licensing is supplied by the caller,
+not automatically verified. The tool cannot search for images.
+
+Imports require write scope and native image/page permissions. Every redirect is
+checked against public DNS and pinned to the resolved IP with hostname-verified
+TLS. Private/local addresses, non-HTTPS URLs, unexpected content, oversized files
+and slow responses are rejected. No browser cookies or OAuth headers are forwarded.
+Base64 upload remains available for clients that encode files programmatically.
+After deploying, refresh/reconnect the AI connector to discover `import_image`
+and the updated writing guide. Existing images need no backfill; the migration
+adds optional provenance. Docker service names and port 3100 are unchanged.

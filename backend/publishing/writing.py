@@ -8,7 +8,7 @@ from wagtail.admin.auth import require_admin_access
 
 SKILL_FILE = Path(__file__).parent / 'skills' / 'write-journal-articles' / 'SKILL.md'
 SKILL_URI = 'journal://skills/write-journal-articles'
-SKILL_VERSION = '2026-10-27.1'
+SKILL_VERSION = '2026-10-27.2'
 
 
 def writing_guide():

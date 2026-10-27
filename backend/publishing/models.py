@@ -208,6 +208,7 @@ class MCPDraftRequest(models.Model):
 
 
 class MCPImageUpload(models.Model):
+    provenance = models.JSONField(default=dict, blank=True)
     connection = models.ForeignKey(MCPConnection, on_delete=models.CASCADE)
     content_hash = models.CharField(max_length=64)
     image = models.ForeignKey('wagtailimages.Image', on_delete=models.CASCADE)

@@ -81,6 +81,14 @@ class UploadArguments(Arguments):
     image_base64: str = Field(min_length=4, max_length=2800000)
 
 
+class ImportArguments(Arguments):
+    title: str = Field(min_length=1, max_length=250)
+    image_url: str = Field(min_length=8, max_length=2000, description='Direct public HTTPS JPEG, PNG or WebP URL, not a webpage. Up to 10 MB.')
+    source_url: str = Field(min_length=8, max_length=2000, description='Public source page documenting the image and its rights.')
+    credit: str = Field(min_length=1, max_length=350, description='Photographer or rights-holder credit.')
+    license: str = Field(min_length=1, max_length=350, description='Verified reuse basis, e.g. CC BY 4.0, public domain, or permission from owner. Attribution alone is not permission.')
+
+
 Section = Annotated[Union[TextSection, QuoteSection, ImageSection, ListSection], Field(discriminator='type')]
 
 
@@ -126,11 +134,12 @@ TOOLS = {
     'get_analytics': (AnalyticsArguments, 'Read actual aggregate page views, active reading time, popular pages and referrer domains over 1–90 days. No unique-person counts or identifying visitor data.'),
     'list_articles': (ListArguments, 'List articles accessible to this connection, including drafts. Use after_id for pagination.'),
     'get_article': (GetArguments, 'Read the latest saved draft of an accessible article.'),
-    'create_article_draft': (DraftArguments, 'Read get_writing_guide first. Create an unpublished illustrated article with SEO metadata. Paragraphs support [label](https://url), **bold** and *italic*; raw HTML is escaped. Use list_images/upload_image for real image IDs. Reuse request_key for safe retries; never publishes.'),
+    'create_article_draft': (DraftArguments, 'Read get_writing_guide first. Create an unpublished illustrated article with SEO metadata. Paragraphs support [label](https://url), **bold** and *italic*; raw HTML is escaped. Use list_images/import_image for real image IDs; use upload_image only for programmatically encoded bytes. Reuse request_key for safe retries; never publishes.'),
+    'import_image': (ImportArguments, 'Import a licensed real photo from a direct public HTTPS image URL. The server downloads, validates and compresses it; no base64 needed. Supply verified source, credit and reuse license. Returns image_id and credit for article captions. Does not search the web or verify licensing for you.'),
     'upload_image': (UploadArguments, 'Upload a base64 JPEG, PNG or WebP image (maximum 2 MB, 40 megapixels). Images are resized, stripped of metadata and compressed to WebP. Identical retries reuse the image. Returns image_id for covers and image sections.'),
 }
 
-WRITE_TOOLS = {'create_article_draft', 'upload_image', 'update_article_draft'}
+WRITE_TOOLS = {'create_article_draft', 'upload_image', 'import_image', 'update_article_draft'}
 PUBLISH_TOOLS = {'publish_article', 'schedule_article'}
 
 
@@ -227,19 +236,42 @@ def choose_image(user, image_id):
     return image
 
 
-def upload_image(connection, args):
-    if not args.title.strip():
+def image_collection(connection, title):
+    if not title.strip():
         raise ValueError('The image title must contain text.')
     policy = get_permission_policy()
     collection = policy.collections_user_has_permission_for(connection.user, 'add').order_by('depth', 'pk').first()
     if not collection or not can_write(connection.user, JournalIndexPage.objects.first()):
         raise ValueError('This account cannot upload journal images.')
+    return collection
+
+
+def upload_image(connection, args):
+    collection = image_collection(connection, args.title)
     try:
         source = base64.b64decode(args.image_base64, validate=True)
     except (ValueError, binascii.Error):
         raise ValueError('Invalid base64 image.')
     if len(source) > 2 * 1024 * 1024:
         raise ValueError('Image exceeds 2 MB. Compress it before uploading.')
+    return save_image(connection, args.title, source, collection)
+
+
+def import_image(connection, args):
+    from urllib.parse import urlsplit
+    from .image_import import download_image
+    collection = image_collection(connection, args.title)
+    parsed = urlsplit(args.source_url)
+    if parsed.scheme != 'https' or not parsed.hostname or parsed.username or parsed.password:
+        raise ValueError('Supply a public HTTPS source page.')
+    if not args.credit.strip() or not args.license.strip():
+        raise ValueError('Source credit and a verified reuse license are required.')
+    source = download_image(args.image_url)
+    return save_image(connection, args.title, source, collection, {
+        'source_url': args.source_url, 'credit': args.credit.strip(), 'license': args.license.strip()})
+
+
+def save_image(connection, title, source, collection, provenance=None):
     digest = hashlib.sha256(source).hexdigest()
     with warnings.catch_warnings():
         warnings.simplefilter('error', Image.DecompressionBombWarning)
@@ -260,17 +292,22 @@ def upload_image(connection, args):
         if previous:
             image = choose_image(connection.user, previous.image_id)
         else:
-            image = get_image_model()(title=args.title.strip(), collection=collection, uploaded_by_user=connection.user,
+            image = get_image_model()(title=title.strip(), collection=collection, uploaded_by_user=connection.user,
                 width=picture.width, height=picture.height)
             filename = f'journal-{digest[:20]}.webp'
             image.file.save(filename, ContentFile(output.getvalue(), name=filename), save=False)
             try:
                 image.save()
-                MCPImageUpload.objects.create(connection=connection, content_hash=digest, image=image)
+                MCPImageUpload.objects.create(connection=connection, content_hash=digest, image=image, provenance=provenance or {})
             except Exception:
                 image.file.delete(save=False)
                 raise
-    return {'image_id': image.pk, 'title': image.title, 'width': image.width, 'height': image.height, 'reused': bool(previous)}
+        if previous and provenance and not previous.provenance:
+            previous.provenance = provenance
+            previous.save(update_fields=['provenance'])
+    return {'image_id': image.pk, 'title': image.title, 'width': image.width, 'height': image.height,
+        'url': urljoin(settings.PUBLIC_URL, image.file.url), 'reused': bool(previous),
+        'provenance': previous.provenance if previous else provenance or {}}
 
 
 def accessible(user):
@@ -307,7 +344,8 @@ def call_tool(connection, name, raw):
             images = images.filter(title__icontains=args.query)
         items = list(images.order_by('pk')[:args.limit])
         return {'images': [{'image_id': item.pk, 'title': item.title, 'width': item.width, 'height': item.height,
-            'url': urljoin(settings.PUBLIC_URL, item.file.url)} for item in items],
+            'url': urljoin(settings.PUBLIC_URL, item.file.url),
+            'provenance': list(MCPImageUpload.objects.filter(image=item).exclude(provenance={}).values_list('provenance', flat=True)[:5])} for item in items],
             'next_after_id': items[-1].pk if len(items) == args.limit else None}
     if name == 'review_article':
         article = accessible(user).filter(pk=args.article_id).first()
@@ -326,6 +364,8 @@ def call_tool(connection, name, raw):
                 raise ValueError('Article was not found or access is denied.')
             path = '/blog/' + article.slug + '/'
         return report(args.days, path)
+    if name == 'import_image':
+        return import_image(connection, args)
     if name == 'upload_image':
         return upload_image(connection, args)
     if name == 'list_articles':
@@ -390,8 +430,8 @@ def rpc(request, connection):
         version = params.get('protocolVersion')
         return result({'protocolVersion': version if version in VERSIONS else '2025-11-25',
             'capabilities': {'tools': {'listChanged': False}, 'resources': {'listChanged': False, 'subscribe': False}, 'prompts': {'listChanged': False}},
-            'serverInfo': {'name': 'isack-journal', 'version': '1.2.0'},
-            'instructions': 'Before writing, editing or publishing articles, call get_writing_guide for the bundled writing skill. Use clear hooks and readable sections, at least one relevant image, [source label](https://url) for clickable references, and dedicated SEO fields. Run review_article and read back the saved draft before publication. Create/update tools save drafts. Publish/schedule only when explicitly requested by the owner and permitted by this connection.'})
+            'serverInfo': {'name': 'isack-journal', 'version': '1.3.0'},
+            'instructions': 'Before writing, editing or publishing articles, call get_writing_guide for the bundled writing skill. Use import_image to fetch licensed photos by HTTPS URL without base64. If list_images finds no matches, retry without a query. Use clear hooks and readable sections, at least one relevant image, [source label](https://url) for clickable references, and dedicated SEO fields. Run review_article and read back the saved draft before publication. Create/update tools save drafts. Publish/schedule only when explicitly requested by the owner and permitted by this connection.'})
     if request.headers.get('MCP-Protocol-Version', '2025-03-26') not in VERSIONS:
         return error(-32600, 'Unsupported MCP protocol version.')
     if method == 'ping':
@@ -421,7 +461,7 @@ def rpc(request, connection):
     if method == 'tools/list':
         definitions = [{'name': name, 'description': description, 'inputSchema': model.model_json_schema(),
             'annotations': {'readOnlyHint': name not in WRITE_TOOLS | PUBLISH_TOOLS, 'destructiveHint': name in PUBLISH_TOOLS,
-                'idempotentHint': True, 'openWorldHint': name in PUBLISH_TOOLS}}
+                'idempotentHint': True, 'openWorldHint': name in PUBLISH_TOOLS or name == 'import_image'}}
             for name, (model, description) in TOOLS.items()
             if available(connection, name)]
         definitions.append({'name': 'list_categories', 'description': 'List available article categories.',

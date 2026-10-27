@@ -1,6 +1,7 @@
 import hashlib
 import base64
 from io import BytesIO
+from unittest.mock import patch
 from tempfile import TemporaryDirectory
 import json
 from datetime import timedelta
@@ -211,3 +212,34 @@ class MCPTests(TestCase):
         self.connection.save()
         result = self.rpc('tools/call', {'name': 'upload_image', 'arguments': {'title': 'Blocked', 'image_base64': 'AAAA'}}).json()['result']
         self.assertTrue(result['isError'])
+
+    def test_import_photo_and_reuse_with_provenance(self):
+        output = BytesIO()
+        Image.new('RGB', (300, 200), '#224466').save(output, format='JPEG')
+        args = {'title': 'A licensed photo', 'image_url': 'https://photos.example/photo.jpg',
+            'source_url': 'https://photos.example/source', 'credit': 'Example photographer', 'license': 'CC BY 4.0'}
+        with patch('publishing.image_import.download_image', return_value=output.getvalue()) as download:
+            result = self.rpc('tools/call', {'name': 'import_image', 'arguments': args}).json()['result']
+            self.assertFalse(result['isError'], result)
+            saved = result['structuredContent']
+            self.assertEqual(saved['provenance']['credit'], args['credit'])
+            self.assertTrue(saved['url'].endswith('.webp'))
+            retry = self.rpc('tools/call', {'name': 'import_image', 'arguments': args}).json()['result']['structuredContent']
+            self.assertEqual(retry['image_id'], saved['image_id'])
+            self.assertTrue(retry['reused'])
+            library = self.rpc('tools/call', {'name': 'list_images', 'arguments': {}}).json()['result']['structuredContent']['images']
+            self.assertEqual(library[0]['provenance'][0]['license'], 'CC BY 4.0')
+            draft = self.draft(cover_image_id=saved['image_id'], cover_alt='Example photo', cover_caption=args['credit'])
+            self.assertFalse(draft['isError'])
+            download.reset_mock()
+            self.connection.can_write = False
+            self.connection.save()
+            self.assertTrue(self.rpc('tools/call', {'name': 'import_image', 'arguments': args}).json()['result']['isError'])
+            download.assert_not_called()
+
+    def test_import_rejects_corrupt_bytes(self):
+        with patch('publishing.image_import.download_image', return_value=b'not an image'):
+            result = self.rpc('tools/call', {'name': 'import_image', 'arguments': {
+                'title': 'Bad image', 'image_url': 'https://example.com/a.jpg',
+                'source_url': 'https://example.com', 'credit': 'Owner', 'license': 'Owner permission'}}).json()['result']
+            self.assertTrue(result['isError'])
