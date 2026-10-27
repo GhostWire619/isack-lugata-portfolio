@@ -7,7 +7,43 @@ body.login{background:var(--paper)!important;color:var(--ink)}.login .content-wr
 
 .journal-studio{background:var(--paper);color:var(--ink);min-height:calc(100dvh - 60px);padding:40px 42px 30px}.j-header{display:flex;align-items:center;justify-content:space-between;gap:25px;margin-bottom:30px}.j-eyebrow{font-size:12px;color:var(--muted);margin:0 0 10px}.j-header h1{font:46px/1.1 JournalEditorial,Georgia,serif;letter-spacing:-.035em;margin:0 0 12px;color:var(--ink)}.j-header p:last-child{font-size:14px;color:var(--muted);margin:0}.j-button{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 16px;min-height:44px;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--ink);text-decoration:none;font-size:13px;font-weight:500;white-space:nowrap}.j-button:hover{background:var(--wash);color:var(--ink)}.j-primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}.j-primary:hover{background:var(--accent);color:var(--accent-ink)}.j-button img{width:17px;height:17px}.j-primary img{filter:invert(1)}.j-guide{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:25px;padding:23px 25px;background:var(--wash);border:1px solid var(--line);border-radius:6px;margin-bottom:30px}.j-guide strong{display:block;font-size:13px;margin-bottom:9px;color:var(--accent)}.j-guide span{font-size:12px;line-height:1.7;color:var(--muted);display:block;max-width:290px}.j-tools{display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:22px}.j-tabs{display:flex;gap:22px;flex-wrap:wrap}.j-tabs a{font-size:13px;color:var(--muted);text-decoration:none;padding:10px 0}.j-tabs a[aria-current]{border-bottom:2px solid var(--accent);color:var(--accent)}.j-tabs span{margin-left:5px;font-size:11px;background:var(--wash);padding:2px 5px;border-radius:4px}.j-tools form{display:flex;gap:8px}.j-tools input{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:10px 12px;font-size:13px;color:var(--ink);min-width:0}.j-list{border:1px solid var(--line);border-radius:6px;background:var(--surface);overflow:hidden}.j-row{display:grid;grid-template-columns:minmax(0,1fr) 150px 150px;gap:25px;padding:25px;align-items:center}.j-row+.j-row{border-top:1px solid var(--line)}.j-article a{color:var(--ink);text-decoration:none}.j-article h2{font-size:16px;line-height:1.5;font-weight:600;margin:0 0 9px;overflow-wrap:anywhere}.j-article p{font-size:11px;color:var(--muted);margin:0}.j-article p span{margin:0 5px}.j-state small{font-size:10px;color:var(--muted);display:block;margin-top:8px;line-height:1.5}.j-badge{display:inline-block;background:var(--wash);color:var(--accent);font-size:11px;padding:5px 9px;border-radius:4px}.j-draft{background:var(--wash);color:var(--muted)}.j-scheduled{background:var(--wash);color:var(--muted)}.j-actions{display:flex;align-items:flex-end;flex-direction:column;gap:11px}.j-view{font-size:11px;color:var(--accent);text-decoration:none}.j-empty{padding:45px 25px;text-align:center}.j-empty h2{font:34px/1.2 JournalEditorial,Georgia;margin-bottom:18px;color:var(--ink)}.j-empty p{font-size:13px;line-height:1.8;color:var(--muted);max-width:530px;margin:0 auto 25px}.j-footer{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-top:23px;font-size:11px;color:var(--muted)}.j-footer a{color:var(--accent)}.j-pagination{display:flex;justify-content:center;align-items:center;gap:20px;margin-top:25px;font-size:12px}@media(max-width:1000px){.journal-studio{padding:30px 25px}.j-row{grid-template-columns:minmax(0,1fr) 120px 130px;gap:18px;padding:22px}}@media(max-width:650px){.journal-studio{padding:25px 16px}.j-header{align-items:flex-start;flex-direction:column;gap:20px}.j-header h1{font-size:38px}.j-guide{grid-template-columns:1fr;gap:18px;padding:20px}.j-guide span{max-width:none}.j-tabs{gap:15px}.j-tabs a{font-size:12px}.j-tools form{width:100%}.j-tools input{flex:1;width:100%}.j-row{grid-template-columns:minmax(0,1fr) auto;gap:16px;padding:20px}.j-article{grid-column:1/-1}.j-state{align-self:start}.j-actions{align-items:flex-end}.j-footer{line-height:1.7}}
 
-.journal-editor-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap}.journal-editor-actions>button[name="action-publish"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}.journal-editor-actions>button[name="action-publish"]:hover{background:var(--accent)}
+.journal-editor-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+
+/* Article actions follow the form instead of floating over editable fields. */
+.editor-view #page-edit-form > .footer:has(.journal-editor-actions){
+    position:static;inset:auto;transform:none;z-index:auto;transition:none;
+    display:block;width:auto;margin:24px clamp(16px,5vw,80px) 40px;
+}
+.editor-view .footer:has(.journal-editor-actions) > .actions--primary{
+    display:block;min-width:0;width:100%;padding:16px 0;
+    background:transparent;color:var(--ink);border-top:1px solid var(--line);border-radius:0;
+}
+.editor-view .footer .actions--primary > .journal-editor-actions{min-width:0}
+.journal-editor-actions .w-dropdown-button{display:inline-flex;flex:0 1 auto;width:auto;min-width:0}
+.editor-view .journal-editor-actions > .button,
+.editor-view .journal-editor-actions .w-dropdown-button > .button{
+    display:inline-flex;align-items:center;justify-content:center;gap:6px;
+    flex:0 0 auto;width:auto;min-width:0;height:44px;min-height:44px;
+    padding-inline:14px;font-size:14px;background:var(--surface);color:var(--ink);border:1px solid var(--line);
+}
+.editor-view .journal-editor-actions .w-dropdown__toggle{
+    height:44px;min-height:44px;background:var(--surface);color:var(--ink);border-color:var(--line);
+}
+.editor-view .journal-editor-actions > button[name="action-publish"]{
+    background:var(--accent);border-color:var(--accent);color:var(--accent-ink);
+}
+.editor-view .journal-editor-actions .button:hover{filter:brightness(.95)}
+.editor-view .journal-editor-actions .button:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.editor-view .footer:has(.journal-editor-actions) > .footer__container:not(.actions--primary){
+    margin:0;background:var(--wash);color:var(--ink);border-radius:4px;
+}
+.editor-view .footer:has(.journal-editor-actions) > .footer__container--hidden{display:none}
+@media(max-width:600px){
+    .journal-editor-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+    .editor-view .journal-editor-actions > .button,
+    .journal-editor-actions .w-dropdown-button{width:100%}
+    .editor-view .journal-editor-actions .w-dropdown-button > .button{flex:1;min-width:0;padding-inline:8px}
+}
 
 .journal-studio .j-article h2{color:var(--ink)}.journal-studio .j-tools input{height:44px}.journal-editor-actions .button-secondary{background:transparent}
 
