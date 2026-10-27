@@ -100,7 +100,9 @@ def ai_connections(request):
                 can_analytics=values['can_analytics'], can_publish=values['can_publish'])
     connections = MCPConnection.objects.filter(user=request.user, revoked_at__isnull=True,
         expires_at__gt=timezone.now()).select_related('oauth_application').order_by('-created_at')
-    response = render(request, 'publishing/studio_ai.html', {'connections': connections, 'form': form,
+    from .models import OAuthFailure
+    failures = OAuthFailure.objects.filter(user=request.user).order_by('-created_at')[:10]
+    response = render(request, 'publishing/studio_ai.html', {'connections': connections, 'oauth_failures': failures, 'form': form,
         'token': token, 'mcp_url': settings.PUBLIC_URL + '/mcp'})
     response['Cache-Control'] = 'no-store'
     response['Referrer-Policy'] = 'no-referrer'

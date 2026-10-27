@@ -49,7 +49,10 @@ class MCPTests(TestCase):
         names = [tool['name'] for tool in self.rpc('tools/list').json()['result']['tools']]
         self.assertIn('create_article_draft', names)
         self.assertNotIn('publish_article', names)
-        self.assertEqual(self.client.get('/mcp/').status_code, 405)
+        probe = self.client.get('/mcp/')
+        self.assertEqual(probe.status_code, 401)
+        self.assertIn('resource_metadata=', probe['WWW-Authenticate'])
+        self.assertEqual(self.client.get('/mcp/', HTTP_AUTHORIZATION='Bearer ' + self.token).status_code, 405)
 
     def test_draft_is_private_escaped_and_retry_safe(self):
         first = self.draft()

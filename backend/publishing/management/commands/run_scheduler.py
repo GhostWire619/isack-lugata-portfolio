@@ -22,8 +22,9 @@ class Command(BaseCommand):
             try:
                 call_command('publish_scheduled')
                 if time.monotonic() - last_cleanup > 86400:
-                    from publishing.models import PageView
+                    from publishing.models import PageView, OAuthFailure
                     PageView.objects.filter(created_at__lt=timezone.now() - timedelta(days=90)).delete()
+                    OAuthFailure.objects.filter(created_at__lt=timezone.now() - timedelta(days=14)).delete()
                     call_command('cleartokens', verbosity=0)
                     last_cleanup = time.monotonic()
             except Exception:

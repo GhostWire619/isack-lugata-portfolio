@@ -56,6 +56,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django_otp.middleware.OTPMiddleware',
     'publishing.middleware.RequireAdminOTP',
+    'publishing.oauth_diagnostics.OAuthDiagnostics',
     'publishing.middleware.ProtocolCORS',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',

@@ -58,6 +58,25 @@ class JournalOAuthValidator(OAuth2Validator):
 class JournalAuthorizationView(AuthorizationView):
     template_name = 'publishing/authorize.html'
 
+    def error_response(self, error, application, **kwargs):
+        from .oauth_diagnostics import safe_description
+        native_error = error.oauthlib_error
+        self.request.oauth_failure = {'code': native_error.error,
+            'description': safe_description(native_error.description, self.request)}
+        return super().error_response(error, application, **kwargs)
+
+    def render_to_response(self, context, **response_kwargs):
+        failure = getattr(self.request, 'oauth_failure', None)
+        if failure:
+            context['oauth_diagnostic'] = {**failure, 'reference': getattr(self.request, 'oauth_reference', ''),
+                **getattr(self.request, 'oauth_metadata_failure', {})}
+        else:
+            try:
+                context['oauth_client_host'] = urlsplit(context.get('redirect_uri', '')).hostname
+            except ValueError:
+                context['oauth_client_host'] = ''
+        return super().render_to_response(context, **response_kwargs)
+
     def form_valid(self, form):
         scopes = form.cleaned_data['scope'].split()
         if not self.request.POST.get('allow_publish'):

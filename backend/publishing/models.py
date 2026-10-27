@@ -235,3 +235,10 @@ class PageView(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     seconds = models.PositiveIntegerField(default=0)
     progress = models.PositiveSmallIntegerField(default=0)
+
+
+class OAuthFailure(models.Model):
+    reference = models.CharField(max_length=16, unique=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    details = models.JSONField(default=dict)

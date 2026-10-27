@@ -69,6 +69,11 @@ jobs:
           grep -q 'csrfmiddlewaretoken' /tmp/login.html
           test "$(curl --silent -o /tmp/mcp-auth.txt -w '%{http_code}' -X POST -H 'Host: isack.space' -H 'X-Forwarded-Proto: https' -H 'Content-Type: application/json' --data '{}' http://localhost:3100/mcp/)" = '401'
           grep -q 'access token is required' /tmp/mcp-auth.txt
+          test "$(curl --silent -D /tmp/mcp-get-headers.txt -o /dev/null -w '%{http_code}' -H 'Host: isack.space' -H 'X-Forwarded-Proto: https' http://localhost:3100/mcp)" = '401'
+          grep -qi 'WWW-Authenticate:.*resource_metadata=' /tmp/mcp-get-headers.txt
+          curl --silent -H 'Host: isack.space' -H 'X-Forwarded-Proto: https' 'http://localhost:3100/admin/ai/authorize/?state=oauth-query-redaction-canary-93817' -o /dev/null
+          docker compose logs --no-color portfolio journal > /tmp/access-log-redaction.txt
+          if grep -q 'oauth-query-redaction-canary-93817' /tmp/access-log-redaction.txt; then exit 1; fi
           curl --fail --silent -H 'Host: isack.space' -H 'X-Forwarded-Proto: https' http://localhost:3100/.well-known/oauth-authorization-server -o /tmp/oauth.json
           python -c 'import json; d=json.load(open("/tmp/oauth.json")); assert d["authorization_endpoint"] == "https://isack.space/admin/ai/authorize/"; assert d["code_challenge_methods_supported"] == ["S256"]'
           curl --fail --silent -H 'Host: isack.space' -H 'X-Forwarded-Proto: https' http://localhost:3100/.well-known/oauth-protected-resource/mcp -o /tmp/mcp-resource.json

@@ -448,14 +448,11 @@ def rpc(request, connection):
 
 @csrf_exempt
 def endpoint(request):
-    if request.method != 'POST':
-        response = HttpResponse(status=405)
-        response['Allow'] = 'POST'
-    elif request.headers.get('Origin') and request.headers['Origin'] not in settings.MCP_ALLOWED_ORIGINS:
+    if request.headers.get('Origin') and request.headers['Origin'] not in settings.MCP_ALLOWED_ORIGINS:
         response = HttpResponse('Origin is not allowed.', status=403)
-    elif request.content_type != 'application/json':
+    elif request.method == 'POST' and request.content_type != 'application/json':
         response = HttpResponse('Use application/json.', status=415)
-    elif int(request.META.get('CONTENT_LENGTH') or 0) > 3000000:
+    elif request.method == 'POST' and int(request.META.get('CONTENT_LENGTH') or 0) > 3000000:
         response = HttpResponse('Request is too large.', status=413)
     else:
         auth = request.headers.get('Authorization', '')
@@ -469,6 +466,9 @@ def endpoint(request):
         if not connection:
             response = HttpResponse('A valid journal access token is required.', status=401)
             response['WWW-Authenticate'] = f'Bearer realm="journal", resource_metadata="{settings.PUBLIC_URL}/.well-known/oauth-protected-resource/mcp"'
+        elif request.method != 'POST':
+            response = HttpResponse(status=405)
+            response['Allow'] = 'POST'
         else:
             MCPConnection.objects.filter(pk=connection.pk).update(last_used_at=timezone.now())
             response = rpc(request, connection)

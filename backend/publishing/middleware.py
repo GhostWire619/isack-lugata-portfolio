@@ -39,5 +39,5 @@ class ProtocolCORS:
                 response['Access-Control-Allow-Origin'] = '*' if request.path.startswith(('/oauth/', '/.well-known/')) else origin or settings.PUBLIC_URL
                 response['Access-Control-Allow-Headers'] = 'Authorization, Content-Type, MCP-Protocol-Version, Accept'
                 response['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS'
-                response['Access-Control-Expose-Headers'] = 'WWW-Authenticate'
+                response['Access-Control-Expose-Headers'] = 'WWW-Authenticate, X-OAuth-Diagnostic-ID'
         return response

@@ -6,7 +6,12 @@ from oauth2_provider.settings import oauth2_settings
 class JournalClientMetadataFetcher(SafeMetadataFetcher):
     def fetch(self, client_id):
         # Keep DOT's HTTPS, pinned public-IP, size, timeout and no-redirect checks.
-        metadata, max_age = super().fetch(client_id)
+        try:
+            metadata, max_age = super().fetch(client_id)
+        except Exception as error:
+            from .oauth_diagnostics import metadata_failed
+            metadata_failed(client_id, error)
+            raise
         methods = metadata.get('token_endpoint_auth_methods_supported')
         if methods is not None:
             if not isinstance(methods, list) or not methods or not all(isinstance(method, str) for method in methods):

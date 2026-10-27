@@ -129,6 +129,18 @@ Open **Studio → AI connections** (`/admin/ai/`). Copy `https://isack.space/mcp
 
 **Connected applications** shows access, last use and expiry. **Disconnect** revokes the connection, pending grants and OAuth access/refresh tokens. Manual bearer tokens can also be generated here and are shown only once. OAuth uses Django OAuth Toolkit, authorization code with S256 PKCE, one-hour access tokens, rotated refresh tokens with reuse protection, a maximum 30-day connection, and resource-bound tokens accepted only at this MCP endpoint. Discovery is at `/.well-known/oauth-authorization-server` and `/.well-known/oauth-protected-resource/mcp`. Registration allows HTTPS callback addresses (loopback HTTP only during development), limits size and rate, and exposes no password or implicit grant. Reconnecting requires a fresh approval.
 
+### OAuth troubleshooting and logs
+
+Authorization failures display the native OAuth error code, a redacted reason and a diagnostic ID. **Studio → AI connections → Recent connection errors** shows the same user's last ten failures, including whether the client was registered, its callback matched, the PKCE method and any published-identity fetch failure. Records expire after 14 days and are bounded per user. Anonymous failures remain in server logs rather than a public database view.
+
+JSON log events `oauth.metadata_failed`, `oauth.request_failed` and `oauth.request_succeeded` include timestamps, stage and correlation IDs. Credentials, authorization codes, OAuth state and raw sign-in URLs are excluded. The bundled Nginx and Gunicorn access logs omit query strings; an external reverse proxy has its own logging configuration. Inspect recent backend diagnostics with:
+
+```bash
+docker compose logs --since=15m journal
+```
+
+The MCP returns a `401` bearer discovery challenge for unauthenticated GET and POST probes. An authenticated GET returns `405` because the endpoint uses stateless POST responses. Regression tests cover Claude's hosted callback `https://claude.ai/api/mcp/auth_callback`, automatic registration, S256 PKCE, form-encoded token exchange and MCP initialization. Published-identity fetches retain HTTPS, public-IP pinning and certificate validation; a blocked metadata fetch is reported rather than bypassed. See [Claude's authentication requirements](https://claude.com/docs/connectors/building/authentication).
+
 ### Real site and article analytics
 
 **Studio → Analytics** (`/admin/analytics/`) shows real page views, active time, reading progress, top pages, referring domains and daily totals for 7, 30 or 90 days. The same aggregate data is available through `get_analytics` with optional article filtering. These are page-view counts, not unique people. The collector never stores IP addresses, analytics cookies or persistent visitor IDs, strips referrer query strings, and respects Do Not Track and Global Privacy Control. It is disabled on localhost and public draft previews. Raw events are pruned after 90 days by the existing scheduler. Google AdSense reports remain separate.

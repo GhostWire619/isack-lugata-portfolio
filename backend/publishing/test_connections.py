@@ -35,9 +35,9 @@ class ConnectionTests(TestCase):
         session['otp_device_id'] = self.device.persistent_id
         session.save()
 
-    def register(self):
+    def register(self, callback='https://assistant.example/callback'):
         response = self.client.post('/oauth/register/', json.dumps({'client_name': 'Test AI',
-            'redirect_uris': ['https://assistant.example/callback'], 'grant_types': ['authorization_code', 'refresh_token'],
+            'redirect_uris': [callback], 'grant_types': ['authorization_code', 'refresh_token'],
             'response_types': ['code'], 'token_endpoint_auth_method': 'none'}), content_type='application/json')
         self.assertEqual(response.status_code, 201, response.content)
         return response.json()['client_id']
@@ -48,6 +48,8 @@ class ConnectionTests(TestCase):
             'scope': 'articles:read articles:write analytics:read articles:publish', 'state': 'checked-state',
             'code_challenge': base64.urlsafe_b64encode(hashlib.sha256(verifier.encode()).digest()).rstrip(b'=').decode(),
             'code_challenge_method': 'S256', 'resource': resource}
+        if resource is None:
+            query.pop('resource')
         response = self.client.get('/admin/ai/authorize/?' + urlencode(query))
         self.assertEqual(response.status_code, 200, response.content)
         soup = BeautifulSoup(response.content, 'html.parser')
@@ -138,6 +140,57 @@ class ConnectionTests(TestCase):
         session.pop('otp_device_id')
         session.save()
         self.assertRedirects(self.client.get('/admin/ai/'), '/security/verify/', fetch_redirect_response=False)
+
+    def test_claude_hosted_dcr_callback_pkce_form_exchange_and_mcp(self):
+        callback = 'https://claude.ai/api/mcp/auth_callback'
+        client_id = self.register(callback)
+        code, verifier = self.authorize(client_id, redirect_uri=callback, resource=None)
+        body = urlencode({'client_id': client_id, 'grant_type': 'authorization_code', 'code': code,
+            'code_verifier': verifier, 'redirect_uri': callback})
+        response = self.client.post('/oauth/token/', body, content_type='application/x-www-form-urlencoded')
+        self.assertEqual(response.status_code, 200, response.content)
+        tokens = response.json()
+        rpc = self.client.post('/mcp', json.dumps({'jsonrpc': '2.0', 'id': 1, 'method': 'initialize',
+            'params': {'protocolVersion': '2025-11-25'}}), content_type='application/json',
+            HTTP_AUTHORIZATION='Bearer ' + tokens['access_token'])
+        self.assertEqual(rpc.status_code, 200, rpc.content)
+        self.assertEqual(rpc.json()['result']['serverInfo']['name'], 'isack-journal')
+
+    def test_metadata_failure_is_correlated_visible_and_redacted(self):
+        from oauth2_provider.cimd import CIMDError
+        from .models import OAuthFailure
+        client_id = 'https://claude.ai/oauth/mcp-oauth-client-metadata'
+        params = {'client_id': client_id, 'response_type': 'code', 'redirect_uri': 'https://claude.ai/api/mcp/auth_callback',
+            'code_challenge': 'private-challenge-should-not-be-logged', 'code_challenge_method': 'S256',
+            'state': 'private-state-should-not-be-logged'}
+        with self.assertLogs('publishing.oauth_diagnostics', level='WARNING') as logs:
+            with patch('oauth2_provider.cimd.SafeMetadataFetcher.fetch', side_effect=CIMDError('client_id document returned HTTP 403')):
+                response = self.client.get('/admin/ai/authorize/?' + urlencode(params))
+        self.assertEqual(response.status_code, 400)
+        failure = OAuthFailure.objects.get()
+        self.assertEqual(failure.reference, response['X-OAuth-Diagnostic-ID'])
+        self.assertEqual(failure.details['provider'], 'Claude')
+        self.assertEqual(failure.details['metadata_http_status'], 403)
+        self.assertEqual(failure.details['error_code'], 'invalid_request')
+        self.assertIn('client_id', failure.details['description'])
+        self.assertContains(response, failure.reference, status_code=400)
+        self.assertContains(response, 'HTTP 403', status_code=400)
+        for secret in [params['state'], params['code_challenge'], client_id]:
+            self.assertNotIn(secret, '\n'.join(logs.output))
+            self.assertNotIn(secret, json.dumps(failure.details))
+        self.assertContains(self.client.get('/admin/ai/'), failure.reference)
+
+    def test_token_errors_log_codes_without_credentials(self):
+        from .models import OAuthFailure
+        with self.assertLogs('publishing.oauth_diagnostics', level='WARNING') as logs:
+            response = Client().post('/oauth/token/', urlencode({'grant_type': 'authorization_code',
+                'client_id': 'unknown', 'client_secret': 'secret-must-not-be-logged', 'code': 'code-must-not-be-logged'}),
+                content_type='application/x-www-form-urlencoded')
+        self.assertEqual(response.status_code, 401)
+        self.assertIn('"error_code": "invalid_client"', '\n'.join(logs.output))
+        self.assertNotIn('secret-must-not-be-logged', '\n'.join(logs.output))
+        self.assertNotIn('code-must-not-be-logged', '\n'.join(logs.output))
+        self.assertFalse(OAuthFailure.objects.exists())
 
     def test_manual_token_is_shown_once_and_analytics_enforces_user_permission(self):
         page = self.client.get('/admin/ai/')
