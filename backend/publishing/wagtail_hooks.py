@@ -21,6 +21,21 @@ def articles_menu():
     return ArticlesMenuItem('Articles', reverse('journal_articles'), icon_name='doc-full', order=50)
 
 
+@hooks.register('register_admin_menu_item')
+def ai_menu():
+    return MenuItem('AI connections', reverse('journal_ai'), icon_name='link', order=60)
+
+
+class AnalyticsMenuItem(MenuItem):
+    def is_shown(self, request):
+        return request.user.has_perm('publishing.view_pageview')
+
+
+@hooks.register('register_admin_menu_item')
+def analytics_menu():
+    return AnalyticsMenuItem('Analytics', reverse('journal_analytics'), icon_name='chart-line', order=70)
+
+
 @hooks.register('construct_page_action_menu')
 def clear_article_actions(menu_items, request, context):
     if isinstance(context.get('page'), ArticlePage) or (context.get('view') == 'create' and isinstance(context.get('parent_page'), JournalIndexPage)):

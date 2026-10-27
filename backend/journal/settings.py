@@ -37,7 +37,7 @@ if not DEBUG and DATABASES['default']['ENGINE'] != 'django.db.backends.postgresq
     raise ImproperlyConfigured('Production requires PostgreSQL.')
 
 INSTALLED_APPS = [
-    'publishing',
+    'publishing', 'oauth2_provider',
     'wagtail.contrib.forms', 'wagtail.contrib.redirects', 'wagtail.contrib.settings',
     'wagtail.embeds', 'wagtail.sites', 'wagtail.users', 'wagtail.snippets',
     'wagtail.documents', 'wagtail.images', 'wagtail.search', 'wagtail.admin', 'wagtail',
@@ -56,6 +56,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django_otp.middleware.OTPMiddleware',
     'publishing.middleware.RequireAdminOTP',
+    'publishing.middleware.ProtocolCORS',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'wagtail.contrib.redirects.middleware.RedirectMiddleware',
@@ -108,6 +109,41 @@ LOGIN_URL = '/admin/login/'
 # Allow the bounded MCP JSON envelope for a base64 image up to 2 MiB.
 DATA_UPLOAD_MAX_MEMORY_SIZE = 3_000_000
 ADSENSE_PUBLISHER_ID = 'ca-pub-4911606730643023'
+OAUTH2_PROVIDER_APPLICATION_MODEL = 'oauth2_provider.Application'
+OAUTH2_PROVIDER = {
+    'SCOPES': {'articles:read': 'Read journal articles and drafts',
+        'articles:write': 'Create and edit drafts and upload images',
+        'articles:publish': 'Publish and schedule articles without another Studio confirmation',
+        'analytics:read': 'Read aggregate site and article analytics'},
+    'DEFAULT_SCOPES': ['articles:read', 'articles:write', 'analytics:read'],
+    'ACCESS_TOKEN_EXPIRE_SECONDS': 3600,
+    'REFRESH_TOKEN_EXPIRE_SECONDS': 2592000,
+    'ROTATE_REFRESH_TOKEN': True, 'REFRESH_TOKEN_REUSE_PROTECTION': True,
+    'PKCE_REQUIRED': True,
+    'OAUTH2_VALIDATOR_CLASS': 'publishing.oauth.JournalOAuthValidator',
+    'COMPLIANT_BCP_RFC9700_IMPLICIT_GRANT': True,
+    'COMPLIANT_BCP_RFC9700_PASSWORD_GRANT': True,
+    'COMPLIANT_BCP_RFC9700_PKCE_METHOD': True,
+    'COMPLIANT_BCP_RFC9700_ACCESS_TOKEN_TRANSPORT': True,
+    'COMPLIANT_BCP_RFC9700_TOKEN_STORAGE': True,
+    'REQUIRE_FORM_ENCODED_REQUEST_BODY': True,
+    'ALLOWED_REDIRECT_URI_SCHEMES': ['https', 'http'] if DEBUG else ['https'],
+    'ALLOW_URI_WILDCARDS': False,
+    'DCR_ENABLED': True,
+    'CIMD_ENABLED': True,
+    'DCR_REGISTRATION_PERMISSION_CLASSES': ['publishing.oauth.RegistrationPermission'],
+    'DCR_REGISTRATION_TOKEN_EXPIRE_SECONDS': 2592000,
+    'OIDC_ISS_ENDPOINT': PUBLIC_URL,
+    'OAUTH2_RESPONSE_TYPES_SUPPORTED': ['code'],
+    'OAUTH2_GRANT_TYPES_SUPPORTED': ['authorization_code', 'refresh_token'],
+    'OAUTH2_TOKEN_ENDPOINT_AUTH_METHODS_SUPPORTED': ['none', 'client_secret_post', 'client_secret_basic'],
+    'OAUTH2_PROTECTED_RESOURCE_IDENTIFIER': PUBLIC_URL + '/mcp',
+    'OAUTH2_PROTECTED_RESOURCE_AUTHORIZATION_SERVERS': [PUBLIC_URL],
+    'OAUTH2_PROTECTED_RESOURCE_NAME': 'Isack Journal',
+    'OAUTH2_PROTECTED_RESOURCE_POLICY_URI': PUBLIC_URL + '/blog/privacy/',
+    'OAUTH2_PROTECTED_RESOURCE_TOS_URI': PUBLIC_URL + '/blog/terms/',
+}
+MCP_ALLOWED_ORIGINS = [PUBLIC_URL, 'https://chatgpt.com', 'https://claude.ai']
 SESSION_COOKIE_NAME = 'journal_session'
 CSRF_COOKIE_NAME = 'journal_csrf'
 SESSION_COOKIE_HTTPONLY = True

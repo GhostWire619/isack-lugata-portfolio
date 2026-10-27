@@ -45,6 +45,7 @@ jobs:
         run: |
           set -euo pipefail
           node scripts/check_advertising.mjs
+          node scripts/check_analytics.mjs
           unset JOURNAL_ENV PUBLIC_URL DATABASE_URL
           python scripts/setup_blog_env.py
           docker network create ecofy-network
@@ -66,6 +67,11 @@ jobs:
           grep -q 'csrfmiddlewaretoken' /tmp/login.html
           test "$(curl --silent -o /tmp/mcp-auth.txt -w '%{http_code}' -X POST -H 'Host: isack.space' -H 'X-Forwarded-Proto: https' -H 'Content-Type: application/json' --data '{}' http://localhost:3100/mcp/)" = '401'
           grep -q 'access token is required' /tmp/mcp-auth.txt
+          curl --fail --silent -H 'Host: isack.space' -H 'X-Forwarded-Proto: https' http://localhost:3100/.well-known/oauth-authorization-server -o /tmp/oauth.json
+          python -c 'import json; d=json.load(open("/tmp/oauth.json")); assert d["authorization_endpoint"] == "https://isack.space/admin/ai/authorize/"; assert d["code_challenge_methods_supported"] == ["S256"]'
+          curl --fail --silent -H 'Host: isack.space' -H 'X-Forwarded-Proto: https' http://localhost:3100/.well-known/oauth-protected-resource/mcp -o /tmp/mcp-resource.json
+          python -c 'import json; assert json.load(open("/tmp/mcp-resource.json"))["resource"] == "https://isack.space/mcp"'
+          test "$(curl --silent -o /tmp/event-auth.txt -w '%{http_code}' -X POST -H 'Host: isack.space' -H 'X-Forwarded-Proto: https' -H 'Content-Type: application/json' --data '{}' http://localhost:3100/events/)" = '403'
           curl --fail --silent -H 'Host: isack.space' -H 'X-Forwarded-Proto: https' http://localhost:3100/blog/feed/ -o /tmp/feed.xml
           grep -q '<rss' /tmp/feed.xml
           curl --fail --silent -H 'Host: isack.space' -H 'X-Forwarded-Proto: https' http://localhost:3100/sitemap.xml -o /tmp/sitemap.xml

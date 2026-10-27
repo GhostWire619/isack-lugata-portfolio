@@ -176,16 +176,23 @@ class MCPConnection(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     token_hash = models.CharField(max_length=64, unique=True, editable=False)
     can_write = models.BooleanField(default=False)
+    can_publish = models.BooleanField(default=False)
+    can_analytics = models.BooleanField(default=False)
+    oauth_application = models.ForeignKey('oauth2_provider.Application', null=True, blank=True, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     expires_at = models.DateTimeField()
     last_used_at = models.DateTimeField(null=True, blank=True)
     revoked_at = models.DateTimeField(null=True, blank=True)
 
+    class Meta:
+        constraints = [models.UniqueConstraint(fields=['user', 'oauth_application'], condition=Q(oauth_application__isnull=False), name='unique_user_oauth_connection')]
+
     @classmethod
-    def issue(cls, *, user, name, expires_at, can_write=False):
+    def issue(cls, *, user, name, expires_at, can_write=False, can_publish=False, can_analytics=False):
         token = 'journal_' + secrets.token_urlsafe(40)
         connection = cls.objects.create(user=user, name=name, expires_at=expires_at,
-            can_write=can_write, token_hash=hashlib.sha256(token.encode()).hexdigest())
+            can_write=can_write, can_publish=can_publish, can_analytics=can_analytics,
+            token_hash=hashlib.sha256(token.encode()).hexdigest())
         return connection, token
 
 
@@ -208,3 +215,23 @@ class MCPImageUpload(models.Model):
 
     class Meta:
         constraints = [models.UniqueConstraint(fields=['connection', 'content_hash'], name='unique_mcp_image_upload')]
+
+
+class MCPAction(models.Model):
+    connection = models.ForeignKey(MCPConnection, on_delete=models.CASCADE)
+    request_key = models.CharField(max_length=100)
+    payload_hash = models.CharField(max_length=64)
+    tool = models.CharField(max_length=60)
+    article = models.ForeignKey(ArticlePage, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    class Meta:
+        constraints = [models.UniqueConstraint(fields=['connection', 'request_key'], name='unique_mcp_action_request')]
+
+
+class PageView(models.Model):
+    id = models.UUIDField(primary_key=True, editable=False)
+    path = models.CharField(max_length=250, db_index=True)
+    referrer = models.CharField(max_length=200, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    seconds = models.PositiveIntegerField(default=0)
+    progress = models.PositiveSmallIntegerField(default=0)

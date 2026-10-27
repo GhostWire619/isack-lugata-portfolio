@@ -4,14 +4,19 @@ from django.urls import include, path
 from wagtail.admin import urls as wagtailadmin_urls
 from wagtail.documents import urls as wagtaildocs_urls
 from wagtail import urls as wagtail_urls
-from publishing import security, studio, views, mcp
+from publishing import security, studio, views, mcp, analytics
 from publishing.feeds import JournalFeed
 
 urlpatterns = [
+    path('', include('publishing.oauth_urls')),
     path('ads.txt', views.ads_txt, name='journal_ads_txt'),
     path('blog/privacy/', views.privacy, name='journal_privacy'),
     path('blog/terms/', views.terms, name='journal_terms'),
     path('mcp/', mcp.endpoint, name='journal_mcp'),
+    path('mcp', mcp.endpoint),
+    path('events/', analytics.collect, name='journal_metrics'),
+    path('admin/ai/', studio.ai_connections, name='journal_ai'),
+    path('admin/analytics/', studio.analytics, name='journal_analytics'),
     path('admin/', studio.articles, name='journal_studio'),
     path('admin/articles/', studio.articles, name='journal_articles'),
     path('admin/articles/new/', studio.write, name='journal_write'),

@@ -6,7 +6,7 @@ from django.urls import reverse
 from urllib.parse import urlencode
 from wagtail.admin.auth import require_admin_access
 from wagtail.permission_policies.pages import PagePermissionPolicy
-from .models import ArticlePage, JournalIndexPage
+from .models import ArticlePage, JournalIndexPage, MCPConnection
 
 
 def can_write(user, journal):
@@ -63,3 +63,54 @@ def advertising_preview(request):
     if not page:
         raise Http404('Create an article before previewing ad placements.')
     return page.serve_preview(request, page.default_preview_mode)
+
+
+@require_admin_access
+def ai_connections(request):
+    from django import forms
+    from django.conf import settings
+    from django.http import HttpResponseBadRequest
+    from django.utils import timezone
+    from datetime import timedelta
+    class TokenForm(forms.Form):
+        name = forms.CharField(max_length=100, label='Connection name', initial='My AI assistant')
+        days = forms.IntegerField(min_value=1, max_value=30, initial=7, label='Expires after (days)')
+        can_write = forms.BooleanField(required=False, initial=True, label='Create and edit drafts, upload images')
+        can_analytics = forms.BooleanField(required=False, initial=True, label='Read aggregate analytics')
+        can_publish = forms.BooleanField(required=False, label='Allow direct publishing and scheduling')
+    token = None
+    form = TokenForm(request.POST if request.method == 'POST' and request.POST.get('action') == 'create' else None)
+    if request.method == 'POST':
+        if request.POST.get('action') == 'revoke':
+            connection = MCPConnection.objects.filter(pk=request.POST.get('connection'), user=request.user).first()
+            if not connection:
+                return HttpResponseBadRequest('Connection not found.')
+            connection.revoked_at = timezone.now()
+            connection.save(update_fields=['revoked_at'])
+            if connection.oauth_application_id:
+                from oauth2_provider.models import AccessToken, RefreshToken, Grant
+                RefreshToken.objects.filter(user=request.user, application=connection.oauth_application).delete()
+                AccessToken.objects.filter(user=request.user, application=connection.oauth_application).delete()
+                Grant.objects.filter(user=request.user, application=connection.oauth_application).delete()
+            return redirect('journal_ai')
+        if request.POST.get('action') == 'create' and form.is_valid():
+            values = form.cleaned_data
+            _, token = MCPConnection.issue(user=request.user, name=values['name'],
+                expires_at=timezone.now() + timedelta(days=values['days']), can_write=values['can_write'],
+                can_analytics=values['can_analytics'], can_publish=values['can_publish'])
+    connections = MCPConnection.objects.filter(user=request.user, revoked_at__isnull=True,
+        expires_at__gt=timezone.now()).select_related('oauth_application').order_by('-created_at')
+    response = render(request, 'publishing/studio_ai.html', {'connections': connections, 'form': form,
+        'token': token, 'mcp_url': settings.PUBLIC_URL + '/mcp'})
+    response['Cache-Control'] = 'no-store'
+    response['Referrer-Policy'] = 'no-referrer'
+    return response
+
+
+@require_admin_access
+def analytics(request):
+    from .analytics import report
+    if not request.user.has_perm('publishing.view_pageview'):
+        raise PermissionDenied()
+    days = int(request.GET.get('days', '30')) if request.GET.get('days', '30') in {'7', '30', '90'} else 30
+    return render(request, 'publishing/studio_analytics.html', {'metrics': report(days), 'days': days})

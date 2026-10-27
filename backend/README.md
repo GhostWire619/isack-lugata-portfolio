@@ -14,7 +14,7 @@ Django 5.2 + Wagtail 8.0 serve the journal at `/blog/` and the publishing studio
 - Production PostgreSQL and persistent media volumes, separate scheduler and database health checks.
 - Authenticated MCP tools to read articles and create private, editable drafts, with expiring/revocable connections and safe retries.
 
-Not yet connected: real analytics, custom analytics dashboard, ChatGPT/Claude OAuth sign-in and AI content scheduling. The old `design/blog/admin.html` is an illustrative prototype, not the real admin. Production never seeds sample posts or creates a shared default administrator.
+Studio includes real aggregate analytics, OAuth sign-in for compatible MCP clients, AI connection management, and permission-gated AI publishing/scheduling. The old `design/blog/admin.html` is an illustrative prototype, not the real admin. Production never seeds sample posts or creates a shared default administrator.
 
 ## Writing and publishing
 
@@ -70,11 +70,11 @@ Configure `EMAIL_HOST`, `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD`, `EMAIL_PORT`, 
 
 Recovery codes are shown once, are consumed on use and should be stored in a password manager. Keep the production signing key stable so existing sessions and signed links remain valid across deployments.
 
-## MCP: read articles and create drafts
+## AI connections and MCP
 
-`/mcp/` is an authenticated, stateless Streamable HTTP MCP endpoint. It supports `initialize`, `ping`, `tools/list`, `tools/call` and initialization notifications, with JSON responses and protocol versions 2025-03-26, 2025-06-18 and 2025-11-25. There are no server-initiated streams. The tools are `list_categories`, `list_articles`, `get_article` and, with write access, `create_article_draft` and `upload_image`. Draft creation never publishes or schedules an article. Publication remains a Studio action.
+`/mcp/` is an authenticated, stateless Streamable HTTP MCP endpoint. It supports `initialize`, `ping`, `tools/list`, `tools/call` and initialization notifications, with JSON responses and protocol versions 2025-03-26, 2025-06-18 and 2025-11-25. There are no server-initiated streams. The read tools are `list_categories`, `list_articles`, and `get_article`. Write permission adds `create_article_draft`, `update_article_draft`, and `upload_image`. Explicit publishing permission adds `publish_article` and `schedule_article`; analytics permission adds `get_analytics` when the user also has `publishing.view_pageview`. Draft tools never publish. Publishing tools also check native Wagtail publishing permission. Updates, publishing and scheduling require the current `revision_id` as `expected_revision_id` to prevent overwriting newer work, plus a retry-safe `request_key`.
 
-Connections use individual expiring bearer tokens, stored only as hashes in the database, tied to an active staff account and its current article permissions. Browser login cookies cannot authenticate MCP requests. Cross-origin browser requests are rejected. Keep the endpoint behind HTTPS in production. Tokens must be treated as passwords; do not commit them or paste them into public configuration.
+Connections use individual expiring bearer tokens, stored only as hashes in the database, tied to an active staff account and its current article permissions. Browser login cookies cannot authenticate MCP requests. MCP browser origins are restricted to the site, ChatGPT and Claude; protocol discovery/token endpoints permit credential-free CORS. Keep the endpoint behind HTTPS in production. Tokens must be treated as passwords; do not commit them or paste them into public configuration.
 
 Create a connection from the server, choosing an existing Studio username and a private, persistent output location (the container's `/app/data/` is ephemeral unless you mount it):
 
@@ -113,7 +113,17 @@ The client can upload local images through MCP with `--image-file cover=/private
 
 Use `list_categories` for category slugs, or omit the category. Keep the same `request_key` and content when retrying; changing content with an existing key is rejected. Responses include a Studio editor link. Drafts remain excluded from public pages, feeds and sitemaps. The draft-request record links creation to its connection for traceability.
 
-This is a token-authenticated connection, **not yet an OAuth connector for ChatGPT or Claude**. Their sign-in flow, discovery metadata, scheduling tools and analytics tools are still pending. The optional test client does not dynamically install a tool into either application.
+### Connect from Studio
+
+Open **Studio → AI connections** (`/admin/ai/`). Copy `https://isack.space/mcp` into a compatible AI app's custom MCP connection screen and choose OAuth. The app discovers the authorization, registration and token endpoints automatically. Sign in to Studio, complete MFA, and approve the requested permissions. Direct publishing is unchecked by default even when requested by the client. Availability of custom MCP connections depends on the client and account; deployment does not install the connection in ChatGPT or Claude for you.
+
+**Connected applications** shows access, last use and expiry. **Disconnect** revokes the connection, pending grants and OAuth access/refresh tokens. Manual bearer tokens can also be generated here and are shown only once. OAuth uses Django OAuth Toolkit, authorization code with S256 PKCE, one-hour access tokens, rotated refresh tokens with reuse protection, a maximum 30-day connection, and resource-bound tokens accepted only at this MCP endpoint. Discovery is at `/.well-known/oauth-authorization-server` and `/.well-known/oauth-protected-resource/mcp`. Registration allows HTTPS callback addresses (loopback HTTP only during development), limits size and rate, and exposes no password or implicit grant. Reconnecting requires a fresh approval.
+
+### Real site and article analytics
+
+**Studio → Analytics** (`/admin/analytics/`) shows real page views, active time, reading progress, top pages, referring domains and daily totals for 7, 30 or 90 days. The same aggregate data is available through `get_analytics` with optional article filtering. These are page-view counts, not unique people. The collector never stores IP addresses, analytics cookies or persistent visitor IDs, strips referrer query strings, and respects Do Not Track and Global Privacy Control. It is disabled on localhost and public draft previews. Raw events are pruned after 90 days by the existing scheduler. Google AdSense reports remain separate.
+
+The first-party collector is included in public journal HTML and exported portfolio pages, including route changes. `python scripts/build_analytics.py` refreshes portfolio exports; it is also part of the normal content build. `/events/` accepts only bounded same-origin public-page events. The first report will be empty until real visits arrive after deployment.
 
 ## Appearance
 

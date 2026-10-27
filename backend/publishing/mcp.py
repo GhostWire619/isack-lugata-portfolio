@@ -1,7 +1,7 @@
 """Stateless MCP Streamable HTTP. Bearer credentials never inherit browser sessions.
 
-Only read and draft creation are exposed: publishing remains an authenticated
-Studio action. JSON responses are used; server-initiated streams are not needed.
+Drafts are the default; publishing needs an explicit connection scope and native
+page permission. JSON responses are used; server-initiated streams are not needed.
 """
 import hashlib
 import base64
@@ -27,7 +27,7 @@ from wagtail.permission_policies.pages import PagePermissionPolicy
 from wagtail.images import get_image_model, get_permission_policy
 from PIL import Image, ImageOps, UnidentifiedImageError
 
-from .models import ArticlePage, Category, JournalIndexPage, MCPConnection, MCPDraftRequest, MCPImageUpload
+from .models import ArticlePage, Category, JournalIndexPage, MCPConnection, MCPDraftRequest, MCPImageUpload, MCPAction
 from .studio import can_write
 
 logger = logging.getLogger(__name__)
@@ -84,14 +84,108 @@ class DraftArguments(Arguments):
     sections: list[Section] = Field(min_length=1, max_length=80)
 
 
+class UpdateArguments(DraftArguments):
+    article_id: int = Field(gt=0)
+    expected_revision_id: int = Field(gt=0)
+
+
+class PublishArguments(GetArguments):
+    request_key: str = Field(min_length=1, max_length=100, pattern=r'^[a-zA-Z0-9_-]+$')
+    expected_revision_id: int = Field(gt=0)
+
+
+class ScheduleArguments(PublishArguments):
+    publish_at: str = Field(min_length=20, max_length=40, description='Future ISO 8601 timestamp with timezone, e.g. 2027-01-01T09:00:00+03:00.')
+
+
+class AnalyticsArguments(Arguments):
+    days: int = Field(default=30, ge=1, le=90)
+    article_id: int | None = Field(default=None, gt=0)
+
+
 TOOLS = {
+    'update_article_draft': (UpdateArguments, 'Replace an article draft with complete content. Requires expected_revision_id from get_article to prevent overwriting newer changes. Never publishes.'),
+    'publish_article': (PublishArguments, 'Publish the specified saved revision immediately. Requires explicit direct-publishing permission. This makes content public; use only when the owner requests publication.'),
+    'schedule_article': (ScheduleArguments, 'Schedule a saved revision for a future timezone-aware timestamp. Requires explicit direct-publishing permission.'),
+    'get_analytics': (AnalyticsArguments, 'Read actual aggregate page views, active reading time, popular pages and referrer domains over 1–90 days. No unique-person counts or identifying visitor data.'),
     'list_articles': (ListArguments, 'List articles accessible to this connection, including drafts. Use after_id for pagination.'),
     'get_article': (GetArguments, 'Read the latest saved draft of an accessible article.'),
     'create_article_draft': (DraftArguments, 'Create an unpublished article for review in Studio. Supports text, attributed quotations, images and a cover. Upload images first. Reuse request_key for safe retries; never publishes.'),
     'upload_image': (UploadArguments, 'Upload a base64 JPEG, PNG or WebP image (maximum 2 MB, 40 megapixels). Images are resized, stripped of metadata and compressed to WebP. Identical retries reuse the image. Returns image_id for covers and image sections.'),
 }
 
-WRITE_TOOLS = {'create_article_draft', 'upload_image'}
+WRITE_TOOLS = {'create_article_draft', 'upload_image', 'update_article_draft'}
+PUBLISH_TOOLS = {'publish_article', 'schedule_article'}
+
+
+def available(connection, name):
+    return (name in TOOLS and (name not in WRITE_TOOLS or connection.can_write)
+        and (name not in PUBLISH_TOOLS or connection.can_publish)
+        and (name != 'get_analytics' or (connection.can_analytics and connection.user.has_perm('publishing.view_pageview'))))
+
+
+def draft_content(user, args):
+    category = Category.objects.filter(slug=args.category_slug).first() if args.category_slug else None
+    if args.category_slug and not category:
+        raise ValueError('Unknown category. Use list_categories to choose an existing category.')
+    if not args.title.strip() or not args.intro.strip() or any(not s.text.strip() for s in args.sections if hasattr(s, 'text')):
+        raise ValueError('Title, introduction and sections must contain text.')
+    body = []
+    for section in args.sections:
+        if section.type == 'image':
+            if not section.alt.strip():
+                raise ValueError('Each image needs an accessible description.')
+            body.append(('image', {'image': choose_image(user, section.image_id), 'alt': section.alt, 'caption': section.caption}))
+        elif section.type == 'quote':
+            body.append(('quote', {'quote': section.text, 'attribution': section.attribution}))
+        elif section.type == 'paragraph':
+            body.append(('paragraph', '<p>' + str(escape(section.text)).replace('\n\n', '</p><p>').replace('\n', '<br/>') + '</p>'))
+        else:
+            body.append((section.type, section.text))
+    return dict(title=args.title.strip(), intro=args.intro.strip(), category=category, body=body,
+        search_description=args.intro.strip()[:255], cover=choose_image(user, args.cover_image_id) if args.cover_image_id else None,
+        cover_alt=args.cover_alt, cover_caption=args.cover_caption)
+
+
+@transaction.atomic
+def change_article(connection, name, args):
+    from django.utils.dateparse import parse_datetime
+    MCPConnection.objects.select_for_update().get(pk=connection.pk)
+    article = accessible(connection.user).select_for_update().filter(pk=args.article_id).first()
+    if not article:
+        raise ValueError('Article was not found or access is denied.')
+    digest = hashlib.sha256(args.model_dump_json().encode()).hexdigest()
+    previous = MCPAction.objects.filter(connection=connection, request_key=args.request_key).first()
+    if previous:
+        if previous.payload_hash != digest or previous.tool != name:
+            raise ValueError('request_key was already used with different content.')
+        return {'article': serialize(article, True), 'reused': True}
+    if article.latest_revision_id != args.expected_revision_id:
+        raise ValueError('The article has changed. Read it again before editing or publishing.')
+    draft = article.get_latest_revision_as_object()
+    if name == 'update_article_draft':
+        for field, value in draft_content(connection.user, args).items():
+            setattr(draft, field, value)
+        draft.full_clean()
+        draft.save_revision(user=connection.user, log_action=True)
+    else:
+        if not article.permissions_for_user(connection.user).can_publish():
+            raise ValueError('This account cannot publish this article.')
+        draft.full_clean()
+        if name == 'schedule_article':
+            when = parse_datetime(args.publish_at)
+            if not when or timezone.is_naive(when) or when <= timezone.now():
+                raise ValueError('Choose a future date and include a timezone offset.')
+            draft.go_live_at = when
+            revision = draft.save_revision(user=connection.user, log_action=True)
+        else:
+            # An existing schedule must not silently defer an explicit publish-now request.
+            draft.go_live_at = None
+            revision = draft.save_revision(user=connection.user, log_action=True)
+        revision.publish(user=connection.user)
+    MCPAction.objects.create(connection=connection, request_key=args.request_key, payload_hash=digest, tool=name, article=article)
+    article.refresh_from_db()
+    return {'article': serialize(article, True), 'reused': False}
 
 
 def choose_image(user, image_id):
@@ -154,6 +248,8 @@ def accessible(user):
 def serialize(article, include_body=False):
     draft = article.get_latest_revision_as_object()
     result = {'id': article.pk, 'title': draft.title, 'intro': draft.intro,
+        'revision_id': article.latest_revision_id,
+        'scheduled_at': article.latest_revision.approved_go_live_at.isoformat() if article.latest_revision and article.latest_revision.approved_go_live_at else None,
         'live': article.live, 'has_unpublished_changes': article.has_unpublished_changes,
         'editor_url': settings.PUBLIC_URL.rstrip('/') + reverse('wagtailadmin_pages:edit', args=[article.pk]),
         'category_slug': draft.category.slug if draft.category_id else None}
@@ -164,10 +260,21 @@ def serialize(article, include_body=False):
 
 
 def call_tool(connection, name, raw):
-    if name not in TOOLS or (name in WRITE_TOOLS and not connection.can_write):
+    if not available(connection, name):
         raise ValueError('Tool is unavailable for this connection.')
     args = TOOLS[name][0].model_validate(raw)
     user = connection.user
+    if name in PUBLISH_TOOLS or name == 'update_article_draft':
+        return change_article(connection, name, args)
+    if name == 'get_analytics':
+        from .analytics import report
+        path = None
+        if args.article_id:
+            article = accessible(user).filter(pk=args.article_id).first()
+            if not article:
+                raise ValueError('Article was not found or access is denied.')
+            path = '/blog/' + article.slug + '/'
+        return report(args.days, path)
     if name == 'upload_image':
         return upload_image(connection, args)
     if name == 'list_articles':
@@ -252,18 +359,18 @@ def rpc(request, connection):
         version = params.get('protocolVersion')
         return result({'protocolVersion': version if version in VERSIONS else '2025-11-25',
             'capabilities': {'tools': {'listChanged': False}},
-            'serverInfo': {'name': 'isack-journal', 'version': '1.0.0'},
-            'instructions': 'Articles created here remain drafts. Review and publish in Studio.'})
+            'serverInfo': {'name': 'isack-journal', 'version': '1.1.0'},
+            'instructions': 'Create and update tools save private drafts. Review in Studio. Publish/schedule tools are available only with separately granted direct-publishing permission; use them only when the owner explicitly requests publication.'})
     if request.headers.get('MCP-Protocol-Version', '2025-03-26') not in VERSIONS:
         return error(-32600, 'Unsupported MCP protocol version.')
     if method == 'ping':
         return result({})
     if method == 'tools/list':
         definitions = [{'name': name, 'description': description, 'inputSchema': model.model_json_schema(),
-            'annotations': {'readOnlyHint': name not in WRITE_TOOLS, 'destructiveHint': False,
-                'idempotentHint': True, 'openWorldHint': False}}
+            'annotations': {'readOnlyHint': name not in WRITE_TOOLS | PUBLISH_TOOLS, 'destructiveHint': name in PUBLISH_TOOLS,
+                'idempotentHint': True, 'openWorldHint': name in PUBLISH_TOOLS}}
             for name, (model, description) in TOOLS.items()
-            if name not in WRITE_TOOLS or connection.can_write]
+            if available(connection, name)]
         definitions.append({'name': 'list_categories', 'description': 'List available article categories.',
             'inputSchema': Arguments.model_json_schema(), 'annotations': {'readOnlyHint': True, 'openWorldHint': False}})
         return result({'tools': definitions})
@@ -291,7 +398,7 @@ def endpoint(request):
     if request.method != 'POST':
         response = HttpResponse(status=405)
         response['Allow'] = 'POST'
-    elif request.headers.get('Origin') and request.headers['Origin'] != settings.PUBLIC_URL.rstrip('/'):
+    elif request.headers.get('Origin') and request.headers['Origin'] not in settings.MCP_ALLOWED_ORIGINS:
         response = HttpResponse('Origin is not allowed.', status=403)
     elif request.content_type != 'application/json':
         response = HttpResponse('Use application/json.', status=415)
@@ -302,10 +409,13 @@ def endpoint(request):
         token = auth[7:] if auth.startswith('Bearer ') else ''
         connection = MCPConnection.objects.select_related('user').filter(
             token_hash=hashlib.sha256(token.encode()).hexdigest(), revoked_at__isnull=True,
-            expires_at__gt=timezone.now(), user__is_active=True, user__is_staff=True).first() if token else None
+            expires_at__gt=timezone.now(), user__is_active=True, user__is_staff=True, oauth_application__isnull=True).first() if token else None
+        if not connection and token:
+            from .oauth import authenticate
+            connection = authenticate(token)
         if not connection:
             response = HttpResponse('A valid journal access token is required.', status=401)
-            response['WWW-Authenticate'] = 'Bearer realm="journal"'
+            response['WWW-Authenticate'] = f'Bearer realm="journal", resource_metadata="{settings.PUBLIC_URL}/.well-known/oauth-protected-resource/mcp"'
         else:
             MCPConnection.objects.filter(pk=connection.pk).update(last_used_at=timezone.now())
             response = rpc(request, connection)

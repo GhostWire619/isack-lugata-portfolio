@@ -160,4 +160,4 @@ docker compose up -d --build --wait
 docker compose exec journal python manage.py createsuperuser
 ```
 
-Nginx Proxy Manager still forwards to `isack-portfolio:3100`. The journal is at `/blog/` and the real publishing studio at `/admin/`. The authenticated MCP endpoint at `/mcp/` supports reading articles and creating drafts; see the backend guide for credentials and testing. OAuth sign-in for ChatGPT/Claude and real analytics remain pending; the design dashboard's sample figures are not live analytics.
+Nginx Proxy Manager still forwards to `isack-portfolio:3100`. The journal is at `/blog/` and the real publishing studio at `/admin/`. Studio now includes **AI connections** at `/admin/ai/` and real **Analytics** at `/admin/analytics/`. Add `https://isack.space/mcp` as a custom MCP server in an AI client that supports OAuth. AI creates drafts by default; direct publishing and scheduling require separate explicit permission. See the backend guide for connection details, analytics coverage and testing.
