@@ -32,10 +32,9 @@ services:
     networks:
       - journal-network
   journal:
-    build:
+    build: &journal-build
       context: .
       dockerfile: backend/Dockerfile
-    image: isack-journal:local
     container_name: isack-journal
     env_file: .env
     command: ["sh", "-c", "python manage.py migrate --noinput && python manage.py bootstrap_journal && exec gunicorn journal.wsgi:application --bind 0.0.0.0:8000 --workers 2 --threads 2 --timeout 90 --access-logfile - --error-logfile -"]
@@ -48,7 +47,7 @@ services:
     networks:
       - journal-network
   journal-scheduler:
-    image: isack-journal:local
+    build: *journal-build
     env_file: .env
     command: ["python", "manage.py", "run_scheduler"]
     volumes:

@@ -50,7 +50,8 @@ jobs:
           docker network create ecofy-network
           trap 'docker compose logs --tail=60; docker compose down -v; docker network rm ecofy-network' EXIT
           docker compose config --quiet
-          docker compose up -d --build --wait --wait-timeout 180
+          docker compose up -d --build --wait --wait-timeout 180 2>&1 | tee /tmp/full-stack-start.log
+          if grep -Eqi 'pull access denied|repository does not exist' /tmp/full-stack-start.log; then exit 1; fi
           curl --fail --silent http://localhost:3100/ -o /tmp/portfolio.html
           grep -q 'Isack Lugata' /tmp/portfolio.html
           curl --fail --silent http://localhost:3100/ads.txt -o /tmp/ads.txt

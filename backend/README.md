@@ -47,6 +47,8 @@ Log in at `/admin/`, scan the QR code with an authenticator, verify the code and
 
 One `compose.yaml` starts the entire site: portfolio gateway, journal, PostgreSQL and scheduler. No extra Compose files or flags are needed:
 
+Both journal services declare the same local Docker build. Compose gives them local project image tags, so a fresh server never tries to fetch a private `isack-journal` repository. Container names, the published gateway port and persistent volumes keep their existing identities.
+
 ```bash
 git pull
 python3 scripts/setup_blog_env.py
