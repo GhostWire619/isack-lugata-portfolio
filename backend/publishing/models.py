@@ -95,7 +95,7 @@ class ArticlePage(Page):
     cover_caption = models.CharField(max_length=350, blank=True)
     body = StreamField([
         ('heading', blocks.CharBlock(form_classname='title')),
-        ('paragraph', blocks.RichTextBlock(features=['h3', 'bold', 'italic', 'link', 'ol', 'ul'])),
+        ('paragraph', blocks.RichTextBlock(features=['h3', 'bold', 'italic', 'underline', 'link', 'ol', 'ul'])),
         ('image', PictureBlock()),
         ('gallery', blocks.ListBlock(PictureBlock(), min_num=2, max_num=12)),
         ('quote', QuoteBlock()),

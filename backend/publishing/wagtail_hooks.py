@@ -4,6 +4,17 @@ from publishing.models import ArticlePage, JournalIndexPage
 from wagtail.admin.menu import MenuItem
 
 
+@hooks.register('register_rich_text_features')
+def journal_underline(features):
+    from wagtail.admin.rich_text.editors.draftail.features import InlineStyleFeature
+    from wagtail.admin.rich_text.converters.html_to_contentstate import InlineStyleElementHandler
+    features.register_editor_plugin('draftail', 'underline', InlineStyleFeature({
+        'type': 'UNDERLINE', 'label': 'U', 'description': 'Underline'}))
+    features.register_converter_rule('contentstate', 'underline', {
+        'from_database_format': {'u': InlineStyleElementHandler('UNDERLINE')},
+        'to_database_format': {'style_map': {'UNDERLINE': 'u'}}})
+
+
 @hooks.register('insert_global_admin_css')
 def journal_admin_styles():
     from django.templatetags.static import static

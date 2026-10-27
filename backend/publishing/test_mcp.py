@@ -80,6 +80,59 @@ class MCPTests(TestCase):
         self.assertIn('<a href="https://example.com/reference">the source</a>', str(article.get_latest_revision_as_object().body[0].value))
         self.assertFalse(article.live)
 
+    def test_writing_skill_is_available_as_tool_resource_and_prompt(self):
+        from .writing import SKILL_URI
+        guide = self.rpc('tools/call', {'name': 'get_writing_guide', 'arguments': {}}).json()['result']['structuredContent']['skill']
+        resources = self.rpc('resources/list').json()['result']['resources']
+        self.assertEqual(resources[0]['uri'], SKILL_URI)
+        read = self.rpc('resources/read', {'uri': SKILL_URI}).json()['result']['contents'][0]
+        self.assertEqual(read['text'], guide)
+        prompt = self.rpc('prompts/get', {'name': 'write_article', 'arguments': {'topic': 'How local-first apps work'}}).json()['result']
+        self.assertIn(guide, prompt['messages'][0]['content']['text'])
+        self.assertIn('How local-first apps work', prompt['messages'][0]['content']['text'])
+        self.assertEqual(self.rpc('resources/read', {'uri': 'file:///private'}).json()['error']['code'], -32002)
+        self.assertEqual(self.rpc('prompts/get', {'name': 'write_article', 'arguments': {}}).json()['error']['code'], -32602)
+        self.connection.can_write = False
+        self.connection.save()
+        self.assertFalse(self.rpc('tools/call', {'name': 'get_writing_guide', 'arguments': {}}).json()['result']['isError'])
+
+    def test_seo_metadata_and_lists_survive_draft_edit_and_publication(self):
+        sections = [{'type': 'paragraph', 'text': 'Read **the evidence** in [the report](https://example.com/report).'},
+            {'type': 'bullets', 'items': ['One useful finding.', 'A *second* finding.']},
+            {'type': 'steps', 'items': ['Open the project.', 'Review the results.']}]
+        first = self.draft(seo_title='A useful search title', meta_description='A factual search summary.', sections=sections)
+        self.assertFalse(first['isError'], first)
+        saved = first['structuredContent']['article']
+        article = ArticlePage.objects.get(pk=saved['id'])
+        self.assertIsNone(saved['public_url'])
+        self.assertEqual(saved['seo_title'], 'A useful search title')
+        self.assertIn('<ul>', str(article.get_latest_revision_as_object().body[1].value))
+        update = {'request_key': 'update-metadata', 'article_id': article.pk, 'expected_revision_id': saved['revision_id'],
+            'title': saved['title'], 'intro': 'Updated introduction.', 'sections': sections}
+        edited = self.rpc('tools/call', {'name': 'update_article_draft', 'arguments': update}).json()['result']
+        self.assertFalse(edited['isError'], edited)
+        self.assertEqual(edited['structuredContent']['article']['meta_description'], 'A factual search summary.')
+        article.refresh_from_db()
+        article.get_latest_revision().publish()
+        response = self.client.get('/blog/an-mcp-draft/')
+        self.assertContains(response, '<meta name="description" content="A factual search summary.">', html=True)
+        self.assertContains(response, 'A useful search title')
+        self.assertContains(response, '<strong>the evidence</strong>', html=True)
+        self.assertContains(response, '<ol><li>Open the project.</li><li>Review the results.</li></ol>', html=True)
+
+    def test_article_review_checks_saved_sources_images_and_readability(self):
+        saved = self.draft(sections=[{'type': 'paragraph', 'text': 'word ' * 110 + '[the source](https://example.com)'}])['structuredContent']['article']
+        result = self.rpc('tools/call', {'name': 'review_article', 'arguments': {'article_id': saved['id']}}).json()['result']
+        self.assertFalse(result['isError'], result)
+        review = result['structuredContent']
+        self.assertEqual(review['long_paragraphs'], 1)
+        self.assertEqual(review['links'][0], {'label': 'the source', 'url': 'https://example.com'})
+        self.assertEqual(review['images'], [])
+        self.assertTrue(review['warnings'])
+        self.assertTrue(self.rpc('tools/call', {'name': 'review_article', 'arguments': {'article_id': 999999}}).json()['result']['isError'])
+        get_user_model().objects.filter(pk=self.owner.pk).update(is_superuser=False)
+        self.assertTrue(self.rpc('tools/call', {'name': 'review_article', 'arguments': {'article_id': saved['id']}}).json()['result']['isError'])
+
     def test_bearer_required_cookie_is_not_enough(self):
         self.client.force_login(self.owner)
         self.assertEqual(self.client.post('/mcp/', '{}', content_type='application/json').status_code, 401)
@@ -126,6 +179,9 @@ class MCPTests(TestCase):
         upload = self.rpc('tools/call', {'name': 'upload_image', 'arguments': arguments}).json()['result']
         self.assertFalse(upload['isError'], upload)
         image_id = upload['structuredContent']['image_id']
+        images = self.rpc('tools/call', {'name': 'list_images', 'arguments': {'query': 'editorial'}}).json()['result']['structuredContent']['images']
+        self.assertEqual(images[0]['image_id'], image_id)
+        self.assertTrue(images[0]['url'].startswith('http://localhost:8001/media/'))
         retry = self.rpc('tools/call', {'name': 'upload_image', 'arguments': arguments}).json()['result']
         self.assertEqual(retry['structuredContent']['image_id'], image_id)
         self.assertTrue(retry['structuredContent']['reused'])
@@ -140,6 +196,8 @@ class MCPTests(TestCase):
         draft = article.get_latest_revision_as_object()
         self.assertEqual(draft.body[0].value['attribution'], 'From this article')
         self.assertEqual(draft.body[1].value['image'].pk, image_id)
+        review = self.rpc('tools/call', {'name': 'review_article', 'arguments': {'article_id': article.pk}}).json()['result']['structuredContent']
+        self.assertEqual(len(review['images']), 2)
         self.assertTrue(self.draft(request_key='no-alt', cover_image_id=image_id)['isError'])
 
     def test_upload_validation_and_permissions(self):

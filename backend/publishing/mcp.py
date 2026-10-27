@@ -11,6 +11,7 @@ import json
 import logging
 import warnings
 from typing import Annotated, Literal, Union
+from urllib.parse import urljoin
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -28,7 +29,8 @@ from PIL import Image, ImageOps, UnidentifiedImageError
 
 from .models import ArticlePage, Category, JournalIndexPage, MCPConnection, MCPDraftRequest, MCPImageUpload, MCPAction
 from .studio import can_write
-from .links import paragraph_html
+from .links import paragraph_html, inline_links
+from .writing import writing_guide, SKILL_URI, SKILL_VERSION
 
 logger = logging.getLogger(__name__)
 VERSIONS = {'2025-11-25', '2025-06-18', '2025-03-26'}
@@ -43,13 +45,17 @@ class ListArguments(Arguments):
     after_id: int = Field(default=0, ge=0)
 
 
+class ImageListArguments(ListArguments):
+    query: str = Field(default='', max_length=100)
+
+
 class GetArguments(Arguments):
     article_id: int = Field(gt=0)
 
 
 class TextSection(Arguments):
     type: Literal['heading', 'paragraph', 'code']
-    text: str = Field(min_length=1, max_length=10000, description='Paragraphs support clickable URLs and [link labels](https://example.com). Raw HTML is escaped. Headings and code remain plain text.')
+    text: str = Field(min_length=1, max_length=10000, description='Paragraphs support [link labels](https://example.com), URLs, **bold**, *italic* and ++underline++. Raw HTML is escaped. Headings and code remain plain text.')
 
 
 class QuoteSection(Arguments):
@@ -65,18 +71,25 @@ class ImageSection(Arguments):
     caption: str = Field(default='', max_length=350)
 
 
+class ListSection(Arguments):
+    type: Literal['bullets', 'steps']
+    items: list[Annotated[str, Field(min_length=1, max_length=1000)]] = Field(min_length=1, max_length=20)
+
+
 class UploadArguments(Arguments):
     title: str = Field(min_length=1, max_length=250)
     image_base64: str = Field(min_length=4, max_length=2800000)
 
 
-Section = Annotated[Union[TextSection, QuoteSection, ImageSection], Field(discriminator='type')]
+Section = Annotated[Union[TextSection, QuoteSection, ImageSection, ListSection], Field(discriminator='type')]
 
 
 class DraftArguments(Arguments):
     request_key: str = Field(min_length=1, max_length=100, pattern=r'^[a-zA-Z0-9_-]+$')
     title: str = Field(min_length=1, max_length=200)
     intro: str = Field(min_length=1, max_length=350)
+    seo_title: str | None = Field(default=None, max_length=255, description='Optional search title. Omit on updates to preserve it.')
+    meta_description: str | None = Field(default=None, max_length=255, description='Accurate search/share summary, not body content. Omit on updates to preserve it.')
     category_slug: str | None = Field(default=None, max_length=100)
     cover_image_id: int | None = Field(default=None, gt=0)
     cover_alt: str = Field(default='', max_length=250)
@@ -104,13 +117,16 @@ class AnalyticsArguments(Arguments):
 
 
 TOOLS = {
-    'update_article_draft': (UpdateArguments, 'Replace an article draft with complete content. Requires expected_revision_id from get_article to prevent overwriting newer changes. Never publishes.'),
-    'publish_article': (PublishArguments, 'Publish the specified saved revision immediately. Requires explicit direct-publishing permission. This makes content public; use only when the owner requests publication.'),
+    'get_writing_guide': (Arguments, 'Read the bundled article-writing skill BEFORE drafting, editing or publishing. Covers hooks, voice, mobile reading layout, relevant images, clickable source syntax, SEO and AI discovery.'),
+    'review_article': (GetArguments, 'Check a saved draft before publishing: clickable references, images/alt text, paragraph lengths and search metadata. Structural feedback only; does not fact-check, fetch URLs or score rankings.'),
+    'list_images': (ImageListArguments, 'Find permitted uploaded images to illustrate an article. Returns real image IDs for covers and image sections. Select relevant images; do not invent IDs.'),
+    'update_article_draft': (UpdateArguments, 'Read get_writing_guide first. Replace draft content; paragraph text supports [label](https://url), **bold** and *italic*. Use expected_revision_id from get_article to avoid overwriting newer changes. Never publishes.'),
+    'publish_article': (PublishArguments, 'Publish the specified saved revision immediately. First read get_writing_guide, review_article and get_article; check images, source links and metadata. Requires direct-publishing permission and an explicit owner request.'),
     'schedule_article': (ScheduleArguments, 'Schedule a saved revision for a future timezone-aware timestamp. Requires explicit direct-publishing permission.'),
     'get_analytics': (AnalyticsArguments, 'Read actual aggregate page views, active reading time, popular pages and referrer domains over 1–90 days. No unique-person counts or identifying visitor data.'),
     'list_articles': (ListArguments, 'List articles accessible to this connection, including drafts. Use after_id for pagination.'),
     'get_article': (GetArguments, 'Read the latest saved draft of an accessible article.'),
-    'create_article_draft': (DraftArguments, 'Create an unpublished article for review in Studio. Supports text, attributed quotations, images and a cover. Upload images first. Reuse request_key for safe retries; never publishes.'),
+    'create_article_draft': (DraftArguments, 'Read get_writing_guide first. Create an unpublished illustrated article with SEO metadata. Paragraphs support [label](https://url), **bold** and *italic*; raw HTML is escaped. Use list_images/upload_image for real image IDs. Reuse request_key for safe retries; never publishes.'),
     'upload_image': (UploadArguments, 'Upload a base64 JPEG, PNG or WebP image (maximum 2 MB, 40 megapixels). Images are resized, stripped of metadata and compressed to WebP. Identical retries reuse the image. Returns image_id for covers and image sections.'),
 }
 
@@ -140,11 +156,27 @@ def draft_content(user, args):
             body.append(('quote', {'quote': section.text, 'attribution': section.attribution}))
         elif section.type == 'paragraph':
             body.append(('paragraph', paragraph_html(section.text)))
+        elif section.type in {'bullets', 'steps'}:
+            if any(not item.strip() for item in section.items):
+                raise ValueError('List items must contain text.')
+            tag = 'ul' if section.type == 'bullets' else 'ol'
+            body.append(('paragraph', f'<{tag}>' + ''.join('<li>' + inline_links(item) + '</li>' for item in section.items) + f'</{tag}>'))
         else:
             body.append((section.type, section.text))
-    return dict(title=args.title.strip(), intro=args.intro.strip(), category=category, body=body,
-        search_description=args.intro.strip()[:255], cover=choose_image(user, args.cover_image_id) if args.cover_image_id else None,
+    values = dict(title=args.title.strip(), intro=args.intro.strip(), category=category, body=body,
+        cover=choose_image(user, args.cover_image_id) if args.cover_image_id else None,
         cover_alt=args.cover_alt, cover_caption=args.cover_caption)
+    if args.seo_title is not None:
+        values['seo_title'] = args.seo_title.strip()
+    if args.meta_description is not None:
+        values['search_description'] = args.meta_description.strip()
+    return values
+
+
+def request_hash(args):
+    # New optional metadata must not invalidate retry keys from older clients.
+    omitted = {name for name in ('seo_title', 'meta_description') if getattr(args, name, None) is None}
+    return hashlib.sha256(args.model_dump_json(exclude=omitted).encode()).hexdigest()
 
 
 @transaction.atomic
@@ -154,7 +186,7 @@ def change_article(connection, name, args):
     article = accessible(connection.user).select_for_update().filter(pk=args.article_id).first()
     if not article:
         raise ValueError('Article was not found or access is denied.')
-    digest = hashlib.sha256(args.model_dump_json().encode()).hexdigest()
+    digest = request_hash(args)
     previous = MCPAction.objects.filter(connection=connection, request_key=args.request_key).first()
     if previous:
         if previous.payload_hash != digest or previous.tool != name:
@@ -248,6 +280,8 @@ def accessible(user):
 def serialize(article, include_body=False):
     draft = article.get_latest_revision_as_object()
     result = {'id': article.pk, 'title': draft.title, 'intro': draft.intro,
+        'seo_title': draft.seo_title, 'meta_description': draft.search_description,
+        'public_url': settings.PUBLIC_URL + '/blog/' + article.slug + '/' if article.live and ArticlePage.objects.public().filter(pk=article.pk).exists() else None,
         'revision_id': article.latest_revision_id,
         'scheduled_at': article.latest_revision.approved_go_live_at.isoformat() if article.latest_revision and article.latest_revision.approved_go_live_at else None,
         'live': article.live, 'has_unpublished_changes': article.has_unpublished_changes,
@@ -264,6 +298,23 @@ def call_tool(connection, name, raw):
         raise ValueError('Tool is unavailable for this connection.')
     args = TOOLS[name][0].model_validate(raw)
     user = connection.user
+    if name == 'get_writing_guide':
+        return {'name': 'write-journal-articles', 'version': SKILL_VERSION, 'skill': writing_guide(),
+            'resource_uri': SKILL_URI, 'download_url': settings.PUBLIC_URL + '/blog/ai-writing-skill.md'}
+    if name == 'list_images':
+        images = get_permission_policy().instances_user_has_any_permission_for(user, {'choose', 'change'}).filter(pk__gt=args.after_id)
+        if args.query:
+            images = images.filter(title__icontains=args.query)
+        items = list(images.order_by('pk')[:args.limit])
+        return {'images': [{'image_id': item.pk, 'title': item.title, 'width': item.width, 'height': item.height,
+            'url': urljoin(settings.PUBLIC_URL, item.file.url)} for item in items],
+            'next_after_id': items[-1].pk if len(items) == args.limit else None}
+    if name == 'review_article':
+        article = accessible(user).filter(pk=args.article_id).first()
+        if not article:
+            raise ValueError('Article was not found or access is denied.')
+        from .editorial import review
+        return review(article)
     if name in PUBLISH_TOOLS or name == 'update_article_draft':
         return change_article(connection, name, args)
     if name == 'get_analytics':
@@ -286,7 +337,7 @@ def call_tool(connection, name, raw):
         if not article:
             raise ValueError('Article was not found or access is denied.')
         return {'article': serialize(article, True)}
-    payload_hash = hashlib.sha256(args.model_dump_json().encode()).hexdigest()
+    payload_hash = request_hash(args)
     with transaction.atomic():
         # Serialize tree insertion and retries for a connection on PostgreSQL.
         MCPConnection.objects.select_for_update().get(pk=connection.pk)
@@ -300,34 +351,14 @@ def call_tool(connection, name, raw):
             if not accessible(user).filter(pk=previous.article_id).exists():
                 raise ValueError('Article access is denied.')
             return {'article': serialize(previous.article, True), 'reused': True}
-        category = None
-        if args.category_slug:
-            category = Category.objects.filter(slug=args.category_slug).first()
-            if not category:
-                raise ValueError('Unknown category. Use list_categories to choose an existing category.')
-        if not args.title.strip() or not args.intro.strip() or any(not s.text.strip() for s in args.sections if hasattr(s, 'text')):
-            raise ValueError('Title, introduction and sections must contain text.')
+        content = draft_content(user, args)
         slug_base = slugify(args.title)[:180] or 'article'
         slug, suffix = slug_base, 2
         while journal.get_children().filter(slug=slug).exists():
             slug = f'{slug_base}-{suffix}'
             suffix += 1
-        body = []
-        for section in args.sections:
-            if section.type == 'image':
-                if not section.alt.strip():
-                    raise ValueError('Each image needs an accessible description.')
-                body.append(('image', {'image': choose_image(user, section.image_id), 'alt': section.alt, 'caption': section.caption}))
-            elif section.type == 'quote':
-                body.append(('quote', {'quote': section.text, 'attribution': section.attribution}))
-            elif section.type == 'paragraph':
-                body.append(('paragraph', paragraph_html(section.text)))
-            else:
-                body.append((section.type, section.text))
-        cover = choose_image(user, args.cover_image_id) if args.cover_image_id else None
-        article = ArticlePage(title=args.title.strip(), slug=slug, intro=args.intro.strip(),
-            category=category, owner=user, live=False, body=body, search_description=args.intro.strip()[:255],
-            cover=cover, cover_alt=args.cover_alt, cover_caption=args.cover_caption)
+        content.setdefault('search_description', args.intro.strip()[:255])
+        article = ArticlePage(slug=slug, owner=user, live=False, **content)
         article.full_clean(exclude=['path', 'depth'])
         journal.add_child(instance=article)
         article.save_revision(user=user, log_action=True)
@@ -358,13 +389,35 @@ def rpc(request, connection):
     if method == 'initialize':
         version = params.get('protocolVersion')
         return result({'protocolVersion': version if version in VERSIONS else '2025-11-25',
-            'capabilities': {'tools': {'listChanged': False}},
-            'serverInfo': {'name': 'isack-journal', 'version': '1.1.0'},
-            'instructions': 'Create and update tools save private drafts. Review in Studio. Publish/schedule tools are available only with separately granted direct-publishing permission; use them only when the owner explicitly requests publication.'})
+            'capabilities': {'tools': {'listChanged': False}, 'resources': {'listChanged': False, 'subscribe': False}, 'prompts': {'listChanged': False}},
+            'serverInfo': {'name': 'isack-journal', 'version': '1.2.0'},
+            'instructions': 'Before writing, editing or publishing articles, call get_writing_guide for the bundled writing skill. Use clear hooks and readable sections, at least one relevant image, [source label](https://url) for clickable references, and dedicated SEO fields. Run review_article and read back the saved draft before publication. Create/update tools save drafts. Publish/schedule only when explicitly requested by the owner and permitted by this connection.'})
     if request.headers.get('MCP-Protocol-Version', '2025-03-26') not in VERSIONS:
         return error(-32600, 'Unsupported MCP protocol version.')
     if method == 'ping':
         return result({})
+    if method == 'resources/list':
+        return result({'resources': [{'uri': SKILL_URI, 'name': 'write-journal-articles',
+            'title': 'Side notes article-writing skill', 'description': 'Editorial voice, hooks, images, clickable sources, SEO and AI discovery.', 'mimeType': 'text/markdown'}]})
+    if method == 'resources/templates/list':
+        return result({'resourceTemplates': []})
+    if method == 'resources/read':
+        if params.get('uri') != SKILL_URI:
+            return error(-32002, 'Resource not found.')
+        return result({'contents': [{'uri': SKILL_URI, 'mimeType': 'text/markdown', 'text': writing_guide()}]})
+    if method == 'prompts/list':
+        return result({'prompts': [{'name': 'write_article', 'title': 'Write a Side notes article',
+            'description': 'Start an illustrated, sourced article using the bundled writing and SEO skill.',
+            'arguments': [{'name': 'topic', 'description': 'The subject and reader question to cover.', 'required': True}]}]})
+    if method == 'prompts/get':
+        arguments = params.get('arguments', {})
+        if params.get('name') != 'write_article' or not isinstance(arguments, dict) or set(arguments) != {'topic'}:
+            return error(-32602, 'Choose write_article with a topic argument.')
+        topic = arguments['topic']
+        if not isinstance(topic, str) or not topic.strip() or len(topic) > 1000:
+            return error(-32602, 'Topic must be text between 1 and 1000 characters.')
+        return result({'description': 'Write an engaging, illustrated Side notes draft with verified clickable sources.',
+            'messages': [{'role': 'user', 'content': {'type': 'text', 'text': writing_guide() + '\n\nArticle topic: ' + topic + '\nCreate a private draft unless the owner has explicitly requested publishing or scheduling.'}}]})
     if method == 'tools/list':
         definitions = [{'name': name, 'description': description, 'inputSchema': model.model_json_schema(),
             'annotations': {'readOnlyHint': name not in WRITE_TOOLS | PUBLISH_TOOLS, 'destructiveHint': name in PUBLISH_TOOLS,

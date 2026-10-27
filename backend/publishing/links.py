@@ -5,6 +5,18 @@ from urllib.parse import urlsplit
 from django.utils.html import escape, urlize
 
 MARKDOWN_LINK = re.compile(r'\[([^\]\n]{1,300})\]\(((?:https?://|mailto:)(?:[^\s<>()]|\([^\s<>()]*\)){1,2048})\)')
+EMPHASIS = re.compile(r'\*\*([^*\n]{1,500})\*\*|(?<!\*)\*([^*\n]{1,500})\*(?!\*)|(?<!\w)\+\+([^+\n]{1,500})\+\+(?!\w)')
+
+
+def inline_emphasis(text):
+    parts, start = [], 0
+    for match in EMPHASIS.finditer(text):
+        parts.append(str(urlize(text[start:match.start()], autoescape=True)))
+        tag, label = ('strong', match[1]) if match[1] is not None else ('em', match[2]) if match[2] is not None else ('u', match[3])
+        parts.append(f'<{tag}>{escape(label)}</{tag}>')
+        start = match.end()
+    parts.append(str(urlize(text[start:], autoescape=True)))
+    return ''.join(parts)
 
 
 def inline_links(text):
@@ -18,10 +30,10 @@ def inline_links(text):
             valid = False
         if not valid:
             continue
-        parts.append(str(urlize(text[start:match.start()], autoescape=True)))
+        parts.append(inline_emphasis(text[start:match.start()]))
         parts.append(f'<a href="{escape(match[2])}">{escape(match[1])}</a>')
         start = match.end()
-    parts.append(str(urlize(text[start:], autoescape=True)))
+    parts.append(inline_emphasis(text[start:]))
     return ''.join(parts)
 
 

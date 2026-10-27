@@ -115,7 +115,15 @@ The client can upload local images through MCP with `--image-file cover=/private
 
 Use `list_categories` for category slugs, or omit the category. Keep the same `request_key` and content when retrying; changing content with an existing key is rejected. Responses include a Studio editor link. Drafts remain excluded from public pages, feeds and sitemaps. The draft-request record links creation to its connection for traceability.
 
-### Connect from Studio
+### Bundled article-writing skill
+
+The MCP advertises a portable `write-journal-articles` skill in initialization instructions, the read-only `get_writing_guide` tool, a Markdown resource and the `write_article` prompt. The same file is downloadable as Markdown at `/blog/ai-writing-skill.md` and as an authenticated ZIP through **Studio → AI connections**. Client support for resources/prompts varies, so the guide tool is the primary entry point; connecting does not silently install a skill into an AI account.
+
+The guide covers hooks, clear wording, phone-readable paragraphs, selective emphasis, meaningful images, clickable source labels, SEO and AI discoverability. It calls for at least one relevant image by default and leaving a draft when a suitable image cannot be obtained. `list_images` exposes permitted uploaded images and their real IDs/URLs. `review_article` reports saved links, images and alt text, long paragraphs and search metadata; it does not fetch external URLs, fact-check or invent a ranking score. These are model instructions and structural feedback, not an automatic guarantee of editorial quality or AI citations.
+
+`create_article_draft` and `update_article_draft` accept optional `seo_title` and `meta_description`. Omitting them during updates preserves existing values. Paragraphs and list items support `**bold**`, `*italic*` and labelled links. `bullets` and `steps` sections accept an `items` array and save as native rich-text lists. Published, publicly accessible articles return `public_url`; drafts and private pages return null. Refresh the client's tool discovery after deploying changed tool definitions.
+
+### OAuth connection
 
 Open **Studio → AI connections** (`/admin/ai/`). Copy `https://isack.space/mcp` into a compatible AI app's custom MCP connection screen and choose OAuth. The app discovers the authorization, registration and token endpoints automatically. Sign in to Studio, complete MFA, and approve the requested permissions. Direct publishing is unchecked by default even when requested by the client. Availability of custom MCP connections depends on the client and account; deployment does not install the connection in ChatGPT or Claude for you.
 
@@ -130,6 +138,8 @@ The first-party collector is included in public journal HTML and exported portfo
 ## Appearance
 
 The journal, article pages, login and Studio share paper/forest palettes and a light/dark appearance control. The choice persists in `localStorage` under `journal-theme`, synchronizes between tabs and defaults to the device setting. A tiny head script applies it before styles paint. Without JavaScript, content remains readable in light mode. Uploaded photographs retain their original colours; controls and backgrounds change together.
+
+Dark mode uses a pure black page with muted text rather than a green-tinted background. Articles use locally hosted Source Serif 4 normal/italic fonts (SIL Open Font License in the assets folder), a restrained reading measure, shared left alignment for title/intro/image/body, and a responsive opening drop cap. Body size is 20px desktop and 18px mobile. The reading stylesheet and 54 KB normal font preload are article-only. Underline is available in the native editor as well as the MCP's `++underline++` syntax; named links are underlined automatically.
 
 ## Google AdSense
 

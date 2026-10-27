@@ -32,3 +32,22 @@ class ArticleLinkTests(SimpleTestCase):
         soup = BeautifulSoup(rendered, 'html.parser')
         self.assertFalse(soup.select('script'))
         self.assertEqual(soup.select_one('a')['href'], 'https://example.com/wiki/Topic_(detail)')
+
+    def test_emphasis_remains_editable_and_html_is_escaped(self):
+        html = paragraph_html('A **useful point** and an *important detail*, with [a source](https://example.com). **<script>bad</script>**')
+        soup = BeautifulSoup(html, 'html.parser')
+        self.assertEqual(soup.select_one('strong').text, 'useful point')
+        self.assertEqual(soup.select_one('em').text, 'important detail')
+        self.assertFalse(soup.select('script'))
+        self.assertEqual(len(soup.select('a')), 1)
+        self.assertEqual(link_article_html(html), html)
+
+    def test_underlining_and_named_links_survive_native_editor_round_trip(self):
+        from wagtail.admin.rich_text.converters.contentstate import ContentstateConverter
+        html = paragraph_html('A ++key detail++ with [the full report](https://example.com/report).')
+        converter = ContentstateConverter(features=['underline', 'link'])
+        restored = converter.to_database_format(converter.from_database_format(html))
+        soup = BeautifulSoup(restored, 'html.parser')
+        self.assertEqual(soup.select_one('u').text, 'key detail')
+        self.assertEqual(soup.select_one('a')['href'], 'https://example.com/report')
+        self.assertEqual(soup.select_one('a').text, 'the full report')

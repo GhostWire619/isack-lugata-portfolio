@@ -159,6 +159,21 @@ class ConnectionTests(TestCase):
         with self.assertRaises(ValueError):
             call_tool(connection, 'get_analytics', {})
 
+    def test_skill_download_is_portable_and_protected(self):
+        from io import BytesIO
+        from zipfile import ZipFile
+        from .writing import writing_guide
+        response = self.client.get('/admin/ai/writing-skill/')
+        self.assertEqual(response.status_code, 200)
+        with ZipFile(BytesIO(response.content)) as package:
+            self.assertEqual(package.namelist(), ['write-journal-articles/SKILL.md'])
+            self.assertEqual(package.read(package.namelist()[0]).decode(), writing_guide())
+        self.assertEqual(Client().get('/admin/ai/writing-skill/').status_code, 302)
+        public = Client().get('/blog/ai-writing-skill.md')
+        self.assertEqual(public.status_code, 200)
+        self.assertEqual(public.content.decode(), writing_guide())
+        self.assertIn('noindex', public['X-Robots-Tag'])
+
     def test_draft_edit_publish_and_schedule_permissions(self):
         connection, _ = MCPConnection.issue(user=self.owner, name='Test', can_write=True,
             expires_at=timezone.now() + timedelta(hours=1))
