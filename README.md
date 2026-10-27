@@ -4,12 +4,13 @@ A freelance-focused portfolio for Isack Lugata, a full-stack and mobile develope
 
 ## Run on your server with Docker
 
-Requires Docker Engine and the Docker Compose plugin. The finished site and its assets are already included; no Node.js, Python, or content generation is needed on the server. The portfolio joins the existing external **`ecofy-network`**, matching Ecofy backend's Docker Compose configuration. Start Ecofy first so that network exists.
+Requires Docker Engine, the Docker Compose plugin, and Python 3 for the one-time settings helper. The finished site and assets are included; no content generation is needed on the server. One `compose.yaml` starts the portfolio, journal, PostgreSQL database and publishing scheduler. The portfolio joins the existing external **`ecofy-network`**, matching Ecofy backend's Docker Compose configuration. Start Ecofy first so that network exists.
 
 ```sh
 git clone https://github.com/GhostWire619/isack-lugata-portfolio.git
 cd isack-lugata-portfolio
-docker compose up -d --build
+python3 scripts/setup_blog_env.py
+docker compose up -d --build --wait
 ```
 
 Open `http://YOUR_SERVER_IP:3100`. The host and container both use port **3100**. If the server has a firewall, allow inbound TCP port 3100. For a domain with HTTPS, point your existing reverse proxy to this port.
@@ -21,7 +22,8 @@ docker compose logs --tail=100
 
 # Pull updates and rebuild
 git pull --ff-only
-docker compose up -d --build
+python3 scripts/setup_blog_env.py
+docker compose up -d --build --wait
 
 # Stop the site
 docker compose down
@@ -45,16 +47,11 @@ To connect an existing proxy container, use `docker network connect ecofy-networ
 
 If the domain returns 502, check `docker compose ps`, `docker compose logs --tail=100`, and that the proxy container and portfolio both appear in `docker network inspect ecofy-network`. The proxy can use the server IP and published port 3100 instead if they do not share a Docker network.
 
-Without Compose:
-
-```sh
-docker build -t isack-portfolio .
-docker run -d --name isack-portfolio --network ecofy-network --restart unless-stopped -p 3100:3100 isack-portfolio
-```
+The setup helper creates the private `.env` once. If you already deployed with `.env.blog`, it copies those exact settings into `.env` and retains the old file, preserving the database password and Django signing key. Re-running the helper leaves an existing `.env` unchanged. Named database/media volumes and container names are preserved. After the first deployment, create your owner login with `docker compose exec journal python manage.py createsuperuser`.
 
 ## Run locally without Docker
 
-Requires Node.js; no npm packages are needed to serve the site.
+For a portfolio-only local preview, use Node.js; no npm packages are needed. To run the real journal locally too, see the backend setup guide.
 
 ```sh
 npm run dev
@@ -155,12 +152,12 @@ Photo compositions retain real people and real photographs. Captions do not inve
 
 The database-backed journal lives in `backend/`; see [the journal setup guide](backend/README.md). It adds Django/Wagtail, owner login with two-factor authentication, article editing and scheduling, optimized uploaded images, PostgreSQL, RSS and a combined sitemap. The independent visual prototype remains in `design/blog/` for reference.
 
-The default Compose command above still runs the existing portfolio only. To enable the journal, generate private settings and use the additive deployment:
+All services are in the default `compose.yaml`. Prepare or migrate private settings once, then use the standard Compose command:
 
 ```sh
 python3 scripts/setup_blog_env.py
-docker compose --env-file .env.blog -f compose.yaml -f compose.blog.yaml up -d --build
-docker compose --env-file .env.blog -f compose.yaml -f compose.blog.yaml exec journal python manage.py createsuperuser
+docker compose up -d --build --wait
+docker compose exec journal python manage.py createsuperuser
 ```
 
 Nginx Proxy Manager still forwards to `isack-portfolio:3100`. The journal is at `/blog/` and the real publishing studio at `/admin/`. The authenticated MCP endpoint at `/mcp/` supports reading articles and creating drafts; see the backend guide for credentials and testing. OAuth sign-in for ChatGPT/Claude and real analytics remain pending; the design dashboard's sample figures are not live analytics.

@@ -10,4 +10,5 @@ backend/data/
 backend/media/
 backend/staticfiles/
 .env.blog
+.env
 *.sqlite3

@@ -1,7 +1,6 @@
 FROM nginx:stable-alpine
 
-ARG NGINX_CONFIG=deploy/nginx.conf
-COPY ${NGINX_CONFIG} /etc/nginx/conf.d/default.conf
+COPY deploy/nginx.conf /etc/nginx/conf.d/default.conf
 COPY dist/ /usr/share/nginx/html/
 
 EXPOSE 3100

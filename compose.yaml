@@ -1,3 +1,4 @@
+# Entire site: docker compose up -d --build
 services:
   portfolio:
     container_name: isack-portfolio
@@ -5,10 +6,68 @@ services:
     ports:
       - "3100:3100"
     restart: unless-stopped
+    volumes:
+      - journal-media:/var/www/journal-media:ro
+    depends_on:
+      journal:
+        condition: service_healthy
     networks:
+      - journal-network
       - ecofy-network
-
+  journal-db:
+    image: postgres:17-alpine
+    container_name: isack-journal-db
+    environment:
+      POSTGRES_DB: isack_journal
+      POSTGRES_USER: journal
+      POSTGRES_PASSWORD: ${JOURNAL_DB_PASSWORD:?Run python3 scripts/setup_blog_env.py once to create .env}
+    volumes:
+      - journal-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U journal -d isack_journal"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+    networks:
+      - journal-network
+  journal:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    image: isack-journal:local
+    container_name: isack-journal
+    env_file: .env
+    command: ["sh", "-c", "python manage.py migrate --noinput && python manage.py bootstrap_journal && exec gunicorn journal.wsgi:application --bind 0.0.0.0:8000 --workers 2 --threads 2 --timeout 90 --access-logfile - --error-logfile -"]
+    volumes:
+      - journal-media:/app/media
+    depends_on:
+      journal-db:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - journal-network
+  journal-scheduler:
+    image: isack-journal:local
+    env_file: .env
+    command: ["python", "manage.py", "run_scheduler"]
+    volumes:
+      - journal-media:/app/media
+    depends_on:
+      journal:
+        condition: service_healthy
+    healthcheck:
+      disable: true
+    restart: unless-stopped
+    networks:
+      - journal-network
+volumes:
+  journal-db:
+  journal-media:
 networks:
   ecofy-network:
     external: true
     name: ecofy-network
+  journal-network:
+    driver: bridge
+    internal: false

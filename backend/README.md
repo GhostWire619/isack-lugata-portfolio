@@ -45,16 +45,16 @@ Log in at `/admin/`, scan the QR code with an authenticator, verify the code and
 
 ## Deploy on the existing server
 
-The original `compose.yaml` remains a portfolio-only deployment. Opt into the journal with the additive override:
+One `compose.yaml` starts the entire site: portfolio gateway, journal, PostgreSQL and scheduler. No extra Compose files or flags are needed:
 
 ```bash
 git pull
 python3 scripts/setup_blog_env.py
-docker compose --env-file .env.blog -f compose.yaml -f compose.blog.yaml up -d --build
-docker compose --env-file .env.blog -f compose.yaml -f compose.blog.yaml exec journal python manage.py createsuperuser
+docker compose up -d --build --wait
+docker compose exec journal python manage.py createsuperuser
 ```
 
-The setup script generates a unique database password and Django signing key in the ignored `.env.blog`. It never prints or overwrites existing secrets. Set `PUBLIC_URL` if using another domain. Use the exact same Compose file arguments for future updates, backups and shutdowns; using only the original compose file omits the journal services.
+The setup script creates the ignored `.env` with a unique database password and Django signing key. When upgrading from `.env.blog`, it copies the existing settings byte-for-byte and keeps the legacy file. Existing `.env` files are validated and preserved; no secrets are printed or rotated. Set `PUBLIC_URL` if using another domain. Future updates use `docker compose up -d --build`, and logs/status use `docker compose logs` / `docker compose ps`. Keep the same checkout directory/project name to reuse the existing named volumes.
 
 Nginx Proxy Manager remains `http://isack-portfolio:3100` on `ecofy-network`, with HTTPS configured for `isack.space` and forwarded protocol headers preserved. Restrict direct external access to port 3100 to your reverse proxy as appropriate for your host. The journal and its PostgreSQL database use a separate Docker network; neither exposes a host port. No Ecofy application or database configuration is modified.
 
@@ -64,7 +64,7 @@ The production image runs as a non-root user. The Nginx container reads the shar
 
 ## Password recovery and recovery codes
 
-Configure `EMAIL_HOST`, `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD`, `EMAIL_PORT`, `EMAIL_USE_TLS` and `DEFAULT_FROM_EMAIL` in `.env.blog`, then recreate the journal container to enable actual email delivery. Development uses console email. Without SMTP, a server owner can reset a password with `python manage.py changepassword USERNAME` inside the journal container. Password recovery does not bypass two-factor authentication.
+Configure `EMAIL_HOST`, `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD`, `EMAIL_PORT`, `EMAIL_USE_TLS` and `DEFAULT_FROM_EMAIL` in `.env`, then recreate the journal container to enable actual email delivery. Development uses console email. Without SMTP, a server owner can reset a password with `python manage.py changepassword USERNAME` inside the journal container. Password recovery does not bypass two-factor authentication.
 
 Recovery codes are shown once, are consumed on use and should be stored in a password manager. Keep the production signing key stable so existing sessions and signed links remain valid across deployments.
 
@@ -135,14 +135,14 @@ Ad serving starts **off**. After site approval, publish Google's consent message
 
 Ad requests never run in local development, Studio, staff sessions, or draft previews. **Preview ad placements** in Your articles opens the real layout with clearly labelled boxes, through MFA-protected `/admin/advertising/preview/`; add `?layout=journal` for the listing. This preview never includes Google ad-serving code and cannot generate impressions or clicks. It works even while advertising is disabled.
 
-Deploy with the existing additive Compose command after pulling updates. Site approval, the consent message and real ad fill must be checked in your AdSense account; a passing build does not confirm Google approval or that an ad will be returned.
+Deploy with `docker compose up -d --build` after pulling updates. Site approval, the consent message and real ad fill must be checked in your AdSense account; a passing build does not confirm Google approval or that an ad will be returned.
 
 ## Backups and restoration
 
-Back up both named volumes and the private `.env.blog`. A database-only backup does not include images. Store backups outside this server and test restoring them before relying on them. Example database dump:
+Back up both named volumes and the private `.env`. A database-only backup does not include images. Store backups outside this server and test restoring them before relying on them. Example database dump:
 
 ```bash
-docker compose --env-file .env.blog -f compose.yaml -f compose.blog.yaml exec -T journal-db pg_dump -U journal -d isack_journal > journal-backup.sql
+docker compose exec -T journal-db pg_dump -U journal -d isack_journal > journal-backup.sql
 ```
 
 For media, use your host's volume backup tooling or archive `/app/media` from the journal container. Do not use `docker compose down -v` on the production deployment: it removes the database and media volumes.

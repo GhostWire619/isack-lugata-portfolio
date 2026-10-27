@@ -24,7 +24,8 @@ jobs:
       - name: Build and check Nginx configuration
         run: |
           docker build -t isack-portfolio:test .
-          docker run --rm isack-portfolio:test nginx -t
+          python scripts/setup_blog_env.py
+          python -m unittest discover -s scripts -p "test_setup_blog_env.py"
           docker compose config --quiet
       - name: Verify the running site on port 3100
         shell: bash
@@ -32,7 +33,8 @@ jobs:
           set -euo pipefail
           docker network create ecofy-network
           trap 'docker logs isack-portfolio; docker compose down; docker network rm ecofy-network' EXIT
-          docker compose up -d --build
+          docker compose up -d --build --wait --wait-timeout 180
+          docker compose exec -T portfolio nginx -t
           curl --fail --retry 15 --retry-all-errors --retry-delay 1 http://localhost:3100/healthz
           for route in / /about /ecofy /globoexpats /wakili-msomi /habitek /osher-market /falco /tanstack-tanzania /robotics; do
             curl --fail --silent --show-error "http://localhost:3100$route" -o /tmp/portfolio-page.html
@@ -45,7 +47,7 @@ jobs:
           curl --fail --silent --show-error -D /tmp/module-headers "http://localhost:3100/${module#dist/}" -o /tmp/module.js
           grep -qi 'content-type: application/javascript' /tmp/module-headers
           curl --fail --silent --show-error http://localhost:3100/robots.txt | grep 'Sitemap: https://isack.space/sitemap.xml'
-          curl --fail --silent --show-error http://localhost:3100/sitemap.xml | grep 'https://isack.space/about'
+          curl --fail --silent --show-error -H 'Host: isack.space' -H 'X-Forwarded-Proto: https' http://localhost:3100/sitemap.xml | grep 'https://isack.space/about'
           docker inspect --format '{{json .NetworkSettings.Networks}}' isack-portfolio | grep 'ecofy-network'
           docker run --rm --network ecofy-network --entrypoint wget isack-portfolio:test -q -O - http://isack-portfolio:3100/healthz
           curl --fail --silent --show-error -D /tmp/auxiliary-headers http://localhost:3100/test-1 -o /dev/null

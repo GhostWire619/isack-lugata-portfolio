@@ -48,9 +48,9 @@ jobs:
           unset JOURNAL_ENV PUBLIC_URL DATABASE_URL
           python scripts/setup_blog_env.py
           docker network create ecofy-network
-          trap 'docker compose --env-file .env.blog -f compose.yaml -f compose.blog.yaml logs --tail=60; docker compose --env-file .env.blog -f compose.yaml -f compose.blog.yaml down -v; docker network rm ecofy-network' EXIT
-          docker compose --env-file .env.blog -f compose.yaml -f compose.blog.yaml config --quiet
-          docker compose --env-file .env.blog -f compose.yaml -f compose.blog.yaml up -d --build --wait --wait-timeout 180
+          trap 'docker compose logs --tail=60; docker compose down -v; docker network rm ecofy-network' EXIT
+          docker compose config --quiet
+          docker compose up -d --build --wait --wait-timeout 180
           curl --fail --silent http://localhost:3100/ -o /tmp/portfolio.html
           grep -q 'Isack Lugata' /tmp/portfolio.html
           curl --fail --silent http://localhost:3100/ads.txt -o /tmp/ads.txt
