@@ -131,6 +131,7 @@ OAUTH2_PROVIDER = {
     'ALLOW_URI_WILDCARDS': False,
     'DCR_ENABLED': True,
     'CIMD_ENABLED': True,
+    'CIMD_METADATA_FETCHER': 'publishing.oauth_clients.JournalClientMetadataFetcher',
     'DCR_REGISTRATION_PERMISSION_CLASSES': ['publishing.oauth.RegistrationPermission'],
     'DCR_REGISTRATION_TOKEN_EXPIRE_SECONDS': 2592000,
     'OIDC_ISS_ENDPOINT': PUBLIC_URL,

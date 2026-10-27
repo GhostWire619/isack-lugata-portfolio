@@ -2,6 +2,7 @@ import base64
 import hashlib
 import json
 import secrets
+from unittest.mock import patch
 from datetime import timedelta
 from urllib.parse import parse_qs, urlsplit, urlencode
 from uuid import uuid4
@@ -41,9 +42,9 @@ class ConnectionTests(TestCase):
         self.assertEqual(response.status_code, 201, response.content)
         return response.json()['client_id']
 
-    def authorize(self, client_id, *, publish=False, resource='http://localhost:8001/mcp'):
+    def authorize(self, client_id, *, publish=False, resource='http://localhost:8001/mcp', redirect_uri='https://assistant.example/callback'):
         verifier = secrets.token_urlsafe(48)
-        query = {'client_id': client_id, 'response_type': 'code', 'redirect_uri': 'https://assistant.example/callback',
+        query = {'client_id': client_id, 'response_type': 'code', 'redirect_uri': redirect_uri,
             'scope': 'articles:read articles:write analytics:read articles:publish', 'state': 'checked-state',
             'code_challenge': base64.urlsafe_b64encode(hashlib.sha256(verifier.encode()).digest()).rstrip(b'=').decode(),
             'code_challenge_method': 'S256', 'resource': resource}
@@ -61,9 +62,34 @@ class ConnectionTests(TestCase):
         self.assertIn('code', values, values)
         return values['code'][0], verifier
 
-    def exchange(self, client_id, code, verifier, resource='http://localhost:8001/mcp'):
+    def exchange(self, client_id, code, verifier, resource='http://localhost:8001/mcp', redirect_uri='https://assistant.example/callback'):
         return self.client.post('/oauth/token/', {'client_id': client_id, 'grant_type': 'authorization_code',
-            'code': code, 'code_verifier': verifier, 'redirect_uri': 'https://assistant.example/callback', 'resource': resource})
+            'code': code, 'code_verifier': verifier, 'redirect_uri': redirect_uri, 'resource': resource})
+
+    def test_chatgpt_cimd_negotiates_public_pkce_and_completes_connection(self):
+        client_id = 'https://chatgpt.com/oauth/client.json'
+        callback = 'https://chatgpt.com/connector_platform_oauth_redirect'
+        metadata = {'client_id': client_id, 'client_name': 'ChatGPT', 'redirect_uris': [callback],
+            'grant_types': ['authorization_code', 'refresh_token'], 'response_types': ['code'],
+            'token_endpoint_auth_method': 'private_key_jwt',
+            'token_endpoint_auth_methods_supported': ['none', 'private_key_jwt']}
+        with patch('oauth2_provider.cimd.SafeMetadataFetcher.fetch', return_value=(metadata, 3600)):
+            code, verifier = self.authorize(client_id, redirect_uri=callback)
+        response = self.exchange(client_id, code, verifier, redirect_uri=callback)
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertNotIn('articles:publish', response.json()['scope'])
+        rpc = self.client.post('/mcp', json.dumps({'jsonrpc': '2.0', 'id': 1, 'method': 'tools/list'}),
+            content_type='application/json', HTTP_AUTHORIZATION='Bearer ' + response.json()['access_token'])
+        self.assertEqual(rpc.status_code, 200, rpc.content)
+        self.assertIn('create_article_draft', [tool['name'] for tool in rpc.json()['result']['tools']])
+
+    def test_cimd_does_not_downgrade_clients_that_do_not_offer_public_auth(self):
+        from .oauth_clients import JournalClientMetadataFetcher
+        from oauth2_provider.cimd import CIMDError
+        for methods in [['private_key_jwt'], [], 'none']:
+            with patch('oauth2_provider.cimd.SafeMetadataFetcher.fetch', return_value=({'token_endpoint_auth_methods_supported': methods}, 3600)):
+                with self.assertRaises(CIMDError):
+                    JournalClientMetadataFetcher().fetch('https://client.example/metadata.json')
 
     def test_oauth_pkce_scope_consent_refresh_and_revoke(self):
         client_id = self.register()
