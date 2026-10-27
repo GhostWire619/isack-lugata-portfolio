@@ -81,6 +81,10 @@ def ai_connections(request):
     token = None
     form = TokenForm(request.POST if request.method == 'POST' and request.POST.get('action') == 'create' else None)
     if request.method == 'POST':
+        if request.POST.get('action') == 'setup_claude':
+            from .oauth import claude_application
+            claude_application(request.user, create=True)
+            return redirect('journal_ai')
         if request.POST.get('action') == 'revoke':
             connection = MCPConnection.objects.filter(pk=request.POST.get('connection'), user=request.user).first()
             if not connection:
@@ -101,9 +105,10 @@ def ai_connections(request):
     connections = MCPConnection.objects.filter(user=request.user, revoked_at__isnull=True,
         expires_at__gt=timezone.now()).select_related('oauth_application').order_by('-created_at')
     from .models import OAuthFailure
+    from .oauth import claude_application
     failures = OAuthFailure.objects.filter(user=request.user).order_by('-created_at')[:10]
     response = render(request, 'publishing/studio_ai.html', {'connections': connections, 'oauth_failures': failures, 'form': form,
-        'token': token, 'mcp_url': settings.PUBLIC_URL + '/mcp'})
+        'token': token, 'mcp_url': settings.PUBLIC_URL + '/mcp', 'claude_client': claude_application(request.user)})
     response['Cache-Control'] = 'no-store'
     response['Referrer-Policy'] = 'no-referrer'
     return response

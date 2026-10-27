@@ -156,6 +156,32 @@ class ConnectionTests(TestCase):
         self.assertEqual(rpc.status_code, 200, rpc.content)
         self.assertEqual(rpc.json()['result']['serverInfo']['name'], 'isack-journal')
 
+    def test_studio_claude_setup_registers_reusable_public_client_and_completes_oauth(self):
+        from .oauth import claude_application
+        self.assertIsNone(claude_application(self.owner))
+        page = self.client.get('/admin/ai/')
+        soup = BeautifulSoup(page.content, 'html.parser')
+        csrf = soup.select_one('input[name=csrfmiddlewaretoken]')['value']
+        self.assertEqual(self.client.post('/admin/ai/', {'action': 'setup_claude'}).status_code, 403)
+        for _ in range(2):
+            response = self.client.post('/admin/ai/', {'action': 'setup_claude', 'csrfmiddlewaretoken': csrf})
+            self.assertEqual(response.status_code, 302)
+        application = claude_application(self.owner)
+        self.assertEqual(application.client_secret, '')
+        self.assertFalse(application.skip_authorization)
+        self.assertEqual(application.client_type, 'public')
+        self.assertContains(self.client.get('/admin/ai/'), application.client_id)
+        self.assertFalse(MCPConnection.objects.filter(oauth_application=application).exists())
+        callback = 'https://claude.ai/api/mcp/auth_callback'
+        code, verifier = self.authorize(application.client_id, redirect_uri=callback, resource=None)
+        response = self.exchange(application.client_id, code, verifier, redirect_uri=callback)
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertNotIn('articles:publish', response.json()['scope'])
+        rpc = self.client.post('/mcp', json.dumps({'jsonrpc': '2.0', 'id': 1, 'method': 'tools/list'}),
+            content_type='application/json', HTTP_AUTHORIZATION='Bearer ' + response.json()['access_token'])
+        self.assertEqual(rpc.status_code, 200, rpc.content)
+        self.assertIn('create_article_draft', [tool['name'] for tool in rpc.json()['result']['tools']])
+
     def test_metadata_failure_is_correlated_visible_and_redacted(self):
         from oauth2_provider.cimd import CIMDError
         from .models import OAuthFailure

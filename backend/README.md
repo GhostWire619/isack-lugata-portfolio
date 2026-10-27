@@ -131,6 +131,8 @@ Open **Studio → AI connections** (`/admin/ai/`). Copy `https://isack.space/mcp
 
 ### OAuth troubleshooting and logs
 
+For Claude, Studio also provides **Set up Claude**. This creates an owner-specific public OAuth client without granting access. Remove any failed Claude connector and add a new one with the MCP URL, **Sign in now**, and **Use your own OAuth client**. Copy the Studio client ID and leave the client secret blank. The registered callback is exactly `https://claude.ai/api/mcp/auth_callback`; normal MFA, consent, S256 PKCE and scope restrictions still apply. The setup is repeatable and preserves the client ID across deployments. A public client ID is an identifier, not a bearer credential. This explicit registration route avoids depending on a cached automatic-registration ID or fetching Claude's published identity.
+
 Authorization failures display the native OAuth error code, a redacted reason and a diagnostic ID. **Studio → AI connections → Recent connection errors** shows the same user's last ten failures, including whether the client was registered, its callback matched, the PKCE method and any published-identity fetch failure. Records expire after 14 days and are bounded per user. Anonymous failures remain in server logs rather than a public database view.
 
 JSON log events `oauth.metadata_failed`, `oauth.request_failed` and `oauth.request_succeeded` include timestamps, stage and correlation IDs. Credentials, authorization codes, OAuth state and raw sign-in URLs are excluded. The bundled Nginx and Gunicorn access logs omit query strings; an external reverse proxy has its own logging configuration. Inspect recent backend diagnostics with:

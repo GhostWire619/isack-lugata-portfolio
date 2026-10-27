@@ -19,6 +19,28 @@ def resource_uri():
     return settings.PUBLIC_URL + '/mcp'
 
 
+def claude_application(user, *, create=False):
+    """An explicit public client for Claude's 'Use your own OAuth client' flow."""
+    from django.core.exceptions import PermissionDenied
+    from oauth2_provider.models import get_application_model
+    Application = get_application_model()
+    client_id = f'journal-claude-{user.pk}'
+    if create:
+        application, _ = Application.objects.get_or_create(client_id=client_id, defaults={
+            'user': user, 'name': 'Claude', 'client_type': Application.CLIENT_PUBLIC,
+            'client_secret': '', 'hash_client_secret': False,
+            'authorization_grant_type': Application.GRANT_AUTHORIZATION_CODE,
+            'redirect_uris': 'https://claude.ai/api/mcp/auth_callback', 'skip_authorization': False})
+    else:
+        application = Application.objects.filter(client_id=client_id).first()
+    if application and (application.user_id != user.pk or application.client_type != Application.CLIENT_PUBLIC
+            or application.redirect_uris != 'https://claude.ai/api/mcp/auth_callback'
+            or application.authorization_grant_type != Application.GRANT_AUTHORIZATION_CODE
+            or application.skip_authorization):
+        raise PermissionDenied('This Claude client registration has conflicting settings.')
+    return application
+
+
 def connection_for(user, application, scopes, reconnect=False):
     connection, _ = MCPConnection.objects.get_or_create(user=user, oauth_application=application,
         defaults={'name': application.name[:100], 'token_hash': hashlib.sha256(secrets.token_bytes(40)).hexdigest(),
