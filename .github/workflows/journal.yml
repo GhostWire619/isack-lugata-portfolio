@@ -46,6 +46,7 @@ jobs:
           set -euo pipefail
           node scripts/check_advertising.mjs
           node scripts/check_analytics.mjs
+          node scripts/check_clarity.mjs
           unset JOURNAL_ENV PUBLIC_URL DATABASE_URL
           python scripts/setup_blog_env.py
           docker network create ecofy-network

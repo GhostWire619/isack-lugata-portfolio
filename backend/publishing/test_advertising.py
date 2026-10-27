@@ -44,6 +44,16 @@ class AdvertisingTests(TestCase):
         self.assertContains(response, '/blog/terms/"')
         self.assertNotContains(response, 'pagead2.googlesyndication.com')
 
+    def test_clarity_only_loads_on_public_production_pages(self):
+        marker = 'sidenotes/clarity.js'
+        for path in ['/blog/', '/blog/privacy/', '/blog/terms/']:
+            self.assertContains(self.client.get(path), marker, count=1)
+        self.assertNotContains(self.client.get('/admin/login/'), marker)
+        with override_settings(DEBUG=True):
+            self.assertNotContains(self.client.get('/blog/'), marker)
+        self.client.force_login(self.owner)
+        self.assertNotContains(self.client.get('/blog/'), marker)
+
     def test_article_has_one_loader_and_correct_units_at_text_break(self):
         article = self.article()
         response = self.client.get('/blog/article-with-ads/')
