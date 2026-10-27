@@ -107,6 +107,8 @@ Add `--article-file /private/article.json` to create and read back a draft. The 
 
 Sections support `heading`, `paragraph`, `code`, `quote` and `image`. A quotation uses `{"type":"quote","text":"Original or verified quotation","attribution":"Source or attribution"}`. An image uses `{"type":"image","image_id":123,"alt":"Accessible description","caption":"Optional caption"}`. Covers use the top-level fields `cover_image_id`, `cover_alt` and `cover_caption`.
 
+Paragraph text supports clickable URLs and labelled references such as `[Read the source](https://example.com/report)`. MCP saves these as native editable rich-text links while escaping raw HTML. Existing published paragraphs with plain URLs or labelled references also gain clickable links when rendered, without changing their revisions. Existing anchors and code blocks are preserved. In the Studio editor, select text and use the link control to add or edit a link.
+
 `upload_image` accepts `title` and `image_base64`: JPEG, PNG or WebP up to 2 MiB and 40 megapixels. It checks image collection permissions, strips metadata, scales to at most 2560 pixels and stores compressed WebP. No server-side fetching of arbitrary URLs or local files is exposed. Repeated identical uploads on the same connection reuse the image. Article references also check image permissions. The gateway and Django permit the bounded 3 MB JSON request.
 
 The client can upload local images through MCP with `--image-file cover=/private/cover.webp --image-file inline=/private/inline.webp`. Use `"cover_image_id":"@cover"` or `"image_id":"@inline"` in the article JSON; the client replaces these references with the returned image IDs before calling the draft tool.

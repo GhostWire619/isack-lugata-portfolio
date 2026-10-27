@@ -73,6 +73,13 @@ class MCPTests(TestCase):
             self.assertTrue(self.draft(**changes)['isError'])
         self.assertFalse(MCPDraftRequest.objects.exists())
 
+    def test_ai_drafts_save_editable_clickable_references(self):
+        result = self.draft(sections=[{'type': 'paragraph', 'text': 'See [the source](https://example.com/reference) and https://example.org.'}])
+        self.assertFalse(result['isError'], result)
+        article = ArticlePage.objects.get(pk=result['structuredContent']['article']['id'])
+        self.assertIn('<a href="https://example.com/reference">the source</a>', str(article.get_latest_revision_as_object().body[0].value))
+        self.assertFalse(article.live)
+
     def test_bearer_required_cookie_is_not_enough(self):
         self.client.force_login(self.owner)
         self.assertEqual(self.client.post('/mcp/', '{}', content_type='application/json').status_code, 401)

@@ -19,7 +19,6 @@ from django.db import transaction
 from django.http import HttpResponse, JsonResponse
 from django.urls import reverse
 from django.utils import timezone
-from django.utils.html import escape
 from django.utils.text import slugify
 from django.views.decorators.csrf import csrf_exempt
 from pydantic import BaseModel, ConfigDict, Field, ValidationError as InputError
@@ -29,6 +28,7 @@ from PIL import Image, ImageOps, UnidentifiedImageError
 
 from .models import ArticlePage, Category, JournalIndexPage, MCPConnection, MCPDraftRequest, MCPImageUpload, MCPAction
 from .studio import can_write
+from .links import paragraph_html
 
 logger = logging.getLogger(__name__)
 VERSIONS = {'2025-11-25', '2025-06-18', '2025-03-26'}
@@ -49,7 +49,7 @@ class GetArguments(Arguments):
 
 class TextSection(Arguments):
     type: Literal['heading', 'paragraph', 'code']
-    text: str = Field(min_length=1, max_length=10000)
+    text: str = Field(min_length=1, max_length=10000, description='Paragraphs support clickable URLs and [link labels](https://example.com). Raw HTML is escaped. Headings and code remain plain text.')
 
 
 class QuoteSection(Arguments):
@@ -139,7 +139,7 @@ def draft_content(user, args):
         elif section.type == 'quote':
             body.append(('quote', {'quote': section.text, 'attribution': section.attribution}))
         elif section.type == 'paragraph':
-            body.append(('paragraph', '<p>' + str(escape(section.text)).replace('\n\n', '</p><p>').replace('\n', '<br/>') + '</p>'))
+            body.append(('paragraph', paragraph_html(section.text)))
         else:
             body.append((section.type, section.text))
     return dict(title=args.title.strip(), intro=args.intro.strip(), category=category, body=body,
@@ -321,7 +321,7 @@ def call_tool(connection, name, raw):
             elif section.type == 'quote':
                 body.append(('quote', {'quote': section.text, 'attribution': section.attribution}))
             elif section.type == 'paragraph':
-                body.append(('paragraph', '<p>' + str(escape(section.text)).replace('\n\n', '</p><p>').replace('\n', '<br/>') + '</p>'))
+                body.append(('paragraph', paragraph_html(section.text)))
             else:
                 body.append((section.type, section.text))
         cover = choose_image(user, args.cover_image_id) if args.cover_image_id else None

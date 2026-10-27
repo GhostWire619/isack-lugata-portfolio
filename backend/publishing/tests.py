@@ -70,6 +70,14 @@ class PublishingTests(TestCase):
         self.assertContains(response, 'A real article introduction')
         revision.publish()
         self.assertContains(self.client.get('/blog/revision-example/'), 'Unpublished replacement introduction.')
+
+    def test_existing_plain_text_references_become_links_without_republishing(self):
+        article = self.make_article('clickable-references')
+        article.body = [('paragraph', '<p>Visit https://example.com/reference or [the report](https://example.org/report).</p>')]
+        article.save_revision().publish()
+        response = self.client.get('/blog/clickable-references/')
+        self.assertContains(response, 'href="https://example.com/reference"')
+        self.assertContains(response, '<a href="https://example.org/report">the report</a>', html=True)
     def test_search_topic_filter_and_safe_search_markup(self):
         self.make_article('searchable-example')
         other = Category.objects.get(slug='science')
