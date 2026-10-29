@@ -1,5 +1,6 @@
 """Install the shared analytics collectors in exported portfolio pages."""
 import gzip
+import re
 from pathlib import Path
 root = Path(__file__).resolve().parents[1]
 source = root / 'backend/static/sidenotes/analytics.js'
@@ -13,6 +14,9 @@ for page in (root / 'dist').rglob('*.html'):
     html = page.read_text(encoding='utf-8')
     if '</head>' not in html:
         continue
+    # A single stable, square PNG favicon is readable by search crawlers.
+    html = re.sub(r'<link\b(?=[^>]*\brel=[\'"](?:icon|shortcut icon|apple-touch-icon)[\'"])[^>]*>', '', html, flags=re.I)
+    html = html.replace('</head>', '<link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png"><link rel="icon" href="/favicon.ico" sizes="any"><link rel="apple-touch-icon" href="/favicon-180.png"></head>', 1)
     for marker in markers:
         if marker not in html:
             html = html.replace('</head>', marker + '</head>', 1)

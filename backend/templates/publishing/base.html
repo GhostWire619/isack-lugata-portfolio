@@ -8,7 +8,9 @@
 <link rel="canonical" href="{{ public_origin }}{% if canonical_path %}{{ canonical_path }}{% else %}{% pageurl page %}{% endif %}">
 <meta property="og:type" content="{% block og_type %}website{% endblock %}"><meta property="og:title" content="{{ page.seo_title|default:page.title }}"><meta property="og:description" content="{{ description }}"><meta property="og:url" content="{{ public_origin }}{% if canonical_path %}{{ canonical_path }}{% else %}{% pageurl page %}{% endif %}"><meta property="og:site_name" content="{{ publication.name }}">
 {% if page.cover %}{% image page.cover width-1600 format-webp as social %}<meta property="og:image" content="{{ public_origin }}{{ social.url }}"><meta name="twitter:card" content="summary_large_image">{% endif %}
-<link rel="icon" href="{% static 'sidenotes/assets/favicon.svg' %}" type="image/svg+xml">
+<link rel="icon" href="/favicon-192.png" type="image/png" sizes="192x192">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="/favicon-180.png">
 <link rel="alternate" type="application/rss+xml" title="{{ publication.name }}" href="{% url 'journal_feed' %}">
 <link rel="stylesheet" href="{% static 'sidenotes/site.css' %}"><link rel="stylesheet" href="{% static 'sidenotes/journal.css' %}">
 <link rel="stylesheet" href="{% static 'sidenotes/theme.css' %}">
