@@ -23,14 +23,14 @@ for (const options of [{hostname:'localhost'},{hostname:'preview.example'},{path
   assert.equal(result.context.clarity,undefined);
 }
 const page=browser();
-assert.equal(page.scripts.length,0);
+assert.equal(page.scripts.length,1);
 assert.equal(page.context.clarity.q[0][0],'consentv2');
 assert.equal(page.context.clarity.q[0][1].analytics_Storage,'denied');
 page.idle[0]();
-assert.equal(page.scripts[0].src,'https://www.clarity.ms/tag/z485ii73vk');
-assert.equal(page.scripts[0].async,true);
-assert.equal(page.scripts[1].src,'https://www.googletagmanager.com/gtag/js?id=G-XWWT4YVE88');
+assert.equal(page.scripts[1].src,'https://www.clarity.ms/tag/z485ii73vk');
 assert.equal(page.scripts[1].async,true);
+assert.equal(page.scripts[0].src,'https://www.googletagmanager.com/gtag/js?id=G-XWWT4YVE88');
+assert.equal(page.scripts[0].async,true);
 assert.equal(page.context.dataLayer[0][0],'consent');
 assert.equal(page.context.dataLayer[0][1],'default');
 assert.equal(page.context.dataLayer[0][2].analytics_storage,'denied');

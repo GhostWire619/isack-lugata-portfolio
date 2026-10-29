@@ -26,6 +26,13 @@
   window.gtag('config', 'G-XWWT4YVE88', {
     allow_google_signals: false, allow_ad_personalization_signals: false
   });
+  // Start Google's independent loader immediately. Deferring it behind a
+  // session-replay loader can delay page views on short visits.
+  const google = document.createElement('script');
+  google.async = true;
+  google.src = 'https://www.googletagmanager.com/gtag/js?id=G-XWWT4YVE88';
+  google.onerror = () => console.warn('Google Analytics could not load. Check browser blocking or network access.');
+  document.head.appendChild(google);
   const apply = () => {
     window.clarity('consentv2', {ad_Storage: 'denied', analytics_Storage: granted ? 'granted' : 'denied'});
     window.gtag('consent', 'update', {analytics_storage: granted ? 'granted' : 'denied'});
@@ -48,10 +55,6 @@
     script.async = true;
     script.src = 'https://www.clarity.ms/tag/z485ii73vk';
     document.head.appendChild(script);
-    const google = document.createElement('script');
-    google.async = true;
-    google.src = 'https://www.googletagmanager.com/gtag/js?id=G-XWWT4YVE88';
-    document.head.appendChild(google);
   };
   if ('requestIdleCallback' in window) window.requestIdleCallback(load, {timeout: 1500});
   else setTimeout(load, 0);

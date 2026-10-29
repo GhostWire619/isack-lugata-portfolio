@@ -10,7 +10,25 @@
     // Only materialize visible units: AdSense processes pending <ins> nodes in
     // DOM order, so pre-inserting a hidden rail can initialize the wrong unit.
     ad.append(markup.content.cloneNode(true));
-    try { (window.adsbygoogle = window.adsbygoogle || []).push({}); } catch {}
+    const unit = ad.querySelector('ins.adsbygoogle');
+    const placement = ad.closest('.journal-ad');
+    const update = () => {
+      // Only hide units Google explicitly declares empty; a slow request is
+      // not proof of no fill. Never hide or modify a filled ad iframe.
+      if (unit && unit.getAttribute('data-ad-status') === 'unfilled' && placement) {
+        placement.hidden = true;
+        statusObserver?.disconnect();
+      }
+    };
+    const statusObserver = unit && 'MutationObserver' in window
+      ? new MutationObserver(update) : null;
+    statusObserver?.observe(unit, {attributes:true, attributeFilter:['data-ad-status']});
+    update();
+    try { (window.adsbygoogle = window.adsbygoogle || []).push({}); } catch (error) {
+      statusObserver?.disconnect();
+      if (placement) placement.hidden = true;
+      console.warn('Journal advertisement could not initialize.', error);
+    }
   };
   const ads = document.querySelectorAll('[data-ad-container]');
   if ('IntersectionObserver' in window) {

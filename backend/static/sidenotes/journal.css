@@ -8,3 +8,6 @@
 @media(min-width:1200px){.article-layout{grid-template-columns:120px minmax(0,680px) 300px;gap:30px}.article-ad-rail{display:block}}
 @media(max-width:600px){.journal-ad-horizontal .journal-ad-slot{height:200px}.journal-ad-rectangle{margin-block:12px;max-width:336px;grid-column:1/-1}.journal-ad-rectangle .journal-ad-slot{height:280px}}
 .article-body .rich-copy a{color:var(--accent);text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:.18em;overflow-wrap:anywhere}.article-body .rich-copy a:hover{text-decoration-thickness:2px}.article-body .rich-copy a:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:2px}
+
+/* Remove the entire empty placement, including its label and reserved space. */
+.journal-ad[hidden]{display:none!important}
