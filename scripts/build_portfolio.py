@@ -4,5 +4,5 @@ import subprocess
 import sys
 
 root=Path(__file__).resolve().parents[1]
-for script in ['build_identity_artwork.py','personalize.py','arrange_portfolio.py','build_case_studies.py','build_seo.py','build_advertising.py','build_analytics.py','optimize_site.py']:
+for script in ['build_identity_artwork.py','personalize.py','arrange_portfolio.py','build_case_studies.py','build_seo.py','build_advertising.py','build_analytics.py','harden_pages.py','optimize_site.py']:
     subprocess.run([sys.executable,str(root/'scripts'/script)],cwd=root,check=True)

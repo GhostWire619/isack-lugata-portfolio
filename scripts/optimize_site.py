@@ -81,9 +81,35 @@ embedded = re.compile(r'data:image/(png|jpe?g|svg\+xml);base64,([A-Za-z0-9+/=]+)
 svg_cache = {}
 
 
+drawn_image = re.compile(r'<image\b[^>]*?href="data:image/(png|jpe?g|webp);base64,([A-Za-z0-9+/=]+)"[^>]*>')
+EMBEDDED_LIMIT = 1200
+
+
+def fit_drawn_image(match):
+    # Artwork embedded sources up to 6000px wide for marks shown at 50px. Keep twice the
+    # size each one is drawn at, which stays sharp on every phone screen.
+    tag = match.group()
+    drawn = [float(value) for value in re.findall(r'\b(?:width|height)="([\d.]+)"', tag)]
+    limit = min(EMBEDDED_LIMIT, round(max(drawn) * 2)) if drawn else EMBEDDED_LIMIT
+    raw = base64.b64decode(match.group(2))
+    with Image.open(BytesIO(raw)) as source:
+        if max(source.size) <= limit:
+            return tag
+        fitted = source.convert('RGBA')
+    fitted.thumbnail((limit, limit), Image.Resampling.LANCZOS)
+    buffer = BytesIO()
+    fitted.save(buffer, 'WEBP', quality=82, alpha_quality=95, method=6)
+    if buffer.tell() >= len(raw):
+        return tag
+    uri = 'data:image/webp;base64,' + base64.b64encode(buffer.getvalue()).decode()
+    return tag.replace(f'data:image/{match.group(1)};base64,{match.group(2)}', uri)
+
+
 def optimize_svg(raw):
     if raw in svg_cache:
         return svg_cache[raw]
+    source = raw
+    raw = drawn_image.sub(fit_drawn_image, raw)
     def replace_image(match):
         decoded = base64.b64decode(match.group(2))
         if match.group(1) == 'svg+xml':
@@ -92,7 +118,7 @@ def optimize_svg(raw):
         encoded = encode_webp(decoded)
         return 'data:image/webp;base64,' + base64.b64encode(encoded).decode() if encoded else match.group()
     result = embedded.sub(replace_image, raw)
-    svg_cache[raw] = result
+    svg_cache[source] = result
     return result
 
 
@@ -137,7 +163,7 @@ for path in DIST.glob('*.html'):
         video['preload'] = 'none'
         video.attrs.pop('autoplay', None)
     for img in soup.select('img'):
-        first_card = img.find_parent('a', href='./ecofy') or img.find_parent('a', href='./osher-market')
+        first_card = img.get('fetchpriority') == 'high'
         hero = img.find_parent(attrs={'data-framer-name':'hero'}) or img.find_parent('figure', class_='case-media')
         header = img.find_parent(class_='framer-QEZlT')
         if header:

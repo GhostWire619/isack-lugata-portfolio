@@ -2,6 +2,7 @@
 from pathlib import Path
 import base64
 import html
+import io
 import json
 import re
 from PIL import Image, ImageChops
@@ -20,6 +21,14 @@ def data_uri(file):
 
 def image(file,x,y,w,h,fit='xMidYMid meet',extra=''):
     return f'<image href="{data_uri(file)}" x="{x}" y="{y}" width="{w}" height="{h}" preserveAspectRatio="{fit}" {extra}/>'
+
+def logo_icon(file,x,y,w,h):
+    # Logos show small; embedding the full source made this one file 477 KB.
+    with Image.open(DIST/str(file).lstrip('/')) as source:
+        icon=source.convert('RGBA')
+    icon.thumbnail((w*3,h*3),Image.Resampling.LANCZOS)
+    buffer=io.BytesIO();icon.save(buffer,'WEBP',quality=90,method=6)
+    return f'<image href="data:image/webp;base64,{base64.b64encode(buffer.getvalue()).decode()}" x="{x}" y="{y}" width="{w}" height="{h}" preserveAspectRatio="xMidYMid meet"/>'
 
 def svg(body,w=1600,h=2000):
     return f'<svg xmlns="http://www.w3.org/2000/svg" width="{w}" height="{h}" viewBox="0 0 {w} {h}">{body}</svg>'
@@ -201,7 +210,7 @@ DATA['companies']=[
  {'name':'Falco Finance','logo':LOGOS['falco'],'url':'https://falco.co.tz/'},
  {'name':'Wakili Msomi','logo':LOGOS['wakili-msomi'],'url':'https://wakilimsomi.sheriakiganjani.co.tz/'},
  {'name':'TanStack Tanzania','logo':LOGOS['tanstack-tanzania'],'url':'https://tanstack.co.tz/'},
- {'name':'UDSM Robotics Lab','logo':write('brand-lab.svg',image(URL+'lab-icon.png',0,0,100,100)+label(120,40,31,'UDSM',weight='600')+label(120,78,28,'Robotics Lab'),390,105),'url':DATA['lab']['url']},
+ {'name':'UDSM Robotics Lab','logo':write('brand-lab.svg',logo_icon(URL+'lab-icon.png',0,0,100,100)+label(120,40,31,'UDSM',weight='600')+label(120,78,28,'Robotics Lab'),390,105),'url':DATA['lab']['url']},
 ]
 DATA['visuals']={'photos':photos,'readyPhoto':ready_photo,'readyNote':ready_note,'services':['original',URL+'phone-3d.png',URL+'gear-3d.png',URL+'robot-3d.png']}
 

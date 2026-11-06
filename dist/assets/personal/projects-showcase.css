@@ -1,17 +1,23 @@
-.showcase-on .framer-lvzy8y { display:none !important; }
+/* The captured grid is now only the deck's plain container; its entrance animation and frame are off. */
+.framer-lvzy8y {
+  display:block !important; width:100% !important; height:auto !important; padding:0 !important; overflow:visible !important;
+  opacity:1 !important; transform:none !important; filter:none !important; will-change:auto !important; --border-bottom-width:0px !important;
+}
+.framer-lvzy8y > .framer-1mdtcpj { display:none !important; }
+.framer-lvzy8y > .framer-oy8a34 { display:block !important; width:100% !important; height:auto !important; }
 .showcase {
   --ink:#000; --muted:rgba(0,0,0,.6); --line:rgba(0,0,0,.1);
   position:relative; box-sizing:border-box; display:grid; grid-template-columns:repeat(12,minmax(0,1fr)); column-gap:clamp(14px,1.8vw,24px);
   width:100%; padding:clamp(20px,4vh,48px) clamp(16px,3vw,48px) clamp(40px,8vh,96px); color:var(--ink); font:400 15px/22px 'Inter Display','Inter Display Placeholder',Inter,system-ui,sans-serif;
 }
 .showcase *,.showcase *::before,.showcase *::after { box-sizing:border-box; }
-.showcase-card { position:relative; display:block; min-width:0; color:inherit; text-decoration:none; will-change:transform; }
+.showcase-card { position:relative; display:block; min-width:0; color:inherit; text-decoration:none; }
 .showcase-card:focus-visible { outline:2px solid var(--ink); outline-offset:6px; border-radius:16px; }
 .showcase-media {
   position:relative; aspect-ratio:1.19; overflow:hidden; border-radius:14px; background:var(--tint);
   box-shadow:inset 0 0 0 1px rgba(0,0,0,.06);
 }
-.showcase-media img { display:block; width:100%; height:100%; object-fit:cover; will-change:transform; transition:scale .6s cubic-bezier(.2,.7,.2,1); }
+.showcase-media img { display:block; width:100%; height:100%; object-fit:cover; transition:scale .6s cubic-bezier(.2,.7,.2,1); }
 @media (hover:hover) { .showcase-card:hover .showcase-media img { scale:1.03; } }
 
 .showcase-caption { position:relative; display:grid; grid-template-columns:minmax(0,1fr) auto; gap:2px 12px; padding:14px 2px 0; }
@@ -28,10 +34,10 @@
 @media (hover:hover) { .showcase-card:hover .showcase-arrow { background:#000; color:#fff; transform:rotate(8deg) scale(1.06); } }
 
 /* Caption rises in once its card has arrived. */
-.showcase-caption > * { opacity:0; transform:translateY(12px); transition:opacity .5s ease,transform .7s cubic-bezier(.16,.8,.24,1); }
+.showcase-on .showcase-caption > * { opacity:0; transform:translateY(12px); transition:opacity .5s ease,transform .7s cubic-bezier(.16,.8,.24,1); }
 .showcase-caption > :nth-child(2) { transition-delay:.05s; }
 .showcase-caption > :nth-child(3) { transition-delay:.1s; }
-.showcase-card.is-in .showcase-caption > * { opacity:1; transform:none; }
+.showcase-on .showcase-card.is-in .showcase-caption > * { opacity:1; transform:none; }
 
 .showcase-more { grid-column:1 / -1; margin:clamp(36px,8vh,80px) 0 0; color:var(--muted); font:italic 400 20px/1.2 'EB Garamond',Georgia,serif; text-align:center; }
 
@@ -51,7 +57,7 @@
   }
   .showcase-card:last-of-type { margin-bottom:0; }
   .showcase-card::after { content:""; position:absolute; inset:0; border-radius:inherit; background:#000; opacity:var(--dim,0); pointer-events:none; }
-  .showcase-media { flex:1 1 auto; min-height:0; width:100%; aspect-ratio:auto; transform-origin:50% 45%; will-change:transform; }
+  .showcase-media { flex:1 1 auto; min-height:0; width:100%; aspect-ratio:auto; transform-origin:50% 45%; }
   .showcase-media img { object-fit:contain; }
   .showcase-caption { flex:none; width:100%; padding:13px 8px 0; }
   .showcase-more { margin-top:clamp(30px,6vh,60px); }
@@ -75,6 +81,6 @@
 @media (prefers-reduced-motion:reduce) {
   .showcase-card { position:relative !important; top:auto !important; height:auto !important; margin-bottom:26px !important; }
   .showcase-media { flex:none; aspect-ratio:1.8 !important; }
-  .showcase-caption > * { opacity:1; transform:none; transition:none; }
+  .showcase-on .showcase-caption > * { opacity:1; transform:none; transition:none; }
   .showcase-media img,.showcase-arrow,.showcase-cursor { transition:none; }
 }

@@ -66,7 +66,7 @@ class AssistantTests(TestCase):
         knowledge = assistant._knowledge()
         for term in ('Ecofy', 'agriculture', 'Wakili', 'Habitek', 'Robotics', '/ecofy'):
             self.assertNotIn(term, knowledge)
-        for term in ('TSh 500,000', 'lugata619@gmail.com', 'Mobile apps'):
+        for term in ('minimum for any project is TSh 500,000', 'lugata619@gmail.com', 'Mobile apps', 'team of collaborators'):
             self.assertIn(term, knowledge)
 
     def test_rate_limit_per_visitor(self):

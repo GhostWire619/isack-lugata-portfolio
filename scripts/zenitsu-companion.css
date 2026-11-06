@@ -73,7 +73,7 @@
   to { opacity:0; transform:translate(16px,-44px) scale(1.35); }
 }
 
-.zenitsu-launcher,.zenitsu-welcome,.zenitsu-chat {
+.zenitsu-launcher,.zenitsu-chat {
   --z-surface:#fff; --z-ink:#000; --z-muted:rgba(0,0,0,.6); --z-faint:rgba(0,0,0,.45); --z-line:rgba(0,0,0,.1); --z-fill:rgba(0,0,0,.05); --z-fill-strong:rgba(0,0,0,.09);
   --z-button:#000; --z-button-ink:#fff; --z-sheen:linear-gradient(rgba(255,255,255,.5),rgba(255,255,255,.1));
   --z-button-shadow:inset 0 -1px 1px rgba(0,0,0,.4),inset 0 -4px 5px rgba(255,255,255,.3),inset 0 -8px 8px rgba(255,255,255,.2),0 3px 5px -1px rgba(0,0,0,.35),0 6px 10px -1px rgba(0,0,0,.15);
@@ -83,21 +83,20 @@
   --z-spring:cubic-bezier(.2,.9,.25,1.08);
   color:var(--z-ink); font:400 15px/22px var(--z-sans); letter-spacing:.1px;
 }
-[data-tone="dark"].zenitsu-launcher,[data-tone="dark"].zenitsu-welcome,[data-tone="dark"].zenitsu-chat {
+[data-tone="dark"].zenitsu-launcher,[data-tone="dark"].zenitsu-chat {
   --z-surface:#0b0b0b; --z-ink:#fff; --z-muted:rgba(255,255,255,.64); --z-faint:rgba(255,255,255,.48); --z-line:rgba(255,255,255,.13); --z-fill:rgba(255,255,255,.07); --z-fill-strong:rgba(255,255,255,.13);
   --z-button:#c2c2c2; --z-button-ink:#000; --z-sheen:linear-gradient(#fff,rgba(255,255,255,.15));
   --z-button-shadow:inset 0 -1px 2px rgba(0,0,0,.4),inset 0 -4px 4px rgba(255,255,255,.6),inset 0 -8px 8px rgba(255,255,255,.5),0 3px 5px -1px rgba(255,255,255,.3),0 6px 10px -1px rgba(255,255,255,.12);
   --z-card-shadow:0 0 0 1px rgba(255,255,255,.14),0 24px 60px -10px #000;
 }
-.zenitsu-launcher *,.zenitsu-welcome *,.zenitsu-chat * { box-sizing:border-box; }
-.zenitsu-launcher button,.zenitsu-welcome button,.zenitsu-chat button { font:inherit; letter-spacing:inherit; color:inherit; cursor:pointer; }
-.zenitsu-launcher :focus-visible,.zenitsu-welcome :focus-visible,.zenitsu-chat :focus-visible { outline:2px solid var(--z-ink); outline-offset:2px; }
+.zenitsu-launcher *,.zenitsu-chat * { box-sizing:border-box; }
+.zenitsu-launcher button,.zenitsu-chat button { font:inherit; letter-spacing:inherit; color:inherit; cursor:pointer; }
+.zenitsu-launcher :focus-visible,.zenitsu-chat :focus-visible { outline:2px solid var(--z-ink); outline-offset:2px; }
 
 /* Launcher: his face on the site's button, with a label beneath it. */
 .zenitsu-launcher {
   position:fixed; z-index:105; right:max(14px,env(safe-area-inset-right)); bottom:max(10px,env(safe-area-inset-bottom));
 }
-.zenitsu-launcher[data-keyboard] { display:none; }
 .zenitsu-launcher-button {
   display:grid; justify-items:center; padding:0; border:0; background:none; -webkit-tap-highlight-color:transparent;
 }
@@ -138,34 +137,6 @@
 }
 .zenitsu-button-quiet:hover { background:var(--z-fill); color:var(--z-ink) !important; }
 
-/* Welcome: center stage. He strikes down onto this card, greets, then runs off. */
-.zenitsu-stage {
-  position:fixed; z-index:102; inset:0; pointer-events:none; animation:zenitsu-stage-in .5s ease both;
-  background:radial-gradient(ellipse 72% 62% at 50% 72%,rgba(255,255,255,.96) 0,rgba(255,255,255,.72) 42%,rgba(255,255,255,0) 100%);
-}
-.zenitsu-stage[data-tone="dark"] { background:radial-gradient(ellipse 72% 62% at 50% 72%,rgba(0,0,0,.92) 0,rgba(0,0,0,.66) 42%,rgba(0,0,0,0) 100%); }
-.zenitsu-stage[hidden] { display:none; }
-@keyframes zenitsu-stage-in { from { opacity:0; } }
-.zenitsu-welcome {
-  position:fixed; z-index:103; left:50%; bottom:max(13vh,104px); width:min(452px,calc(100vw - 28px)); margin-left:calc(min(452px,calc(100vw - 28px)) / -2);
-  padding:22px 24px 18px; border-radius:20px; background:var(--z-surface); box-shadow:var(--z-card-shadow); text-align:center;
-  transform-origin:50% 0; animation:zenitsu-welcome-pop .5s .1s var(--z-spring) both;
-}
-.zenitsu-welcome[hidden] { display:none; }
-/* The little notch that makes it his speech card. */
-.zenitsu-welcome::before {
-  content:""; position:absolute; left:50%; top:-7px; width:14px; height:14px; margin-left:-7px; border-radius:3px 0 0 0; background:inherit; transform:rotate(45deg);
-  box-shadow:-1px -1px 0 rgba(127,127,127,.18);
-}
-.zenitsu-welcome-title { margin:0 0 7px; font:400 clamp(30px,5vw,38px)/1.1 var(--z-serif); letter-spacing:-1.3px; }
-.zenitsu-welcome-title > span { display:inline-block; overflow:hidden; padding-bottom:.08em; vertical-align:top; }
-.zenitsu-welcome-title > span > span { display:inline-block; animation:zenitsu-word .7s cubic-bezier(.16,.8,.24,1) both; animation-delay:calc(var(--i) * 70ms + .3s); }
-@keyframes zenitsu-word { from { transform:translateY(110%); } }
-.zenitsu-welcome p { margin:0 auto 16px; max-width:360px; color:var(--z-muted); font-size:15px; line-height:22px; }
-.zenitsu-welcome-close { position:absolute; top:10px; right:10px; }
-.zenitsu-welcome-actions { display:flex; align-items:center; justify-content:center; gap:6px; }
-@keyframes zenitsu-welcome-pop { from { opacity:0; transform:translateY(26px) scale(.9); } }
-
 /* Chat */
 .zenitsu-chat {
   position:fixed; z-index:103; right:max(14px,env(safe-area-inset-right)); bottom:calc(max(10px,env(safe-area-inset-bottom)) + 84px);
@@ -174,7 +145,6 @@
   transform-origin:calc(100% - 27px) calc(100% + 40px); animation:zenitsu-pop .34s var(--z-spring) both;
 }
 .zenitsu-chat[hidden] { display:none; }
-.zenitsu-chat[data-keyboard] { bottom:calc(var(--zen-keyboard) + 8px); height:min(560px,calc(var(--zen-viewport) - 16px)); min-height:0; }
 .zenitsu-chat-head { display:flex; align-items:center; gap:10px; padding:11px 10px 11px 13px; border-bottom:1px solid var(--z-line); }
 .zenitsu-disc-small { flex:none; width:34px; height:34px; }
 .zenitsu-chat-title { display:grid; flex:1; min-width:0; }
@@ -237,16 +207,23 @@
 .zenitsu-send:disabled { opacity:.4; cursor:default; }
 .zenitsu-chat-note { margin:0; padding:7px 14px 10px; color:var(--z-faint); font-size:11px; line-height:15px; text-align:center; }
 
-.in-castle .zenitsu-chat,.in-castle .zenitsu-welcome,.in-castle .zenitsu-launcher { visibility:hidden; }
+.in-castle .zenitsu-chat,.in-castle .zenitsu-launcher { visibility:hidden; }
 
-@media (max-width:700px) {
+/* Phones: a full sheet pinned to the visible area, so the keyboard can't break it. */
+@media (max-width:760px), (pointer:coarse) {
   .zenitsu-disc:not(.zenitsu-disc-small) { width:48px; height:48px; }
-  .zenitsu-chat { right:14px; left:14px; width:auto; bottom:calc(max(10px,env(safe-area-inset-bottom)) + 76px); }
-  .zenitsu-welcome { bottom:calc(max(10px,env(safe-area-inset-bottom)) + 82px); padding:18px 18px 15px; }
-  .zenitsu-chat { height:min(560px,calc(var(--zen-viewport,100dvh) - 226px)); }
-  .zenitsu-chat[data-keyboard] { left:8px; right:8px; }
+  .zenitsu-launcher[data-open] { display:none; }
+  .zenitsu-chat {
+    z-index:120; top:0; left:0; right:0; bottom:auto; width:auto; height:100dvh; min-height:0; border-radius:0; box-shadow:none;
+    overscroll-behavior:contain; animation:none; will-change:height;
+  }
+  .zenitsu-chat-head { padding-top:max(11px,env(safe-area-inset-top)); }
+  .zenitsu-chat-log { -webkit-overflow-scrolling:touch; }
+  .zenitsu-icon-button { width:40px; height:40px; }
+  .zenitsu-chat-note { padding-bottom:max(10px,env(safe-area-inset-bottom)); }
+  .zenitsu-msg { animation:none; }
 }
 @media (prefers-reduced-motion:reduce) {
-  .zenitsu-stage,.zenitsu-welcome,.zenitsu-welcome-title > span > span,.zenitsu-chat,.zenitsu-msg,.zenitsu-typing span { animation:none; }
+  .zenitsu-chat,.zenitsu-msg,.zenitsu-typing span { animation:none; }
   .zenitsu-disc,.zenitsu-button,.zenitsu-suggestions button { transition:none; }
 }

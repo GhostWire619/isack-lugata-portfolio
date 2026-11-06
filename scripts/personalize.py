@@ -450,7 +450,7 @@ for filename in paths:
 out('personal.css','''
 /* Small content-specific corrections; the original Framer layout and motion remain. */
 a[href*="unused-social"],a[href*="pinterest.com"],a[href*="dribbble.com"],div[class*="-container"]:has(>a[href*="unused-social"]),div[class*="-container"]:has(>a[href*="pinterest.com"]),div[class*="-container"]:has(>a[href*="dribbble.com"]) { display:none !important; }
-video { object-fit:cover !important; visibility:hidden !important; }
+video { display:none !important; }
 img[src^="/assets/personal/"][src$=".svg"] { object-fit:contain !important; object-position:center !important; }
 img[src^="/assets/identity/cover-"] { object-fit:cover !important; object-position:center !important; }
 img[src^="/assets/identity/story-"],img[src^="/assets/identity/ready-"],img[src^="/assets/identity/icon-"],img[src^="/assets/identity/career-"] { object-fit:contain !important; object-position:center !important; }
@@ -525,6 +525,12 @@ out('personal.js','''
   const companies = '''+json.dumps(DATA.get('companies',[]))+''';
   const storyGallery = '''+json.dumps(story_gallery)+''';
   let pending = false;
+  // These sit far down the page, so their pictures wait until a visitor gets close.
+  const lazyBackgrounds = new IntersectionObserver(entries => entries.forEach(({isIntersecting, target}) => {
+    if (!isIntersecting) return;
+    target.style.backgroundImage = `url("${target.dataset.personalBackground}")`;
+    lazyBackgrounds.unobserve(target);
+  }), {rootMargin: '800px'});
   function addStoryGallery() {
     const stack = document.querySelector('#test .framer-rpyux0');
     if (!stack || stack.nextElementSibling?.classList.contains('story-gallery')) return;
@@ -568,7 +574,7 @@ out('personal.js','''
       img.alt = project.name + ' — ' + project.role;
     }
     projects.forEach(project => {
-      document.querySelectorAll(`a[href="./${project.slug}"],a[href="/${project.slug}"]`).forEach(a => {
+      document.querySelectorAll(`a[href="./${project.slug}"]:not(.showcase-card),a[href="/${project.slug}"]:not(.showcase-card)`).forEach(a => {
         a.querySelectorAll('img').forEach(img => setCover(img, project));
       });
     });
@@ -587,18 +593,14 @@ out('personal.js','''
       });
     }
     // Original showreels are replaced with labeled engineering sketches.
-    document.querySelectorAll('video[src]').forEach((video, i) => {
-      video.pause();
-      video.removeAttribute('autoplay');
+    document.querySelectorAll('video:not([aria-hidden])').forEach((video, i) => {
       const holder = video.parentElement;
       const item = gallery[i % gallery.length];
-      holder.style.backgroundImage = `url("${item.image}")`;
+      holder.dataset.personalBackground = item.image;
+      lazyBackgrounds.observe(holder);
       holder.style.backgroundSize = 'cover';
       holder.style.backgroundPosition = 'center';
       video.setAttribute('aria-hidden', 'true');
-      video.style.visibility = 'hidden';
-      video.removeAttribute('src');
-      video.load();
       holder.dataset.personalGallery = item.href;
       holder.dataset.personalGalleryLabel = item.title + '\\n' + item.subtitle;
       holder.setAttribute('role', 'link'); holder.tabIndex = 0;
@@ -649,7 +651,10 @@ out('personal.js','''
     if (!window.MotionIsMounted) { requestAnimationFrame(start); return; }
     requestAnimationFrame(() => {
       update();
-      new MutationObserver(schedule).observe(document.body, { childList:true, subtree:true, attributes:true, attributeFilter:['src'] });
+      const quietSelector = '.zenitsu-pet,.zenitsu-chat,.zenitsu-launcher,.showcase,.showcase-cursor,.castle';
+      const onlyWidgets = records => records.every(({ target, addedNodes, removedNodes }) => target.closest?.(quietSelector)
+        || (target === document.body && [...addedNodes, ...removedNodes].every(node => node.nodeType !== 1 || node.matches(quietSelector))));
+      new MutationObserver(records => { if (!onlyWidgets(records)) schedule(); }).observe(document.body, { childList:true, subtree:true, attributes:true, attributeFilter:['src'] });
     });
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start, {once:true});
@@ -679,8 +684,11 @@ lab_html=f'''<!doctype html><html lang="en"><head><meta charset="utf-8"><meta na
 (DIST/'robotics.html').write_text(lab_html,encoding='utf8')
 for asset in ('zenitsu-companion.css', 'zenitsu-companion.js', 'projects-showcase.css'):
     (PERSONAL / asset).write_bytes((ROOT / 'scripts' / asset).read_bytes())
-showcase_projects = [{'slug': p['slug'], 'name': p['name'], 'role': p['role'], 'tags': p['tags'], 'color': p['color'], 'cover': cover(p)} for p in DATA['projects']]
-(PERSONAL / 'projects-showcase.js').write_text((ROOT / 'scripts' / 'projects-showcase.js').read_text(encoding='utf8').replace('__SHOWCASE_PROJECTS__', json.dumps(showcase_projects, ensure_ascii=False)), encoding='utf8')
+(PERSONAL / 'showcase').mkdir(exist_ok=True)
+for image in (ROOT / 'scripts' / 'showcase-covers').glob('*.webp'):
+    (PERSONAL / 'showcase' / image.name).write_bytes(image.read_bytes())
+from showcase_markup import render_showcase
+(PERSONAL / 'projects-showcase.js').write_text((ROOT / 'scripts' / 'projects-showcase.js').read_text(encoding='utf8').replace('__SHOWCASE_MARKUP__', json.dumps(render_showcase(DATA['projects']), ensure_ascii=False)), encoding='utf8')
 for asset in (ROOT / 'scripts' / 'castle').rglob('*'):
     if asset.is_file():
         target = PERSONAL / 'castle' / asset.relative_to(ROOT / 'scripts' / 'castle')

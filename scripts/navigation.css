@@ -16,6 +16,13 @@
   a { -webkit-tap-highlight-color:transparent; }
 }
 
+/* Content first on phones: the hero never waits for JavaScript to fade in. */
+@media(max-width:760px) {
+  [data-framer-appear-id] { opacity:1 !important; transform:none !important; filter:none !important; }
+  /* Headings arrive letter by letter behind a blur, hidden until the JS has parsed. Phones read them at once. */
+  h1 span[style*="blur"], h2 span[style*="blur"] { opacity:1 !important; transform:none !important; filter:none !important; }
+}
+
 /* Align the featured rows so the desktop reading order is clear. */
 @media (min-width:992px) {
   .framer-n0UTl .framer-lvzy8y .framer-1yjyrti-container { aspect-ratio:1.18421; }

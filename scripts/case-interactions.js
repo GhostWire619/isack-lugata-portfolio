@@ -48,7 +48,10 @@
  }
  let pending=false;
  function schedule(){if(pending)return;pending=true;requestAnimationFrame(()=>{pending=false;scan();});}
- new MutationObserver(schedule).observe(document.body,{childList:true,subtree:true});
+ const quietSelector = '.zenitsu-pet,.zenitsu-chat,.zenitsu-launcher,.showcase,.showcase-cursor,.castle';
+  const onlyWidgets = records => records.every(({ target, addedNodes, removedNodes }) => target.closest?.(quietSelector)
+    || (target === document.body && [...addedNodes, ...removedNodes].every(node => node.nodeType !== 1 || node.matches(quietSelector))));
+ new MutationObserver(records=>{if(!onlyWidgets(records))schedule();}).observe(document.body,{childList:true,subtree:true});
  document.addEventListener('portfolio:route',schedule);
  scan();
 })();

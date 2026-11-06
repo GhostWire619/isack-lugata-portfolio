@@ -3,26 +3,22 @@
 
   // Paths stay literal so optimize_site.py can append its cache-busting token.
   const SHEETS = {
-    idle: { src: '/assets/personal/zenitsu/idle.webp?v=1e4a341eba4ea4af', frames: 19, fps: 14 },
-    run: { src: '/assets/personal/zenitsu/run.webp?v=1e4a341eba4ea4af', frames: 9, fps: 16 },
-    slash: { src: '/assets/personal/zenitsu/atk01.webp?v=1e4a341eba4ea4af', frames: 19, fps: 18 },
-    spin: { src: '/assets/personal/zenitsu/skl01.webp?v=1e4a341eba4ea4af', frames: 21, fps: 18 },
-    dash: { src: '/assets/personal/zenitsu/skl02.webp?v=1e4a341eba4ea4af', frames: 36, fps: 26 },
-    hit: { src: '/assets/personal/zenitsu/hit01.webp?v=1e4a341eba4ea4af', frames: 7, fps: 14 },
-    recoil: { src: '/assets/personal/zenitsu/hit02.webp?v=1e4a341eba4ea4af', frames: 7, fps: 14 },
-    faint: { src: '/assets/personal/zenitsu/die.webp?v=1e4a341eba4ea4af', frames: 23, fps: 16 },
+    idle: { src: '/assets/personal/zenitsu/idle.webp?v=2bd42fa998597aa3', frames: 19, fps: 14 },
+    run: { src: '/assets/personal/zenitsu/run.webp?v=2bd42fa998597aa3', frames: 9, fps: 16 },
+    slash: { src: '/assets/personal/zenitsu/atk01.webp?v=2bd42fa998597aa3', frames: 19, fps: 18 },
+    spin: { src: '/assets/personal/zenitsu/skl01.webp?v=2bd42fa998597aa3', frames: 21, fps: 18 },
+    dash: { src: '/assets/personal/zenitsu/skl02.webp?v=2bd42fa998597aa3', frames: 36, fps: 26 },
+    hit: { src: '/assets/personal/zenitsu/hit01.webp?v=2bd42fa998597aa3', frames: 7, fps: 14 },
+    recoil: { src: '/assets/personal/zenitsu/hit02.webp?v=2bd42fa998597aa3', frames: 7, fps: 14 },
+    faint: { src: '/assets/personal/zenitsu/die.webp?v=2bd42fa998597aa3', frames: 23, fps: 16 },
   };
   // Crop geometry from the sprite build, in captured pixels.
-  // Sharper art for the moment he's large on stage; loaded only if the welcome will play.
-  const STAGE_SHEETS = {
-    idle: { src: '/assets/personal/castle/zenitsu/idle.webp?v=1e4a341eba4ea4af', frames: 19, cols: 4, rows: 5 },
-    spin: { src: '/assets/personal/castle/zenitsu/skl01.webp?v=1e4a341eba4ea4af', frames: 21, cols: 4, rows: 6 },
-  };
   const CROP_W = 570, CROP_H = 295, BODY_H = 275, FEET_X = 260, FEET_Y = 290;
   const GRAVITY = 2300, DASH_SPEED = 2800;
   const STORAGE_KEY = 'zenitsu-pet-hidden';
 
   const motion = matchMedia('(prefers-reduced-motion: reduce)');
+  const phoneMode = matchMedia('(max-width:760px), (pointer:coarse)').matches;
   const random = (min, max) => min + Math.random() * (max - min);
   const pick = list => list[Math.floor(Math.random() * list.length)];
   const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
@@ -44,27 +40,9 @@
   launcher.className = 'zenitsu-launcher';
   launcher.innerHTML = `
     <button type="button" class="zenitsu-launcher-button" aria-label="Ask Zenitsu, the site's AI guide" aria-expanded="false" aria-controls="zenitsu-chat">
-      <span class="zenitsu-disc"><img src="/assets/personal/zenitsu/avatar.webp?v=1e4a341eba4ea4af" alt="" width="96" height="96" decoding="async"></span>
+      <span class="zenitsu-disc"><img src="/assets/personal/zenitsu/avatar.webp?v=2bd42fa998597aa3" alt="" width="96" height="96" decoding="async"></span>
       <span class="zenitsu-launcher-label">Ask me</span>
     </button>`;
-
-  const stageGlow = document.createElement('div');
-  stageGlow.className = 'zenitsu-stage';
-  stageGlow.hidden = true;
-  stageGlow.setAttribute('aria-hidden', 'true');
-
-  const welcomeCard = document.createElement('aside');
-  welcomeCard.className = 'zenitsu-welcome';
-  welcomeCard.hidden = true;
-  welcomeCard.setAttribute('aria-label', 'Welcome from Zenitsu');
-  welcomeCard.innerHTML = `
-    <button type="button" class="zenitsu-icon-button zenitsu-welcome-close" aria-label="Dismiss welcome"><svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
-    <h2 class="zenitsu-welcome-title" aria-label="Welcome! I'm Zenitsu."></h2>
-    <p>Isack's AI guide. Tell me what you want built, and I'll help you find what it takes and what it costs.</p>
-    <div class="zenitsu-welcome-actions">
-      <button type="button" class="zenitsu-button zenitsu-welcome-ask">Ask me</button>
-      <button type="button" class="zenitsu-button-quiet zenitsu-welcome-prices">See prices</button>
-    </div>`;
 
   const chatPanel = document.createElement('section');
   chatPanel.id = 'zenitsu-chat';
@@ -73,7 +51,7 @@
   chatPanel.setAttribute('aria-label', 'Chat with Zenitsu, the site AI guide');
   chatPanel.innerHTML = `
     <header class="zenitsu-chat-head">
-      <span class="zenitsu-disc zenitsu-disc-small"><img src="/assets/personal/zenitsu/avatar.webp?v=1e4a341eba4ea4af" alt="" width="64" height="64" decoding="async"></span>
+      <span class="zenitsu-disc zenitsu-disc-small"><img src="/assets/personal/zenitsu/avatar.webp?v=2bd42fa998597aa3" alt="" width="64" height="64" decoding="async"></span>
       <div class="zenitsu-chat-title"><strong>Zenitsu</strong><span>Isack's AI guide</span></div>
       <button type="button" class="zenitsu-icon-button zenitsu-chat-more" aria-label="More options" aria-expanded="false" aria-controls="zenitsu-options">
         <svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><g fill="currentColor"><circle cx="4" cy="10" r="1.5"/><circle cx="10" cy="10" r="1.5"/><circle cx="16" cy="10" r="1.5"/></g></svg>
@@ -86,7 +64,7 @@
     </div>
     <div class="zenitsu-chat-log" role="log" aria-live="polite" tabindex="0"></div>
     <form class="zenitsu-chat-form">
-      <input type="text" name="message" maxlength="500" autocomplete="off" placeholder="What do you want built?" aria-label="Your message">
+      <input type="text" name="message" maxlength="500" autocomplete="off" autocapitalize="sentences" enterkeyhint="send" placeholder="What do you want built?" aria-label="Your message">
       <button type="submit" class="zenitsu-send" aria-label="Send message">
         <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><path d="M10 15.5v-11M5.5 9L10 4.5 14.5 9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
@@ -102,8 +80,7 @@
   const optionsPanel = chatPanel.querySelector('.zenitsu-options');
   const visibility = chatPanel.querySelector('.zenitsu-visibility');
 
-  const pet = { x: 0, y: 0, lift: 0, vx: 0, vy: 0, dir: 1, rot: 0, pivotBody: false, surface: null, airborne: false };
-  let onStage = false;
+  const pet = { x: 0, y: 0, vx: 0, vy: 0, dir: 1, rot: 0, pivotBody: false, surface: null, airborne: false };
   let scale = 0, cellW = 0, cellH = 0;
   let sheet = null, frame = -1;
   let behavior = null, lastTime = 0, rafId = 0;
@@ -113,7 +90,7 @@
   /* ---------- rendering ---------- */
 
   function measure() {
-    const target = onStage ? (viewW() < 700 ? 118 : 150) : (viewW() < 700 ? 66 : 88);
+    const target = viewW() < 700 ? 66 : 88;
     scale = target / BODY_H;
     cellW = Math.round(CROP_W * scale);
     cellH = Math.round(CROP_H * scale);
@@ -130,26 +107,39 @@
     frame = -1;
   }
 
+  // Sheets download when first needed; until then he holds a pose he already has.
+  function fetchSheet(data) {
+    if (data.state) return;
+    data.state = 'loading';
+    const image = new Image();
+    image.onload = () => { data.state = 'ready'; };
+    image.src = data.src;
+  }
+
   function show(name, index) {
-    const stage = onStage && STAGE_SHEETS[name]?.ready ? STAGE_SHEETS[name] : null;
-    const data = stage || SHEETS[name];
-    const key = (stage ? 'stage:' : '') + name;
-    const cols = data.cols || data.frames, rows = data.rows || 1;
-    if (!sheet || sheet.name !== key || !sheet.applied) {
-      sheet = { name: key, applied: true };
+    let data = SHEETS[name];
+    fetchSheet(data);
+    if (data.state !== 'ready') {
+      if (name === 'idle' || SHEETS.idle.state !== 'ready') return;
+      name = 'idle';
+      index = 0;
+      data = SHEETS.idle;
+    }
+    if (!sheet || sheet.name !== name || !sheet.applied) {
+      sheet = { name, applied: true };
       sprite.style.backgroundImage = `url("${data.src}")`;
-      sprite.style.backgroundSize = `${cols * cellW}px ${rows * cellH}px`;
+      sprite.style.backgroundSize = `${data.frames * cellW}px ${cellH}px`;
       frame = -1;
     }
     if (index !== frame) {
       frame = index;
-      sprite.style.backgroundPosition = `${-(index % cols) * cellW}px ${-Math.floor(index / cols) * cellH}px`;
+      sprite.style.backgroundPosition = `${-index * cellW}px 0`;
     }
   }
 
   function draw() {
     const feetX = FEET_X * scale, feetY = FEET_Y * scale;
-    body.style.transform = `translate3d(${(pet.x - feetX).toFixed(1)}px,${(pet.y - pet.lift - feetY).toFixed(1)}px,0)`;
+    body.style.transform = `translate3d(${(pet.x - feetX).toFixed(1)}px,${(pet.y - feetY).toFixed(1)}px,0)`;
     sprite.style.transformOrigin = `${feetX}px ${pet.pivotBody ? feetY - BODY_H * scale * .45 : feetY}px`;
     sprite.style.transform = `rotate(${pet.rot.toFixed(1)}deg) scaleX(${pet.dir})`;
   }
@@ -165,6 +155,7 @@
   }
 
   function sparks(x, y, count = 8) {
+    if (phoneMode) return;
     for (let i = 0; i < count; i++) {
       const spark = effect('i', 'zenitsu-spark', 520);
       const angle = random(0, Math.PI * 2), reach = random(20, 70);
@@ -177,6 +168,7 @@
   }
 
   function bolt(x1, y1, x2, y2) {
+    if (phoneMode) return;
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     svg.setAttribute('class', 'zenitsu-bolt');
     const length = Math.hypot(x2 - x1, y2 - y1) || 1;
@@ -520,78 +512,9 @@
     yield* play('dash', { from: 31, to: 35 });
   }
 
-  // Waiting off-stage while the page settles, before the welcome.
-  function* waitInWings() {
-    pet.airborne = true;
-    pet.x = viewW() / 2;
-    pet.y = -300;
-    while (true) {
-      show('idle', 0);
-      yield;
-    }
-  }
-
-  // His greeting: one strike down from the sky, a flourish, two happy hops and a bow.
-  function* welcomeAct() {
-    const bounds = surfaceBounds(welcomeSurface);
-    if (!bounds) return;
-    onStage = true;
-    measure();
-    const x = (bounds.left + bounds.right) / 2;
-    pet.surface = null;
-    pet.airborne = true;
-    pet.lift = 0;
-    pet.rot = 0;
-    pet.dir = 1;
-    pet.x = x;
-    pet.y = -200;
-    show('dash', 14);
-    let time = 0;
-    while (time < .2) {
-      pet.y = lerp(-200, bounds.top, ease(time / .2));
-      show('dash', 12 + (Math.floor(time * 60) % 16));
-      time += yield;
-    }
-    pet.y = bounds.top;
-    pet.airborne = false;
-    pet.surface = welcomeSurface;
-    bolt(x, 0, x, bounds.top - 40);
-    sparks(x, bounds.top - 8, 16);
-    yield* play('recoil', { from: 2, to: 4, fps: 16 });
-    yield* idle(.25);
-
-    // Sword flourish
-    yield* play('spin', { to: 7, fps: 20 });
-    sparks(pet.x + 30, pet.y - scale * BODY_H * .6, 10);
-    yield* play('spin', { from: 8, fps: 20 });
-
-    // Two hops
-    for (const height of [34, 22]) {
-      time = 0;
-      while (time < .32) {
-        const t = time / .32;
-        pet.lift = 4 * height * t * (1 - t);
-        show('idle', Math.floor(time * 14) % SHEETS.idle.frames);
-        time += yield;
-      }
-      pet.lift = 0;
-    }
-
-    // A bow, from the feet, held a beat
-    pet.pivotBody = false;
-    for (const [from, to, seconds] of [[0, 19, .24], [19, 19, .55], [19, 0, .26]]) {
-      time = 0;
-      while (time < seconds) {
-        pet.rot = lerp(from, to, ease(time / seconds)) * pet.dir;
-        show('idle', 0);
-        time += yield;
-      }
-    }
-    pet.rot = 0;
-  }
-
   function* entrance() {
     pet.x = -60; pet.y = floorY(); pet.dir = 1;
+    if (phoneMode) { yield* runTo(viewW() * .62, 200); return; }
     yield* blink(viewW() * random(.55, .8), floorY(), null);
     yield* play('dash', { from: 31, to: 35 });
     yield* slash();
@@ -602,6 +525,11 @@
     if (home) {
       if (pet.surface !== home) return hopOnto(home);
       return chat.thinking ? roam() : idle(random(1.2, 2.4));
+    }
+    if (phoneMode) {
+      // Phones get an easy-going floor routine: no page scanning, no effects.
+      const roll = Math.random();
+      return roll < .55 ? roam() : roll < .88 ? idle(random(1.5, 3.5)) : roll < .94 ? slash() : spin();
     }
     const grounded = !pet.surface;
     const moves = [
@@ -634,8 +562,15 @@
     behavior.next();
   }
 
+  let skipFrame = false, lastScrollAt = 0;
   function tick(time) {
     rafId = requestAnimationFrame(tick);
+    if (phoneMode) {
+      // Scrolling always wins on a phone; he also only needs 30fps.
+      if (time - lastScrollAt < 200) { lastTime = time; return; }
+      skipFrame = !skipFrame;
+      if (skipFrame) return;
+    }
     const dt = clamp((time - lastTime) / 1000 || 0, 0, .05);
     lastTime = time;
 
@@ -723,13 +658,11 @@
     reactToClick();
   });
 
-  /* ---------- welcome and chat ---------- */
+  /* ---------- chat ---------- */
 
-  const HISTORY_KEY = 'zenitsu-chat', SEEN_KEY = 'zenitsu-welcome-seen', QUIET_KEY = 'zenitsu-welcome-quiet-until';
-  const QUIET_MS = 24 * 60 * 60 * 1000, WELCOME_MS = 16000;
-  const INTRO = "H-hi! Tell me what you want built, and I'll help you work out what it takes and what it costs. Just please don't make me fight.";
-  const SUGGESTIONS = ['I need a website', 'I need an app or system', 'How much does it cost?', 'How do I get started?'];
-  const PRICE_QUESTION = 'How much does it cost?';
+  const HISTORY_KEY = 'zenitsu-chat';
+  const INTRO = "H-hi! Tell me what's on your mind, and I'll help you work out what you actually need and what it might take. Just please don't make me fight.";
+  const SUGGESTIONS = ['I need a website', 'I want an app or a system', "I'm not sure what I need", 'What would my project cost?'];
   const FALLBACKS = {
     'slow-down': 'W-wait, too fast! Give me a minute to catch my breath.',
     busy: "I'm overwhelmed right now. Try again, or reach Isack directly.",
@@ -740,7 +673,6 @@
     open: false, thinking: false, messages: [],
     surface: { el: chatPanel, range: null, inset: 0 },
   };
-  const welcomeSurface = { el: welcomeCard, range: null, inset: 0 };
   const chatLog = chatPanel.querySelector('.zenitsu-chat-log');
   const chatForm = chatPanel.querySelector('.zenitsu-chat-form');
   const chatInput = chatPanel.querySelector('input');
@@ -748,7 +680,7 @@
   const coarsePointer = () => matchMedia('(pointer: coarse)').matches;
   let suggestionsEl = null;
 
-  const perch = () => (chat.open ? chat.surface : welcomeCard.hidden ? null : welcomeSurface);
+  const perch = () => (chat.open && !phoneMode ? chat.surface : null);
 
   function leavePerch(surface) {
     if (pet.surface !== surface) return;
@@ -763,48 +695,20 @@
     if (!match || (match.length > 3 && Number(match[3]) === 0)) return;
     const [r, g, b] = match.map(Number);
     const tone = r * .299 + g * .587 + b * .114 < 128 ? 'dark' : 'light';
-    [launcher, welcomeCard, chatPanel, stageGlow].forEach(element => { if (element.dataset.tone !== tone) element.dataset.tone = tone; });
+    [launcher, chatPanel].forEach(element => { if (element.dataset.tone !== tone) element.dataset.tone = tone; });
   }
-
-  let welcomeTimer = 0;
-  function storedNumber(storage, key) {
-    try { return Number(storage.getItem(key)) || 0; } catch { return 0; }
-  }
-  function welcomeDue() {
-    return !storedNumber(sessionStorage, SEEN_KEY) && storedNumber(localStorage, QUIET_KEY) <= Date.now();
-  }
-  function welcome() {
-    if (chat.open || !welcomeDue() || document.documentElement.classList.contains('in-castle')) return;
-    try { sessionStorage.setItem(SEEN_KEY, '1'); } catch {}
-    syncTone();
-    stageGlow.hidden = false;
-    welcomeCard.hidden = false;
-    if (rafId && !hidden) start(welcomeAct(), false);
-    armWelcomeTimer();
-  }
-  function armWelcomeTimer() {
-    clearTimeout(welcomeTimer);
-    welcomeTimer = setTimeout(() => closeWelcome(false), WELCOME_MS);
-  }
-  function closeWelcome(stayQuiet) {
-    clearTimeout(welcomeTimer);
-    if (stayQuiet) {
-      try { localStorage.setItem(QUIET_KEY, String(Date.now() + QUIET_MS)); } catch {}
+  // The client router changes the page colour without a reload, so check only when it moves.
+  function watchRoutes() {
+    const check = () => { syncTone(); setTimeout(syncTone, 350); setTimeout(syncTone, 1200); };
+    for (const method of ['pushState', 'replaceState']) {
+      const original = history[method];
+      history[method] = function (...args) {
+        const result = original.apply(this, args);
+        check();
+        return result;
+      };
     }
-    if (welcomeCard.hidden) return;
-    welcomeCard.hidden = true;
-    stageGlow.hidden = true;
-    // Back to normal size, and off to run around the site.
-    onStage = false;
-    pet.lift = 0;
-    pet.rot = 0;
-    measure();
-    if (pet.surface === welcomeSurface) {
-      pet.surface = null;
-      pet.vx = 0; pet.vy = 0;
-      pet.airborne = false;
-      if (rafId && !perch()) start(chooseMove());
-    }
+    addEventListener('popstate', check);
   }
 
   function addMessage(role, text, contact = false, retry = null) {
@@ -873,7 +777,7 @@
   function restoreChat() {
     try {
       const saved = JSON.parse(sessionStorage.getItem(HISTORY_KEY) || '[]');
-      if (Array.isArray(saved)) chat.messages = saved.filter(m => m && typeof m.content === 'string' && (m.role === 'user' || m.role === 'assistant')).slice(-12);
+      if (Array.isArray(saved)) chat.messages = saved.filter(m => m && typeof m.content === 'string' && (m.role === 'user' || m.role === 'assistant')).slice(-16);
     } catch {}
     renderIntro();
     chat.messages.forEach(message => addMessage(message.role, message.content));
@@ -908,7 +812,7 @@
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         // The server only needs role and text; keep requests within its history limit.
-        body: JSON.stringify({ messages: chat.messages.slice(-12).map(({ role, content: value }) => ({ role, content: value.slice(0, role === 'user' ? 500 : 1500) })) }),
+        body: JSON.stringify({ messages: chat.messages.slice(-16).map(({ role, content: value }) => ({ role, content: value.slice(0, role === 'user' ? 500 : 1500) })) }),
         signal: controller.signal,
       });
       clearTimeout(timeout);
@@ -935,18 +839,50 @@
       });
     } else {
       chat.messages.push({ role: 'assistant', content: reply });
-      chat.messages = chat.messages.slice(-12);
+      chat.messages = chat.messages.slice(-16);
       addMessage('assistant', reply);
       saveHistory();
       // He's delighted with himself every time he gets an answer right.
       if (!motion.matches && !hidden && chat.open && rafId) start(slash());
     }
     if (chat.open && !coarsePointer()) chatInput.focus({ preventScroll: true });
+    offerHandoff();
+  }
+
+  // Once there's something real to discuss, make reaching Isack one tap, with context.
+  function offerHandoff() {
+    chatLog.querySelector('.zenitsu-handoff')?.remove();
+    const said = chat.messages.filter(message => message.role === 'user').map(message => message.content);
+    if (said.length < 3 || chat.thinking) return;
+    const text = `Hi Isack, I was chatting with Zenitsu on your site about a project:\n\n${said.map(line => `- ${line}`).join('\n')}`;
+    const row = document.createElement('div');
+    row.className = 'zenitsu-msg-actions zenitsu-handoff';
+    const link = document.createElement('a');
+    link.href = `https://wa.me/255749498117?text=${encodeURIComponent(text)}`;
+    link.target = '_blank';
+    link.rel = 'noopener';
+    link.textContent = 'Send this to Isack on WhatsApp';
+    row.append(link);
+    chatLog.append(row);
+    chatLog.scrollTop = chatLog.scrollHeight;
   }
 
   function setOptions(open) {
     optionsPanel.hidden = !open;
     moreButton.setAttribute('aria-expanded', String(open));
+  }
+
+  // On phones the page underneath must not scroll or shift while the sheet is up.
+  let lockedAt = 0;
+  function lockPage(locked) {
+    const body = document.body.style;
+    if (locked) {
+      lockedAt = scrollY;
+      Object.assign(body, { position: 'fixed', top: `${-lockedAt}px`, left: '0', right: '0', width: '100%' });
+    } else {
+      Object.assign(body, { position: '', top: '', left: '', right: '', width: '' });
+      scrollTo({ top: lockedAt, behavior: 'instant' });
+    }
   }
 
   function setChat(open) {
@@ -960,47 +896,59 @@
     setOptions(false);
     if (open) {
       syncTone();
-      fitToViewport();
-      closeWelcome(true);
       if (!chatLog.childElementCount) restoreChat();
       chatLog.scrollTop = chatLog.scrollHeight;
+    }
+    if (phoneMode) {
+      lockPage(open);
+      fitToViewport();
+      // Nothing else animates while the sheet is open.
+      if (open) { stop(); layer.hidden = true; }
+      else if (!hidden && !motion.matches) apply();
+      if (open) chatLog.focus({ preventScroll: true });
+      if (!open) chatInput.blur();
+      return;
+    }
+    if (open) {
       if (rafId) start(hopOnto(chat.surface));
-      // Opening a phone keyboard uninvited would hide the panel he just opened.
       if (!coarsePointer()) chatInput.focus({ preventScroll: true });
-      else chatLog.focus({ preventScroll: true });
     } else {
       leavePerch(chat.surface);
     }
   }
 
-  // Keep the composer above a phone's on-screen keyboard.
+  // The on-screen keyboard shrinks the visual viewport; pin the sheet to exactly that.
+  let fitFrame = 0;
   function fitToViewport() {
-    const viewport = window.visualViewport;
-    if (!viewport) return;
-    const keyboard = Math.max(0, innerHeight - viewport.height - viewport.offsetTop);
-    const typing = keyboard > 80;
-    chatPanel.style.setProperty('--zen-viewport', `${viewport.height}px`);
-    chatPanel.style.setProperty('--zen-keyboard', `${keyboard}px`);
-    chatPanel.toggleAttribute('data-keyboard', typing);
-    launcher.toggleAttribute('data-keyboard', typing);
+    if (fitFrame) return;
+    fitFrame = requestAnimationFrame(() => {
+      fitFrame = 0;
+      const viewport = window.visualViewport;
+      if (!phoneMode || !viewport || !chat.open) return;
+      const height = `${Math.round(viewport.height)}px`;
+      const offset = `translateY(${Math.round(viewport.offsetTop)}px)`;
+      if (chatPanel.style.height !== height) {
+        const atBottom = chatLog.scrollHeight - chatLog.scrollTop - chatLog.clientHeight < 40;
+        chatPanel.style.height = height;
+        if (atBottom) chatLog.scrollTop = chatLog.scrollHeight;
+      }
+      if (chatPanel.style.transform !== offset) chatPanel.style.transform = offset;
+    });
   }
 
   launcherButton.addEventListener('click', () => setChat(!chat.open));
-  welcomeCard.querySelector('.zenitsu-welcome-close').addEventListener('click', () => { closeWelcome(true); launcherButton.focus({ preventScroll: true }); });
-  welcomeCard.querySelector('.zenitsu-welcome-ask').addEventListener('click', () => setChat(true));
-  welcomeCard.querySelector('.zenitsu-welcome-prices').addEventListener('click', () => { setChat(true); sendMessage(PRICE_QUESTION); });
-  // Don't whisk the card away from someone who's reading or about to click it.
-  ['pointerenter', 'focusin'].forEach(type => welcomeCard.addEventListener(type, () => clearTimeout(welcomeTimer)));
-  ['pointerleave', 'focusout'].forEach(type => welcomeCard.addEventListener(type, () => { if (!welcomeCard.hidden) armWelcomeTimer(); }));
   moreButton.addEventListener('click', () => setOptions(optionsPanel.hidden));
   chatPanel.querySelector('.zenitsu-chat-close').addEventListener('click', () => { setChat(false); launcherButton.focus({ preventScroll: true }); });
   chatForm.addEventListener('submit', event => { event.preventDefault(); sendMessage(chatInput.value); });
+  // Tapping send must not drop the keyboard mid-conversation.
+  chatSend.addEventListener('pointerdown', event => event.preventDefault());
   window.visualViewport?.addEventListener('resize', fitToViewport);
   window.visualViewport?.addEventListener('scroll', fitToViewport);
+  if (phoneMode) addEventListener('scroll', () => { lastScrollAt = performance.now(); }, { passive: true });
 
   /* ---------- lifecycle ---------- */
 
-  let rafIdEverStarted = false;
+  let hasEntered = false;
   function stop() {
     cancelAnimationFrame(rafId);
     rafId = 0;
@@ -1030,8 +978,8 @@
     delete layer.dataset.still;
     let opening = entrance;
     if (perch()) opening = () => hopOnto(perch());
-    else if (welcomeDue() && !rafIdEverStarted) opening = waitInWings;
-    rafIdEverStarted = true;
+    else if (hasEntered) opening = chooseMove;
+    hasEntered = true;
     start(opening(), false);
     lastTime = performance.now();
     rafId = requestAnimationFrame(tick);
@@ -1047,14 +995,13 @@
     if (event.key !== 'Escape') return;
     if (!optionsPanel.hidden) { setOptions(false); moreButton.focus({ preventScroll: true }); }
     else if (chat.open) { setChat(false); launcherButton.focus({ preventScroll: true }); }
-    else if (!welcomeCard.hidden) closeWelcome(true);
   });
   document.addEventListener('pointerdown', event => {
     if (!optionsPanel.hidden && !optionsPanel.contains(event.target) && !moreButton.contains(event.target)) setOptions(false);
   });
   motion.addEventListener('change', apply);
   // He goes into the castle gallery in person, and blinks back in when it closes.
-  addEventListener('castle:enter', () => { setChat(false); closeWelcome(false); stop(); });
+  addEventListener('castle:enter', () => { setChat(false); stop(); });
   addEventListener('castle:leave', apply);
   addEventListener('resize', () => {
     if (hidden) return;
@@ -1064,32 +1011,18 @@
     draw();
   });
 
-  document.body.append(stageGlow, layer, chatPanel, welcomeCard, launcher);
-  // Headline rises word by word when the card opens.
-  const welcomeTitle = welcomeCard.querySelector('.zenitsu-welcome-title');
-  ["Welcome!", "I'm", 'Zenitsu.'].forEach((word, index) => {
-    const outer = document.createElement('span');
-    outer.setAttribute('aria-hidden', 'true');
-    const inner = document.createElement('span');
-    inner.textContent = word;
-    inner.style.setProperty('--i', index);
-    outer.append(inner);
-    welcomeTitle.append(outer, ' ');
-  });
-  if (welcomeDue() && !motion.matches && !hidden && !navigator.connection?.saveData) {
-    Object.values(STAGE_SHEETS).forEach(sheetData => {
-      const image = new Image();
-      image.onload = () => { sheetData.ready = true; };
-      image.src = sheetData.src;
-    });
-  }
+  document.body.append(layer, chatPanel, launcher);
   syncTone();
-  // The site's client router changes the page colour without a reload.
-  setInterval(syncTone, 700);
-  // Preload every strip after first paint so moves never flash blank.
-  const preload = () => Object.values(SHEETS).forEach(({ src }) => { new Image().src = src; });
-  if ('requestIdleCallback' in window) requestIdleCallback(preload, { timeout: 2500 });
-  else setTimeout(preload, 800);
-  setTimeout(apply, 900);
-  setTimeout(welcome, 1700);
+  watchRoutes();
+  // He arrives after the page is ready; only his two everyday sheets load up front.
+  const arrive = () => {
+    fetchSheet(SHEETS.idle);
+    fetchSheet(SHEETS.run);
+    apply();
+  };
+  if (phoneMode) {
+    const later = () => setTimeout(arrive, 1800);
+    if (document.readyState === 'complete') later();
+    else addEventListener('load', later, { once: true });
+  } else setTimeout(arrive, 900);
 })();

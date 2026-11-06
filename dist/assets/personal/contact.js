@@ -7,7 +7,7 @@
     dialog = document.createElement('dialog');
     dialog.className = 'portfolio-contact';
     dialog.setAttribute('aria-labelledby', 'contact-title');
-    dialog.innerHTML = '<button class="contact-close" aria-label="Close contact options">×</button><h2 id="contact-title">Let’s build something.</h2><p>Have a project in mind? Choose how you’d like to get in touch.</p><a class="contact-option" data-contact-direct="true"><img src="/assets/identity/contact-email.svg?v=1e4a341eba4ea4af" alt=""><div>Email me<span></span></div></a><a class="contact-option" data-contact-direct="true" target="_blank" rel="noopener noreferrer"><img src="/assets/identity/contact-whatsapp.svg?v=1e4a341eba4ea4af" alt=""><div>Chat on WhatsApp<span></span></div></a>';
+    dialog.innerHTML = '<button class="contact-close" aria-label="Close contact options">×</button><h2 id="contact-title">Let’s build something.</h2><p>Have a project in mind? Choose how you’d like to get in touch.</p><a class="contact-option" data-contact-direct="true"><img src="/assets/identity/contact-email.svg?v=2bd42fa998597aa3" alt=""><div>Email me<span></span></div></a><a class="contact-option" data-contact-direct="true" target="_blank" rel="noopener noreferrer"><img src="/assets/identity/contact-whatsapp.svg?v=2bd42fa998597aa3" alt=""><div>Chat on WhatsApp<span></span></div></a>';
     const options = dialog.querySelectorAll('a');
     options[0].href = email;
     options[0].querySelector('span').textContent = contact.email;
@@ -43,11 +43,14 @@
       });
     });
   }
+  const quietSelector = '.zenitsu-pet,.zenitsu-chat,.zenitsu-launcher,.showcase,.showcase-cursor,.castle';
+  const onlyWidgets = records => records.every(({ target, addedNodes, removedNodes }) => target.closest?.(quietSelector)
+    || (target === document.body && [...addedNodes, ...removedNodes].every(node => node.nodeType !== 1 || node.matches(quietSelector))));
   function start() {
     if (document.querySelector('[data-framer-appear-id]') && !window.MotionIsMounted) { requestAnimationFrame(start); return; }
     init(); enhance();
     let pending=false;
-    new MutationObserver(() => { if(pending)return; pending=true; requestAnimationFrame(()=>{pending=false;enhance();}); }).observe(document.body,{childList:true,subtree:true});
+    new MutationObserver(records => { if(pending||onlyWidgets(records))return; pending=true; requestAnimationFrame(()=>{pending=false;enhance();}); }).observe(document.body,{childList:true,subtree:true});
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded',start,{once:true});
   else start();

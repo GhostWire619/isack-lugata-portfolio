@@ -1,7 +1,7 @@
 
 /* Small content-specific corrections; the original Framer layout and motion remain. */
 a[href*="unused-social"],a[href*="pinterest.com"],a[href*="dribbble.com"],div[class*="-container"]:has(>a[href*="unused-social"]),div[class*="-container"]:has(>a[href*="pinterest.com"]),div[class*="-container"]:has(>a[href*="dribbble.com"]) { display:none !important; }
-video { object-fit:cover !important; visibility:hidden !important; }
+video { display:none !important; }
 img[src^="/assets/personal/"][src$=".svg"] { object-fit:contain !important; object-position:center !important; }
 img[src^="/assets/identity/cover-"] { object-fit:cover !important; object-position:center !important; }
 img[src^="/assets/identity/story-"],img[src^="/assets/identity/ready-"],img[src^="/assets/identity/icon-"],img[src^="/assets/identity/career-"] { object-fit:contain !important; object-position:center !important; }

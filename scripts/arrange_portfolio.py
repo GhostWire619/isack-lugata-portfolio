@@ -1,59 +1,56 @@
-"""Keep the captured HTML and its hydrated components in the same order."""
+"""Replace the captured project grid with the showcase, on both sides of hydration.
+
+The server HTML and the page module must match exactly or React discards the whole page,
+so the same cards leave both. The showcase sits in a slot React leaves alone, and a small
+component with no output keeps the site's router reachable, all it needs from React.
+"""
 from pathlib import Path
-import re
+import json
+import subprocess
 
 from bs4 import BeautifulSoup
 
+from showcase_markup import render_showcase
+
 
 DIST = Path(__file__).resolve().parents[1] / 'dist'
-LEFT = ('globoexpats', 'wakili-msomi', 'ecofy', 'habitek')
-RIGHT = ('falco', 'tanstack-tanzania', 'osher-market', 'placeholder')
-COLUMNS = (('framer-1mdtcpj', LEFT), ('framer-oy8a34', RIGHT))
+COLUMNS = ('framer-1mdtcpj', 'framer-oy8a34')
+SHOWCASE_HOST = 'framer-oy8a34'
+ROUTER_BRIDGE = (
+    'function PortfolioRouterBridge(){const router=ce();'
+    'window.__portfolioNavigate=route=>router.navigate(route,void 0,{});return null}\n'
+)
 
 
-def arrange_home(path):
-    html = path.read_text(encoding='utf8')
-    soup = BeautifulSoup(html, 'html.parser')
-    groups = {route: [] for route in LEFT + RIGHT}
-    columns = []
-    for class_name, order in COLUMNS:
-        column = soup.select_one(f'.framer-lvzy8y > .{class_name}')
-        columns.append((column, str(column), order))
-        for variant in column.find_all(recursive=False):
-            route = variant.select_one('a[href]')['href'].lstrip('./')
-            if route == 'habitek' and class_name == 'framer-oy8a34':
-                route = 'placeholder'
-            groups[route].append(variant.extract())
-    for column, original, order in columns:
-        for route in order:
-            column.extend(groups[route])
-        html = html.replace(original, str(column), 1)
-    path.write_text(html, encoding='utf8', newline='\n')
+def strip_grid_html(path, showcase):
+    soup = BeautifulSoup(path.read_text(encoding='utf8'), 'html.parser')
+    for class_name in COLUMNS:
+        soup.select_one(f'.framer-lvzy8y > .{class_name}').clear()
+    # In the page itself, the deck paints with the first frame instead of arriving after hydration.
+    soup.select_one(f'.framer-lvzy8y > .{SHOWCASE_HOST}').append(BeautifulSoup(showcase, 'html.parser'))
+    path.write_text(str(soup), encoding='utf8', newline='\n')
 
 
-def arrange_home_module(path):
+def strip_grid_module(path):
     js = path.read_text(encoding='utf8')
-    names = dict(zip(LEFT + RIGHT[:-1], (
-        'GloboExpats', 'Wakili Msomi', 'Ecofy Africa', 'Habitek',
-        'Falco Finance', 'TanStack Tanzania', 'Osher Market',
-    )))
-    groups = {}
-    columns = []
-    for class_name, order in COLUMNS:
-        start = js.index(f'className:`{class_name}`,children:[') + len(f'className:`{class_name}`,children:[')
+    assert 'ut as ce' in js, 'useRouter import changed'
+    for index, class_name in reversed(list(enumerate(COLUMNS))):
+        marker = f'className:`{class_name}`,children:['
+        marker_at = js.index(marker)
+        start = marker_at + len(marker)
         end = js.index(']}),', js.index('YjyOs65XK:', start))
-        cards = js[start:end].split(',l(M,{links:[')
-        cards[1:] = ['l(M,{links:[' + card for card in cards[1:]]
-        assert len(cards) == len(order), class_name
-        columns.append((start, end, order))
-        for card in cards:
-            title = re.search(r'RehjAvB2r:`([^`]+)`', card)[1]
-            route = next(route for route, name in names.items() if name == title)
-            if route == 'habitek' and class_name == 'framer-oy8a34':
-                route = 'placeholder'
-            groups[route] = card
-    for start, end, order in reversed(columns):
-        js = js[:start] + ','.join(groups[route] for route in order) + js[end:]
+        # In the last column that marker closes the grid too; keep the column's own closer.
+        if js[end - 3:end] == ']})':
+            end -= 3
+        if class_name == SHOWCASE_HOST:
+            # React neither compares nor replaces what is inside dangerouslySetInnerHTML,
+            # which leaves the prebuilt deck alone through hydration.
+            js = js[:marker_at] + f'className:`{class_name}`,' + 'dangerouslySetInnerHTML:{__html:``},suppressHydrationWarning:!0' + js[end + 1:]
+        else:
+            js = js[:start] + 'l(PortfolioRouterBridge,{})' + js[end:]
+    js += '\n' + ROUTER_BRIDGE
+    # A syntax slip here would stall the whole site silently, so fail the build instead.
+    subprocess.run(['node', '--check', '--input-type=module'], input=js.encode('utf8'), check=True, capture_output=True)
     path.write_text(js, encoding='utf8', newline='\n')
 
 
@@ -75,7 +72,8 @@ def update_about(html_path, module_path):
 
 if __name__ == '__main__':
     modules = DIST / 'assets' / 'framerusercontent.com' / 'sites'
-    arrange_home_module(next(modules.rglob('IqnWV9by*.mjs')))
+    strip_grid_module(next(modules.rglob('IqnWV9by*.mjs')))
+    showcase = render_showcase(json.loads((DIST.parent / 'content/portfolio.json').read_text(encoding='utf8'))['projects'])
     for page in ('index.html', 'test-1.html'):
-        arrange_home(DIST / page)
+        strip_grid_html(DIST / page, showcase)
     update_about(DIST / 'about.html', next(modules.rglob('1PtofGw*.mjs')))

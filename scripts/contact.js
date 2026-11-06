@@ -43,11 +43,14 @@
       });
     });
   }
+  const quietSelector = '.zenitsu-pet,.zenitsu-chat,.zenitsu-launcher,.showcase,.showcase-cursor,.castle';
+  const onlyWidgets = records => records.every(({ target, addedNodes, removedNodes }) => target.closest?.(quietSelector)
+    || (target === document.body && [...addedNodes, ...removedNodes].every(node => node.nodeType !== 1 || node.matches(quietSelector))));
   function start() {
     if (document.querySelector('[data-framer-appear-id]') && !window.MotionIsMounted) { requestAnimationFrame(start); return; }
     init(); enhance();
     let pending=false;
-    new MutationObserver(() => { if(pending)return; pending=true; requestAnimationFrame(()=>{pending=false;enhance();}); }).observe(document.body,{childList:true,subtree:true});
+    new MutationObserver(records => { if(pending||onlyWidgets(records))return; pending=true; requestAnimationFrame(()=>{pending=false;enhance();}); }).observe(document.body,{childList:true,subtree:true});
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded',start,{once:true});
   else start();
