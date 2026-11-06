@@ -1,5 +1,5 @@
-import{o as jsx,l as jsxs,N as Fragment,v as useEffect}from"./react.DUE-xjOD.mjs?v=1e7fa648e579b1ed";
-import{ut as useRouter}from"./framer.DCW-Gja5.mjs?v=1e7fa648e579b1ed";
+import{o as jsx,l as jsxs,N as Fragment,v as useEffect}from"./react.DUE-xjOD.mjs?v=654cd3b50517d3bf";
+import{ut as useRouter}from"./framer.DCW-Gja5.mjs?v=654cd3b50517d3bf";
 const routes={"/": "UTNT6GAXH", "/about": "XdYBo4_p8", "/ecofy": "OJvd1BNaN", "/osher-market": "IhYkVKpYR", "/wakili-msomi": "boFkVS3RZ", "/falco": "Zmwx4Ibvc", "/habitek": "mld1MIphZ", "/tanstack-tanzania": "wi2Xaghpb", "/globoexpats": "kuKUydbQG"};
 export function makeCasePage(markup, original) {
  function CasePage(props) {

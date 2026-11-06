@@ -137,6 +137,10 @@ Check the homepage, Story navigation, project cards, clean project routes, back 
 
 `scripts/mirror.py` is retained for provenance. `npm run capture:reference` captures the reference again and overwrites generated files; it is not the content-editing command.
 
+## Site assistant
+
+Zenitsu answers visitor questions through `POST /assistant/chat` (`backend/publishing/assistant.py`). Edit what he knows, including prices, in `backend/publishing/assistant_knowledge.md`. Add `GLM_API_KEY=<key from z.ai>` to the server's private `.env` and restart the `journal` service; without it he politely sends visitors to Isack's contact details. He uses paid `glm-5` first and free `glm-4.5-flash` only if that fails; override with `ZENITSU_MODELS` (comma-separated, tried in order; models that require thinking, such as `glm-5.3-flash`, won't work). Spending is capped by `PER_DAY_TOTAL` in `assistant.py`, counted per server worker. Messages are not stored or logged by this site, but are sent to Z.ai to generate replies.
+
 ## Visual assets
 
 The original reference section structure and headings are retained, including How I got here, Where I stand, Ready for the next adventures, Companies I helped, and More projects coming soon.

@@ -4,7 +4,7 @@ from django.urls import include, path
 from wagtail.admin import urls as wagtailadmin_urls
 from wagtail.documents import urls as wagtaildocs_urls
 from wagtail import urls as wagtail_urls
-from publishing import security, studio, views, mcp, analytics, writing
+from publishing import assistant, security, studio, views, mcp, analytics, writing
 from publishing.feeds import JournalFeed
 
 urlpatterns = [
@@ -16,6 +16,7 @@ urlpatterns = [
     path('mcp/', mcp.endpoint, name='journal_mcp'),
     path('mcp', mcp.endpoint),
     path('events/', analytics.collect, name='journal_metrics'),
+    path('assistant/chat', assistant.chat, name='site_assistant'),
     path('admin/ai/', studio.ai_connections, name='journal_ai'),
     path('admin/ai/writing-skill/', writing.skill_download, name='journal_skill_download'),
     path('admin/analytics/', studio.analytics, name='journal_analytics'),

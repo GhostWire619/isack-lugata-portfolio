@@ -31,7 +31,7 @@
   layer.innerHTML = `
     <div class="zenitsu-body">
       <div class="zenitsu-sprite"></div>
-      <button type="button" class="zenitsu-hit" aria-label="Zenitsu. Press to make him do a move."></button>
+      <button type="button" class="zenitsu-hit" aria-label="Chat with Zenitsu, the site assistant"></button>
     </div>`;
   const menu = document.createElement('div');
   menu.className = 'zenitsu-menu';
@@ -40,9 +40,33 @@
       <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M13.5 2 5 13.6h5.6L9.4 22 19 9.8h-6z"/></svg>
     </button>
     <div id="zenitsu-menu-panel" class="zenitsu-menu-panel" hidden>
+      <button type="button" class="zenitsu-open-chat">Chat with Zenitsu</button>
       <button type="button" class="zenitsu-visibility"></button>
       <p>3D model: <a href="https://sketchfab.com/3d-models/agatsuma-zenitsu-8f877f1dc7b4475c831851c6defd4d7d" target="_blank" rel="noopener">Agatsuma Zenitsu by Witsanu Superball</a>, <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>. Animation frames rendered from the model.</p>
     </div>`;
+
+  const bubble = document.createElement('button');
+  bubble.type = 'button';
+  bubble.className = 'zenitsu-bubble';
+  bubble.hidden = true;
+  bubble.textContent = "Hi! I'm Zenitsu, Isack's guide. Lost? Ask me anything!";
+
+  const chatPanel = document.createElement('section');
+  chatPanel.className = 'zenitsu-chat';
+  chatPanel.hidden = true;
+  chatPanel.setAttribute('aria-label', 'Chat with Zenitsu, the site assistant');
+  chatPanel.innerHTML = `
+    <header class="zenitsu-chat-head">
+      <strong>Zenitsu</strong><span>Isack's AI guide</span>
+      <button type="button" class="zenitsu-chat-close" aria-label="Close chat">×</button>
+    </header>
+    <div class="zenitsu-chat-log" role="log" aria-live="polite" tabindex="0"></div>
+    <div class="zenitsu-chat-chips"></div>
+    <form class="zenitsu-chat-form">
+      <input type="text" name="message" maxlength="500" autocomplete="off" placeholder="Ask about Isack's work or prices" aria-label="Your message">
+      <button type="submit" aria-label="Send">➤</button>
+    </form>
+    <p class="zenitsu-chat-note">AI can make mistakes; prices are confirmed by Isack in a written quote. Messages go to Z.ai to generate replies, so please don't share private details.</p>`;
 
   const body = layer.querySelector('.zenitsu-body');
   const sprite = layer.querySelector('.zenitsu-sprite');
@@ -97,6 +121,7 @@
     body.style.transform = `translate3d(${(pet.x - feetX).toFixed(1)}px,${(pet.y - feetY).toFixed(1)}px,0)`;
     sprite.style.transformOrigin = `${feetX}px ${pet.pivotBody ? feetY - BODY_H * scale * .45 : feetY}px`;
     sprite.style.transform = `rotate(${pet.rot.toFixed(1)}deg) scaleX(${pet.dir})`;
+    if (!bubble.hidden) placeBubble();
   }
 
   /* ---------- effects ---------- */
@@ -181,7 +206,7 @@
     const nodes = document.querySelectorAll('h1,h2,h3,img,picture,video,article,figure');
     for (const el of nodes) {
       if (found.length >= 40) break;
-      if (el.closest('nav,header,.zenitsu-pet,.zenitsu-menu')) continue;
+      if (el.closest('nav,header,.zenitsu-pet,.zenitsu-menu,.zenitsu-chat')) continue;
       const box = el.getBoundingClientRect();
       if (box.bottom < 70 || box.top > viewH() || box.width < 100) continue;
       const isText = /^H[1-3]$/.test(el.tagName);
@@ -458,6 +483,13 @@
     yield* play('recoil');
   }
 
+  function* hopOntoPanel() {
+    const bounds = surfaceBounds(chat.surface);
+    if (!bounds || bounds.top < 70) { yield* idle(.4); return; }
+    yield* blink(clamp(bounds.right - 70, bounds.left + 20, bounds.right - 20), bounds.top, chat.surface);
+    yield* play('dash', { from: 31, to: 35 });
+  }
+
   function* entrance() {
     pet.x = -60; pet.y = floorY(); pet.dir = 1;
     yield* blink(viewW() * random(.55, .8), floorY(), null);
@@ -466,6 +498,10 @@
   }
 
   function chooseMove() {
+    if (chat.open) {
+      if (pet.surface !== chat.surface) return hopOntoPanel();
+      return chat.thinking ? roam() : idle(random(1.2, 2.4));
+    }
     const grounded = !pet.surface;
     const moves = [
       [roam, 6], [idle, 3], [thunder, 3], [slash, 2], [spin, 2], [flip, 3],
@@ -536,7 +572,9 @@
       start((function* () { yield* startled(); yield* faint(); })());
       return;
     }
-    const move = pick([thunder, slash, spin, flip, thunder]);
+    // First press opens the chat; once it's open he just shows off in place.
+    if (!chat.open) { setChat(true); return; }
+    const move = pick([slash, spin]);
     start((function* () { yield* startled(); yield* move(); })());
   }
 
@@ -584,6 +622,190 @@
     reactToClick();
   });
 
+  /* ---------- welcome and chat ---------- */
+
+  const HISTORY_KEY = 'zenitsu-chat', WELCOMED_KEY = 'zenitsu-welcomed';
+  const GREETING = "H-hi! I'm Zenitsu, Isack's guide around here. Ask me about his work, services or prices, and I'll point you the right way. Please don't make me fight anything.";
+  const CHIPS = ['What does Isack build?', 'How much does a website cost?', 'Show me his best work', 'How do I hire him?'];
+  const PAGE_NAMES = {
+    '/': 'Home', '/about': 'His story', '/blog/': 'Blog', '/ecofy': 'Ecofy Africa', '/wakili-msomi': 'Wakili Msomi',
+    '/globoexpats': 'GloboExpats', '/habitek': 'Habitek', '/osher-market': 'Osher Market', '/falco': 'Falco Finance',
+    '/tanstack-tanzania': 'TanStack Tanzania', '/robotics': 'The lab',
+  };
+  const FALLBACKS = {
+    'slow-down': "W-wait, too fast! Give me a minute to catch my breath, then ask again.",
+    busy: "I'm overwhelmed right now! Try again in a moment, or reach Isack directly.",
+    resting: "I've talked all day and I'm falling asleep. Please reach Isack directly for now.",
+    offline: "I can't answer right now, but Isack can.",
+  };
+  const chat = {
+    open: false, thinking: false, messages: [],
+    surface: { el: chatPanel, range: null, inset: 0 },
+  };
+  const chatLog = chatPanel.querySelector('.zenitsu-chat-log');
+  const chatChips = chatPanel.querySelector('.zenitsu-chat-chips');
+  const chatForm = chatPanel.querySelector('.zenitsu-chat-form');
+  const chatInput = chatPanel.querySelector('input');
+  const chatSend = chatForm.querySelector('button');
+  const openChatButton = menu.querySelector('.zenitsu-open-chat');
+
+  function placeBubble() {
+    const width = bubble.offsetWidth, height = bubble.offsetHeight;
+    bubble.style.transform = `translate3d(${clamp(pet.x - width / 2, 8, viewW() - width - 8).toFixed(1)}px,${clamp(pet.y - scale * BODY_H - height - 10, 8, viewH() - height - 8).toFixed(1)}px,0)`;
+  }
+
+  let bubbleTimer = 0;
+  function welcome() {
+    let seen = false;
+    try { seen = sessionStorage.getItem(WELCOMED_KEY) === '1'; } catch {}
+    if (seen || chat.open || hidden || document.documentElement.classList.contains('in-castle')) return;
+    try { sessionStorage.setItem(WELCOMED_KEY, '1'); } catch {}
+    bubble.hidden = false;
+    placeBubble();
+    bubbleTimer = setTimeout(hideBubble, 9000);
+  }
+  function hideBubble() {
+    clearTimeout(bubbleTimer);
+    bubble.hidden = true;
+  }
+
+  function addMessage(role, text, links = [], contact = false) {
+    const row = document.createElement('div');
+    row.className = `zenitsu-msg zenitsu-msg-${role}`;
+    const paragraph = document.createElement('p');
+    paragraph.textContent = text;    // never as HTML: replies come from a model
+    row.append(paragraph);
+    if (links.length || contact) {
+      const actions = document.createElement('div');
+      actions.className = 'zenitsu-msg-actions';
+      links.forEach(path => {
+        if (!PAGE_NAMES[path]) return;
+        const link = document.createElement('a');
+        link.href = path;
+        link.textContent = `${PAGE_NAMES[path]} →`;
+        actions.append(link);
+      });
+      if (contact) {
+        const whatsapp = document.createElement('a');
+        whatsapp.href = 'https://wa.me/255749498117';
+        whatsapp.target = '_blank';
+        whatsapp.rel = 'noopener';
+        whatsapp.textContent = 'WhatsApp Isack';
+        const email = document.createElement('a');
+        email.href = 'mailto:lugata619@gmail.com';
+        email.textContent = 'Email Isack';
+        actions.append(whatsapp, email);
+      }
+      row.append(actions);
+    }
+    chatLog.append(row);
+    chatLog.scrollTop = chatLog.scrollHeight;
+    return row;
+  }
+
+  function renderChips() {
+    chatChips.textContent = '';
+    if (chat.messages.length) return;
+    CHIPS.forEach(text => {
+      const chip = document.createElement('button');
+      chip.type = 'button';
+      chip.textContent = text;
+      chip.addEventListener('click', () => sendMessage(text));
+      chatChips.append(chip);
+    });
+  }
+
+  function saveHistory() {
+    try { sessionStorage.setItem(HISTORY_KEY, JSON.stringify(chat.messages)); } catch {}
+  }
+
+  function restoreChat() {
+    chatLog.textContent = '';
+    addMessage('assistant', GREETING);
+    try {
+      const saved = JSON.parse(sessionStorage.getItem(HISTORY_KEY) || '[]');
+      if (Array.isArray(saved)) chat.messages = saved.filter(m => m && typeof m.content === 'string' && (m.role === 'user' || m.role === 'assistant')).slice(-12);
+    } catch {}
+    chat.messages.forEach(message => addMessage(message.role, message.content, message.links || []));
+    renderChips();
+  }
+
+  async function sendMessage(text) {
+    const content = text.trim().slice(0, 500);
+    if (!content || chat.thinking) return;
+    chat.messages.push({ role: 'user', content });
+    addMessage('user', content);
+    renderChips();
+    chatInput.value = '';
+    chat.thinking = true;
+    chatSend.disabled = true;
+    const typing = addMessage('assistant', 'Thinking…');
+    typing.classList.add('zenitsu-typing');
+    let reply = '', links = [], failure = '';
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 50000);
+      const response = await fetch('/assistant/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        // The server only needs role and text; keep requests within its history limit.
+        body: JSON.stringify({ messages: chat.messages.slice(-12).map(({ role, content: value }) => ({ role, content: value.slice(0, role === 'user' ? 500 : 1500) })) }),
+        signal: controller.signal,
+      });
+      clearTimeout(timeout);
+      const data = await response.json().catch(() => ({}));
+      if (response.ok && data.reply) {
+        reply = data.reply;
+        links = Array.isArray(data.links) ? data.links : [];
+      } else {
+        failure = data.error || 'offline';
+      }
+    } catch {
+      failure = 'busy';
+    }
+    typing.remove();
+    chat.thinking = false;
+    chatSend.disabled = false;
+    if (failure) {
+      // A failed turn stays out of the history so the next attempt can simply retry.
+      chat.messages.pop();
+      addMessage('assistant', FALLBACKS[failure] || FALLBACKS.busy, [], failure !== 'slow-down');
+    } else {
+      chat.messages.push({ role: 'assistant', content: reply, links });
+      chat.messages = chat.messages.slice(-12);
+      addMessage('assistant', reply, links);
+      saveHistory();
+      // He's delighted with himself every time he gets an answer right.
+      if (!motion.matches && !hidden && chat.open && rafId) start(slash());
+    }
+    if (chat.open && !matchMedia('(pointer: coarse)').matches) chatInput.focus({ preventScroll: true });
+  }
+
+  function setChat(open) {
+    if (open === chat.open) return;
+    chat.open = open;
+    chatPanel.hidden = !open;
+    hideBubble();
+    setMenu(false);
+    if (open) {
+      if (!chatLog.childElementCount) restoreChat();
+      chatLog.scrollTop = chatLog.scrollHeight;
+      if (rafId) start(hopOntoPanel());
+      // Opening a phone keyboard uninvited would hide the panel he just opened.
+      if (!matchMedia('(pointer: coarse)').matches) chatInput.focus({ preventScroll: true });
+      else chatLog.focus({ preventScroll: true });
+    } else if (pet.surface === chat.surface) {
+      pet.surface = null;
+      pet.vx = 0; pet.vy = 0;
+      if (rafId) start(fly(), false);
+    }
+  }
+
+  bubble.addEventListener('click', () => setChat(true));
+  openChatButton.addEventListener('click', () => setChat(true));
+  chatPanel.querySelector('.zenitsu-chat-close').addEventListener('click', () => { setChat(false); menuToggle.focus({ preventScroll: true }); });
+  chatForm.addEventListener('submit', event => { event.preventDefault(); sendMessage(chatInput.value); });
+
   /* ---------- lifecycle ---------- */
 
   function stop() {
@@ -613,7 +835,7 @@
       return;
     }
     delete layer.dataset.still;
-    start(entrance(), false);
+    start(chat.open ? hopOntoPanel() : entrance(), false);
     lastTime = performance.now();
     rafId = requestAnimationFrame(tick);
   }
@@ -633,13 +855,14 @@
   });
   document.addEventListener('keydown', event => {
     if (event.key === 'Escape' && !menuPanel.hidden) { setMenu(false); menuToggle.focus({ preventScroll: true }); }
+    else if (event.key === 'Escape' && chat.open) { setChat(false); menuToggle.focus({ preventScroll: true }); }
   });
   document.addEventListener('pointerdown', event => {
     if (!menuPanel.hidden && !menu.contains(event.target)) setMenu(false);
   });
   motion.addEventListener('change', apply);
   // He goes into the castle gallery in person, and blinks back in when it closes.
-  addEventListener('castle:enter', stop);
+  addEventListener('castle:enter', () => { setChat(false); hideBubble(); stop(); });
   addEventListener('castle:leave', apply);
   addEventListener('resize', () => {
     if (hidden) return;
@@ -649,10 +872,12 @@
     draw();
   });
 
-  document.body.append(layer, menu);
+  document.body.append(layer, chatPanel, menu);
+  layer.append(bubble);
   // Preload every strip after first paint so moves never flash blank.
   const preload = () => Object.values(SHEETS).forEach(({ src }) => { new Image().src = src; });
   if ('requestIdleCallback' in window) requestIdleCallback(preload, { timeout: 2500 });
   else setTimeout(preload, 800);
   setTimeout(apply, 900);
+  setTimeout(welcome, 2600);
 })();
