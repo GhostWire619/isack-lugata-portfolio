@@ -1,7 +1,6 @@
 """Keep the captured HTML and its hydrated components in the same order."""
 from pathlib import Path
 import re
-import json
 
 from bs4 import BeautifulSoup
 
@@ -28,21 +27,7 @@ def arrange_home(path):
     for column, original, order in columns:
         for route in order:
             column.extend(groups[route])
-    # Serialize the modified tree directly; source attribute ordering is not stable.
-    projects = json.loads((DIST.parent / 'content/portfolio.json').read_text(encoding='utf8'))['projects']
-    descriptions = {p['slug']:p['cardDescription'] for p in projects}
-    for card in soup.select('.framer-lvzy8y a'):
-        if 'More projects' in card.get_text():
-            card.attrs.pop('href', None)
-            card['role'] = 'note'
-            card['aria-disabled'] = 'true'
-            card['tabindex'] = '-1'
-        else:
-            slug = card.get('href','').lstrip('./')
-            if slug in descriptions:
-                card['data-project-description'] = descriptions[slug]
-                card['class'] = card.get('class',[]) + ['portfolio-project-card']
-    html = str(soup)
+        html = html.replace(original, str(column), 1)
     path.write_text(html, encoding='utf8', newline='\n')
 
 

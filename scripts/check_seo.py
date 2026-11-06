@@ -49,7 +49,7 @@ class Head(HTMLParser):
             self.ld += text
 
 
-expected = ['/', '/about', '/robotics', '/pricing'] + ['/' + p['slug'] for p in data['projects']]
+expected = ['/', '/about', '/robotics'] + ['/' + p['slug'] for p in data['projects']]
 descriptions = set()
 titles = set()
 for route in expected:

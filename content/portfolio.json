@@ -81,8 +81,7 @@
         "/assets/identity/cover-ecofy-detail.svg",
         "/assets/personal/ecofy-live.png",
         "/assets/identity/cover-ecofy.svg"
-      ],
-      "cardDescription": "Farm planning and agricultural guidance, from interface to AI."
+      ]
     },
     {
       "legacy": "stimulate",
@@ -132,8 +131,7 @@
         "/assets/identity/cover-wakili-msomi-detail.svg",
         "/assets/personal/wakili-msomi-live.png",
         "/assets/identity/cover-wakili-msomi.svg"
-      ],
-      "cardDescription": "Frontend and backend for a Swahili legal-assistance platform."
+      ]
     },
     {
       "legacy": "artem-astakhov",
@@ -152,9 +150,9 @@
       "story": [
         "GloboExpats is a marketplace built around the expat community in Tanzania, bringing goods, services, homes, vehicles, and community requests into one browsing experience.",
         "My contribution is mainly frontend development. I work on the part of the product people navigate: turning platform features and data into interfaces that make sense together.",
-        "The public interface brings several entry points together: search, product categories, and listings for goods, homes, and vehicles. Those are different ways into the same marketplace, rather than separate products.",
-        "The preview above shows that browsing structure. Search gives visitors a direct starting point; category navigation lets them explore; listing imagery provides context before they open an item.",
-        "My role was mainly frontend development. This case shows the public product experience, not a claim that I independently designed or built every feature. Open the live product to explore the interface in context."
+        "A marketplace has a lot to communicate at once. Categories, listings, seller information, and the next action all need enough space to be useful without competing for attention.",
+        "I approach that work through clarity and continuity: help someone understand what they are looking at, keep interactions predictable, and make the move from browsing to acting feel natural.",
+        "GloboExpats reflects the frontend side of my work: product interfaces connected to real services, with attention to both the broad journey and the small details along the way."
       ],
       "stack": [
         "Frontend development",
@@ -182,8 +180,7 @@
         "/assets/identity/cover-globoexpats-detail.svg",
         "/assets/personal/globoexpats-live.png",
         "/assets/identity/cover-globoexpats.svg"
-      ],
-      "cardDescription": "Frontend for a marketplace connecting people settling in Tanzania."
+      ]
     },
     {
       "legacy": "reward-point",
@@ -230,8 +227,7 @@
         "/assets/identity/cover-habitek-detail.svg",
         "/assets/personal/habitek-live.png",
         "/assets/identity/cover-habitek.svg"
-      ],
-      "cardDescription": "Frontend and backend connecting property discovery with management."
+      ]
     },
     {
       "legacy": "dibsy",
@@ -280,8 +276,7 @@
         "/assets/identity/cover-osher-market-detail.svg",
         "/assets/personal/osher-market-live.png",
         "/assets/identity/cover-osher-market.svg"
-      ],
-      "cardDescription": "Backend application services for a commerce platform."
+      ]
     },
     {
       "legacy": "caldera",
@@ -300,8 +295,8 @@
       "story": [
         "My work with Falco focuses on its internal management system: the software supporting how the business organizes its everyday work.",
         "I contributed backend development, working on the application services and business logic behind the management workflows.",
-        "The scope was an internal management system, rather than the public company website. My contribution sat in the backend: application services and business logic supporting management workflows.",
-        "The scope map below explains that contribution at a high level. It is not a production architecture diagram. Internal screens, business records, and implementation details are not included in this public case study."
+        "Internal tools deserve the same care as public products. Clear rules, predictable behavior, and maintainable services make a difference to the people who rely on them.",
+        "The project reflects a part of my work that sits behind the scenes: turning business needs into a backend that a team can work with and build on."
       ],
       "stack": [
         "Backend development",
@@ -329,8 +324,7 @@
         "/assets/identity/cover-falco-detail.svg",
         "/assets/identity/cover-falco.svg",
         "/assets/identity/cover-falco.svg"
-      ],
-      "cardDescription": "The backend behind an internal business management system."
+      ]
     },
     {
       "legacy": "ruby",
@@ -378,8 +372,7 @@
         "/assets/identity/cover-tanstack-tanzania-detail.svg",
         "/assets/personal/tanstack-live.png",
         "/assets/identity/cover-tanstack-tanzania.svg"
-      ],
-      "cardDescription": "Backend services connecting students with resources and opportunities."
+      ]
     }
   ],
   "reviewNotes": [

@@ -118,14 +118,3 @@ figcaption { margin-top:14px; font-size:13px; color:var(--muted); }
 }
 @media(prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } .chrome-button,.more-work-card,.more-work-cover img,.reveal-pending { transition:none; } .case-intro h1 { animation:none; } .reveal-pending { opacity:1; transform:none; } }
 @media(max-width:360px) { .case-socials { gap:6px; } }
-/* Evidence blocks keep the reader inside the case without repeated galleries. */
-.case-evidence { padding:40px 0; border-top:1px solid #d4d4d4; }
-.case-evidence h2 { font-size:clamp(28px,4vw,42px); margin:12px 0 28px; }
-.evidence-grid,.scope-flow { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:20px; padding:0; list-style:none; }
-.evidence-grid li,.scope-flow li { border:1px solid #d4d4d4; border-radius:12px; padding:22px; background:#fafafa; }
-.evidence-grid h3 { font-size:20px; margin:0 0 10px; }
-.evidence-grid p,.evidence-note { font-size:15px; line-height:1.65; }
-.scope-flow { grid-template-columns:repeat(4,minmax(0,1fr)); }
-.scope-flow span { display:block; margin-bottom:12px; color:#737373; font-size:12px; }
-.evidence-note { color:#666; margin-top:20px; max-width:760px; }
-@media(max-width:700px) { .evidence-grid,.scope-flow { grid-template-columns:1fr; } .case-evidence { padding:28px 0; } }

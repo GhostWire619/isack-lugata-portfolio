@@ -28,7 +28,6 @@ person = {
 }
 website = {'@type': 'WebSite', '@id': website_id, 'name': name, 'url': origin + '/', 'inLanguage': 'en', 'publisher': {'@id': person_id}}
 pages = {
-    'pricing': {'path': '/pricing', 'title': 'Website Pricing in Tanzania | Isack Lugata', 'description': 'Explore website packages from TSh 500,000 with Isack Lugata. Compare business sites, online shops, custom systems, SEO, hosting and maintenance.'},
     'index': {'path': '/', 'title': 'Isack Lugata | Software & AI Developer in Tanzania', 'description': 'Isack Lugata is a freelance software developer in Dar es Salaam, Tanzania, building websites, mobile apps, backend systems and applied AI solutions.'},
     'about': {'path': '/about', 'title': 'About Isack Lugata | Developer in Dar es Salaam, Tanzania', 'description': 'Meet Isack Madaha Lugata: software developer in Tanzania, Ecofy Africa co-founder and former UDSM robotics lab chairperson. Explore his background and work.'},
     'robotics': {'path': '/robotics', 'title': 'UDSM Robotics & Nena AI | Isack Lugata', 'description': 'Isack Lugata’s backend contributions and former leadership at the UDSM 3D Solutions & Robotics Lab, including the Nena AI Swahili speech team project.'},
@@ -88,7 +87,7 @@ for file, page in pages.items():
     if file != 'index':
         breadcrumb_id = url + '#breadcrumbs'
         web_page['breadcrumb'] = {'@id': breadcrumb_id}
-        graph.append({'@type': 'BreadcrumbList', '@id': breadcrumb_id, 'itemListElement': [{'@type': 'ListItem', 'position': 1, 'name': 'Home', 'item': origin + '/'}, {'@type': 'ListItem', 'position': 2, 'name': page.get('project', {}).get('name', {'about':'About','pricing':'Pricing'}.get(file,'Robotics & Nena AI')), 'item': url}]})
+        graph.append({'@type': 'BreadcrumbList', '@id': breadcrumb_id, 'itemListElement': [{'@type': 'ListItem', 'position': 1, 'name': 'Home', 'item': origin + '/'}, {'@type': 'ListItem', 'position': 2, 'name': page.get('project', {}).get('name', 'About' if file == 'about' else 'Robotics & Nena AI'), 'item': url}]})
     if page.get('project'):
         project = page['project']
         web_page['mainEntity'] = {'@id': url + '#case-study'}
