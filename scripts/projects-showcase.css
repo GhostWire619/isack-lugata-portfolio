@@ -58,7 +58,6 @@
   .showcase-card:last-of-type { margin-bottom:0; }
   .showcase-card::after { content:""; position:absolute; inset:0; border-radius:inherit; background:#000; opacity:var(--dim,0); pointer-events:none; }
   .showcase-media { flex:1 1 auto; min-height:0; width:100%; aspect-ratio:auto; transform-origin:50% 45%; }
-  .showcase-media img { object-fit:contain; }
   .showcase-caption { flex:none; width:100%; padding:13px 8px 0; }
   .showcase-more { margin-top:clamp(30px,6vh,60px); }
 }

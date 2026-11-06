@@ -3,14 +3,14 @@
 
   // Paths stay literal so optimize_site.py can append its cache-busting token.
   const SHEETS = {
-    idle: { src: '/assets/personal/zenitsu/idle.webp?v=2bd42fa998597aa3', frames: 19, fps: 14 },
-    run: { src: '/assets/personal/zenitsu/run.webp?v=2bd42fa998597aa3', frames: 9, fps: 16 },
-    slash: { src: '/assets/personal/zenitsu/atk01.webp?v=2bd42fa998597aa3', frames: 19, fps: 18 },
-    spin: { src: '/assets/personal/zenitsu/skl01.webp?v=2bd42fa998597aa3', frames: 21, fps: 18 },
-    dash: { src: '/assets/personal/zenitsu/skl02.webp?v=2bd42fa998597aa3', frames: 36, fps: 26 },
-    hit: { src: '/assets/personal/zenitsu/hit01.webp?v=2bd42fa998597aa3', frames: 7, fps: 14 },
-    recoil: { src: '/assets/personal/zenitsu/hit02.webp?v=2bd42fa998597aa3', frames: 7, fps: 14 },
-    faint: { src: '/assets/personal/zenitsu/die.webp?v=2bd42fa998597aa3', frames: 23, fps: 16 },
+    idle: { src: '/assets/personal/zenitsu/idle.webp?v=938c7c04d1c07005', frames: 19, fps: 14 },
+    run: { src: '/assets/personal/zenitsu/run.webp?v=938c7c04d1c07005', frames: 9, fps: 16 },
+    slash: { src: '/assets/personal/zenitsu/atk01.webp?v=938c7c04d1c07005', frames: 19, fps: 18 },
+    spin: { src: '/assets/personal/zenitsu/skl01.webp?v=938c7c04d1c07005', frames: 21, fps: 18 },
+    dash: { src: '/assets/personal/zenitsu/skl02.webp?v=938c7c04d1c07005', frames: 36, fps: 26 },
+    hit: { src: '/assets/personal/zenitsu/hit01.webp?v=938c7c04d1c07005', frames: 7, fps: 14 },
+    recoil: { src: '/assets/personal/zenitsu/hit02.webp?v=938c7c04d1c07005', frames: 7, fps: 14 },
+    faint: { src: '/assets/personal/zenitsu/die.webp?v=938c7c04d1c07005', frames: 23, fps: 16 },
   };
   // Crop geometry from the sprite build, in captured pixels.
   const CROP_W = 570, CROP_H = 295, BODY_H = 275, FEET_X = 260, FEET_Y = 290;
@@ -40,7 +40,7 @@
   launcher.className = 'zenitsu-launcher';
   launcher.innerHTML = `
     <button type="button" class="zenitsu-launcher-button" aria-label="Ask Zenitsu, the site's AI guide" aria-expanded="false" aria-controls="zenitsu-chat">
-      <span class="zenitsu-disc"><img src="/assets/personal/zenitsu/avatar.webp?v=2bd42fa998597aa3" alt="" width="96" height="96" decoding="async"></span>
+      <span class="zenitsu-disc"><img src="/assets/personal/zenitsu/avatar.webp?v=938c7c04d1c07005" alt="" width="96" height="96" decoding="async"></span>
       <span class="zenitsu-launcher-label">Ask me</span>
     </button>`;
 
@@ -51,7 +51,7 @@
   chatPanel.setAttribute('aria-label', 'Chat with Zenitsu, the site AI guide');
   chatPanel.innerHTML = `
     <header class="zenitsu-chat-head">
-      <span class="zenitsu-disc zenitsu-disc-small"><img src="/assets/personal/zenitsu/avatar.webp?v=2bd42fa998597aa3" alt="" width="64" height="64" decoding="async"></span>
+      <span class="zenitsu-disc zenitsu-disc-small"><img src="/assets/personal/zenitsu/avatar.webp?v=938c7c04d1c07005" alt="" width="64" height="64" decoding="async"></span>
       <div class="zenitsu-chat-title"><strong>Zenitsu</strong><span>Isack's AI guide</span></div>
       <button type="button" class="zenitsu-icon-button zenitsu-chat-more" aria-label="More options" aria-expanded="false" aria-controls="zenitsu-options">
         <svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><g fill="currentColor"><circle cx="4" cy="10" r="1.5"/><circle cx="10" cy="10" r="1.5"/><circle cx="16" cy="10" r="1.5"/></g></svg>
