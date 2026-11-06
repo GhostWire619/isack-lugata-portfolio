@@ -149,7 +149,7 @@
 .castle-pagehero { position:absolute; left:0; top:0; background-repeat:no-repeat; pointer-events:none; will-change:transform; }
 
 /* The pet steps out of the page while its 3D self is in the castle. */
-.in-castle .zenitsu-pet,.in-castle .zenitsu-menu { visibility:hidden; }
+.in-castle .zenitsu-pet,.in-castle .zenitsu-launcher { visibility:hidden; }
 
 @media (max-width:700px) {
   .castle-caption { width:calc(100% - 150px); }

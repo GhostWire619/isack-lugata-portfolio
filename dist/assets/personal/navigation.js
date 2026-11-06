@@ -15,14 +15,6 @@
     });
     const services = document.querySelector('[data-framer-name="areas"]');
     if (services && !services.id) services.id = 'services';
-    const intro = document.querySelector('.framer-180tc9q');
-    if (intro && !document.querySelector('.portfolio-mobile-jumps')) {
-      const jumps = document.createElement('nav');
-      jumps.className = 'portfolio-mobile-jumps';
-      jumps.setAttribute('aria-label','On this page');
-      jumps.innerHTML = '<a href="#projects">Selected work <span aria-hidden="true">↓</span></a><a href="#services">What I do <span aria-hidden="true">↓</span></a>';
-      intro.append(jumps);
-    }
   }
   function start() {
     if (document.querySelector('[data-framer-appear-id]') && !window.MotionIsMounted) { requestAnimationFrame(start); return; }

@@ -13,6 +13,11 @@
     faint: { src: '/assets/personal/zenitsu/die.webp', frames: 23, fps: 16 },
   };
   // Crop geometry from the sprite build, in captured pixels.
+  // Sharper art for the moment he's large on stage; loaded only if the welcome will play.
+  const STAGE_SHEETS = {
+    idle: { src: '/assets/personal/castle/zenitsu/idle.webp', frames: 19, cols: 4, rows: 5 },
+    spin: { src: '/assets/personal/castle/zenitsu/skl01.webp', frames: 21, cols: 4, rows: 6 },
+  };
   const CROP_W = 570, CROP_H = 295, BODY_H = 275, FEET_X = 260, FEET_Y = 290;
   const GRAVITY = 2300, DASH_SPEED = 2800;
   const STORAGE_KEY = 'zenitsu-pet-hidden';
@@ -21,6 +26,8 @@
   const random = (min, max) => min + Math.random() * (max - min);
   const pick = list => list[Math.floor(Math.random() * list.length)];
   const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+  const lerp = (a, b, t) => a + (b - a) * t;
+  const ease = t => 1 - (1 - clamp(t, 0, 1)) ** 3;
   const viewW = () => document.documentElement.clientWidth;
   const viewH = () => window.visualViewport?.height || innerHeight;
   const floorY = () => viewH() - 4;
@@ -33,49 +40,70 @@
       <div class="zenitsu-sprite"></div>
       <button type="button" class="zenitsu-hit" aria-label="Chat with Zenitsu, the site assistant"></button>
     </div>`;
-  const menu = document.createElement('div');
-  menu.className = 'zenitsu-menu';
-  menu.innerHTML = `
-    <button type="button" class="zenitsu-menu-toggle" aria-label="Zenitsu pet options" aria-expanded="false" aria-controls="zenitsu-menu-panel">
-      <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M13.5 2 5 13.6h5.6L9.4 22 19 9.8h-6z"/></svg>
-    </button>
-    <div id="zenitsu-menu-panel" class="zenitsu-menu-panel" hidden>
-      <button type="button" class="zenitsu-open-chat">Chat with Zenitsu</button>
-      <button type="button" class="zenitsu-visibility"></button>
-      <p>3D model: <a href="https://sketchfab.com/3d-models/agatsuma-zenitsu-8f877f1dc7b4475c831851c6defd4d7d" target="_blank" rel="noopener">Agatsuma Zenitsu by Witsanu Superball</a>, <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>. Animation frames rendered from the model.</p>
+  const launcher = document.createElement('div');
+  launcher.className = 'zenitsu-launcher';
+  launcher.innerHTML = `
+    <button type="button" class="zenitsu-launcher-button" aria-label="Ask Zenitsu, the site's AI guide" aria-expanded="false" aria-controls="zenitsu-chat">
+      <span class="zenitsu-disc"><img src="/assets/personal/zenitsu/avatar.webp" alt="" width="96" height="96" decoding="async"></span>
+      <span class="zenitsu-launcher-label">Ask me</span>
+    </button>`;
+
+  const stageGlow = document.createElement('div');
+  stageGlow.className = 'zenitsu-stage';
+  stageGlow.hidden = true;
+  stageGlow.setAttribute('aria-hidden', 'true');
+
+  const welcomeCard = document.createElement('aside');
+  welcomeCard.className = 'zenitsu-welcome';
+  welcomeCard.hidden = true;
+  welcomeCard.setAttribute('aria-label', 'Welcome from Zenitsu');
+  welcomeCard.innerHTML = `
+    <button type="button" class="zenitsu-icon-button zenitsu-welcome-close" aria-label="Dismiss welcome"><svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
+    <h2 class="zenitsu-welcome-title" aria-label="Welcome! I'm Zenitsu."></h2>
+    <p>Isack's AI guide. Tell me what you want built, and I'll help you find what it takes and what it costs.</p>
+    <div class="zenitsu-welcome-actions">
+      <button type="button" class="zenitsu-button zenitsu-welcome-ask">Ask me</button>
+      <button type="button" class="zenitsu-button-quiet zenitsu-welcome-prices">See prices</button>
     </div>`;
 
-  const bubble = document.createElement('button');
-  bubble.type = 'button';
-  bubble.className = 'zenitsu-bubble';
-  bubble.hidden = true;
-  bubble.textContent = "Hi! I'm Zenitsu, Isack's guide. Lost? Ask me anything!";
-
   const chatPanel = document.createElement('section');
+  chatPanel.id = 'zenitsu-chat';
   chatPanel.className = 'zenitsu-chat';
   chatPanel.hidden = true;
-  chatPanel.setAttribute('aria-label', 'Chat with Zenitsu, the site assistant');
+  chatPanel.setAttribute('aria-label', 'Chat with Zenitsu, the site AI guide');
   chatPanel.innerHTML = `
     <header class="zenitsu-chat-head">
-      <strong>Zenitsu</strong><span>Isack's AI guide</span>
-      <button type="button" class="zenitsu-chat-close" aria-label="Close chat">×</button>
+      <span class="zenitsu-disc zenitsu-disc-small"><img src="/assets/personal/zenitsu/avatar.webp" alt="" width="64" height="64" decoding="async"></span>
+      <div class="zenitsu-chat-title"><strong>Zenitsu</strong><span>Isack's AI guide</span></div>
+      <button type="button" class="zenitsu-icon-button zenitsu-chat-more" aria-label="More options" aria-expanded="false" aria-controls="zenitsu-options">
+        <svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><g fill="currentColor"><circle cx="4" cy="10" r="1.5"/><circle cx="10" cy="10" r="1.5"/><circle cx="16" cy="10" r="1.5"/></g></svg>
+      </button>
+      <button type="button" class="zenitsu-icon-button zenitsu-chat-close" aria-label="Close chat"><svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
     </header>
+    <div id="zenitsu-options" class="zenitsu-options" hidden>
+      <button type="button" class="zenitsu-visibility"></button>
+      <p>3D model: <a href="https://sketchfab.com/3d-models/agatsuma-zenitsu-8f877f1dc7b4475c831851c6defd4d7d" target="_blank" rel="noopener">Agatsuma Zenitsu by Witsanu Superball</a>, <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>. Animation frames rendered from the model.</p>
+    </div>
     <div class="zenitsu-chat-log" role="log" aria-live="polite" tabindex="0"></div>
-    <div class="zenitsu-chat-chips"></div>
     <form class="zenitsu-chat-form">
-      <input type="text" name="message" maxlength="500" autocomplete="off" placeholder="Ask about Isack's work or prices" aria-label="Your message">
-      <button type="submit" aria-label="Send">➤</button>
+      <input type="text" name="message" maxlength="500" autocomplete="off" placeholder="What do you want built?" aria-label="Your message">
+      <button type="submit" class="zenitsu-send" aria-label="Send message">
+        <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><path d="M10 15.5v-11M5.5 9L10 4.5 14.5 9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
     </form>
-    <p class="zenitsu-chat-note">AI can make mistakes; prices are confirmed by Isack in a written quote. Messages go to Z.ai to generate replies, so please don't share private details.</p>`;
+    <p class="zenitsu-chat-note">AI can be wrong. Messages go to Z.ai, so please avoid private details.</p>`;
 
   const body = layer.querySelector('.zenitsu-body');
   const sprite = layer.querySelector('.zenitsu-sprite');
   const hitBox = layer.querySelector('.zenitsu-hit');
-  const menuToggle = menu.querySelector('.zenitsu-menu-toggle');
-  const menuPanel = menu.querySelector('.zenitsu-menu-panel');
-  const visibility = menu.querySelector('.zenitsu-visibility');
+  const launcherButton = launcher.querySelector('.zenitsu-launcher-button');
+  const launcherLabel = launcher.querySelector('.zenitsu-launcher-label');
+  const moreButton = chatPanel.querySelector('.zenitsu-chat-more');
+  const optionsPanel = chatPanel.querySelector('.zenitsu-options');
+  const visibility = chatPanel.querySelector('.zenitsu-visibility');
 
-  const pet = { x: 0, y: 0, vx: 0, vy: 0, dir: 1, rot: 0, pivotBody: false, surface: null, airborne: false };
+  const pet = { x: 0, y: 0, lift: 0, vx: 0, vy: 0, dir: 1, rot: 0, pivotBody: false, surface: null, airborne: false };
+  let onStage = false;
   let scale = 0, cellW = 0, cellH = 0;
   let sheet = null, frame = -1;
   let behavior = null, lastTime = 0, rafId = 0;
@@ -85,7 +113,7 @@
   /* ---------- rendering ---------- */
 
   function measure() {
-    const target = viewW() < 700 ? 66 : 88;
+    const target = onStage ? (viewW() < 700 ? 118 : 150) : (viewW() < 700 ? 66 : 88);
     scale = target / BODY_H;
     cellW = Math.round(CROP_W * scale);
     cellH = Math.round(CROP_H * scale);
@@ -103,25 +131,27 @@
   }
 
   function show(name, index) {
-    const data = SHEETS[name];
-    if (!sheet || sheet.name !== name || !sheet.applied) {
-      sheet = { name, applied: true };
+    const stage = onStage && STAGE_SHEETS[name]?.ready ? STAGE_SHEETS[name] : null;
+    const data = stage || SHEETS[name];
+    const key = (stage ? 'stage:' : '') + name;
+    const cols = data.cols || data.frames, rows = data.rows || 1;
+    if (!sheet || sheet.name !== key || !sheet.applied) {
+      sheet = { name: key, applied: true };
       sprite.style.backgroundImage = `url("${data.src}")`;
-      sprite.style.backgroundSize = `${data.frames * cellW}px ${cellH}px`;
+      sprite.style.backgroundSize = `${cols * cellW}px ${rows * cellH}px`;
       frame = -1;
     }
     if (index !== frame) {
       frame = index;
-      sprite.style.backgroundPosition = `${-index * cellW}px 0`;
+      sprite.style.backgroundPosition = `${-(index % cols) * cellW}px ${-Math.floor(index / cols) * cellH}px`;
     }
   }
 
   function draw() {
     const feetX = FEET_X * scale, feetY = FEET_Y * scale;
-    body.style.transform = `translate3d(${(pet.x - feetX).toFixed(1)}px,${(pet.y - feetY).toFixed(1)}px,0)`;
+    body.style.transform = `translate3d(${(pet.x - feetX).toFixed(1)}px,${(pet.y - pet.lift - feetY).toFixed(1)}px,0)`;
     sprite.style.transformOrigin = `${feetX}px ${pet.pivotBody ? feetY - BODY_H * scale * .45 : feetY}px`;
     sprite.style.transform = `rotate(${pet.rot.toFixed(1)}deg) scaleX(${pet.dir})`;
-    if (!bubble.hidden) placeBubble();
   }
 
   /* ---------- effects ---------- */
@@ -206,7 +236,7 @@
     const nodes = document.querySelectorAll('h1,h2,h3,img,picture,video,article,figure');
     for (const el of nodes) {
       if (found.length >= 40) break;
-      if (el.closest('nav,header,.zenitsu-pet,.zenitsu-menu,.zenitsu-chat')) continue;
+      if (el.closest('nav,header,.zenitsu-pet,.zenitsu-launcher,.zenitsu-chat,.zenitsu-welcome')) continue;
       const box = el.getBoundingClientRect();
       if (box.bottom < 70 || box.top > viewH() || box.width < 100) continue;
       const isText = /^H[1-3]$/.test(el.tagName);
@@ -483,11 +513,81 @@
     yield* play('recoil');
   }
 
-  function* hopOntoPanel() {
-    const bounds = surfaceBounds(chat.surface);
+  function* hopOnto(surface) {
+    const bounds = surfaceBounds(surface);
     if (!bounds || bounds.top < 70) { yield* idle(.4); return; }
-    yield* blink(clamp(bounds.right - 70, bounds.left + 20, bounds.right - 20), bounds.top, chat.surface);
+    yield* blink(clamp(bounds.right - 70, bounds.left + 20, bounds.right - 20), bounds.top, surface);
     yield* play('dash', { from: 31, to: 35 });
+  }
+
+  // Waiting off-stage while the page settles, before the welcome.
+  function* waitInWings() {
+    pet.airborne = true;
+    pet.x = viewW() / 2;
+    pet.y = -300;
+    while (true) {
+      show('idle', 0);
+      yield;
+    }
+  }
+
+  // His greeting: one strike down from the sky, a flourish, two happy hops and a bow.
+  function* welcomeAct() {
+    const bounds = surfaceBounds(welcomeSurface);
+    if (!bounds) return;
+    onStage = true;
+    measure();
+    const x = (bounds.left + bounds.right) / 2;
+    pet.surface = null;
+    pet.airborne = true;
+    pet.lift = 0;
+    pet.rot = 0;
+    pet.dir = 1;
+    pet.x = x;
+    pet.y = -200;
+    show('dash', 14);
+    let time = 0;
+    while (time < .2) {
+      pet.y = lerp(-200, bounds.top, ease(time / .2));
+      show('dash', 12 + (Math.floor(time * 60) % 16));
+      time += yield;
+    }
+    pet.y = bounds.top;
+    pet.airborne = false;
+    pet.surface = welcomeSurface;
+    bolt(x, 0, x, bounds.top - 40);
+    sparks(x, bounds.top - 8, 16);
+    yield* play('recoil', { from: 2, to: 4, fps: 16 });
+    yield* idle(.25);
+
+    // Sword flourish
+    yield* play('spin', { to: 7, fps: 20 });
+    sparks(pet.x + 30, pet.y - scale * BODY_H * .6, 10);
+    yield* play('spin', { from: 8, fps: 20 });
+
+    // Two hops
+    for (const height of [34, 22]) {
+      time = 0;
+      while (time < .32) {
+        const t = time / .32;
+        pet.lift = 4 * height * t * (1 - t);
+        show('idle', Math.floor(time * 14) % SHEETS.idle.frames);
+        time += yield;
+      }
+      pet.lift = 0;
+    }
+
+    // A bow, from the feet, held a beat
+    pet.pivotBody = false;
+    for (const [from, to, seconds] of [[0, 19, .24], [19, 19, .55], [19, 0, .26]]) {
+      time = 0;
+      while (time < seconds) {
+        pet.rot = lerp(from, to, ease(time / seconds)) * pet.dir;
+        show('idle', 0);
+        time += yield;
+      }
+    }
+    pet.rot = 0;
   }
 
   function* entrance() {
@@ -498,8 +598,9 @@
   }
 
   function chooseMove() {
-    if (chat.open) {
-      if (pet.surface !== chat.surface) return hopOntoPanel();
+    const home = perch();
+    if (home) {
+      if (pet.surface !== home) return hopOnto(home);
       return chat.thinking ? roam() : idle(random(1.2, 2.4));
     }
     const grounded = !pet.surface;
@@ -624,67 +725,104 @@
 
   /* ---------- welcome and chat ---------- */
 
-  const HISTORY_KEY = 'zenitsu-chat', WELCOMED_KEY = 'zenitsu-welcomed';
-  const GREETING = "H-hi! I'm Zenitsu, Isack's guide around here. Ask me about his work, services or prices, and I'll point you the right way. Please don't make me fight anything.";
-  const CHIPS = ['What does Isack build?', 'How much does a website cost?', 'Show me his best work', 'How do I hire him?'];
-  const PAGE_NAMES = {
-    '/': 'Home', '/about': 'His story', '/blog/': 'Blog', '/ecofy': 'Ecofy Africa', '/wakili-msomi': 'Wakili Msomi',
-    '/globoexpats': 'GloboExpats', '/habitek': 'Habitek', '/osher-market': 'Osher Market', '/falco': 'Falco Finance',
-    '/tanstack-tanzania': 'TanStack Tanzania', '/robotics': 'The lab',
-  };
+  const HISTORY_KEY = 'zenitsu-chat', SEEN_KEY = 'zenitsu-welcome-seen', QUIET_KEY = 'zenitsu-welcome-quiet-until';
+  const QUIET_MS = 24 * 60 * 60 * 1000, WELCOME_MS = 16000;
+  const INTRO = "H-hi! Tell me what you want built, and I'll help you work out what it takes and what it costs. Just please don't make me fight.";
+  const SUGGESTIONS = ['I need a website', 'I need an app or system', 'How much does it cost?', 'How do I get started?'];
+  const PRICE_QUESTION = 'How much does it cost?';
   const FALLBACKS = {
-    'slow-down': "W-wait, too fast! Give me a minute to catch my breath, then ask again.",
-    busy: "I'm overwhelmed right now! Try again in a moment, or reach Isack directly.",
-    resting: "I've talked all day and I'm falling asleep. Please reach Isack directly for now.",
+    'slow-down': 'W-wait, too fast! Give me a minute to catch my breath.',
+    busy: "I'm overwhelmed right now. Try again, or reach Isack directly.",
+    resting: "I've talked all day and I'm falling asleep. Please reach Isack directly.",
     offline: "I can't answer right now, but Isack can.",
   };
   const chat = {
     open: false, thinking: false, messages: [],
     surface: { el: chatPanel, range: null, inset: 0 },
   };
+  const welcomeSurface = { el: welcomeCard, range: null, inset: 0 };
   const chatLog = chatPanel.querySelector('.zenitsu-chat-log');
-  const chatChips = chatPanel.querySelector('.zenitsu-chat-chips');
   const chatForm = chatPanel.querySelector('.zenitsu-chat-form');
   const chatInput = chatPanel.querySelector('input');
   const chatSend = chatForm.querySelector('button');
-  const openChatButton = menu.querySelector('.zenitsu-open-chat');
+  const coarsePointer = () => matchMedia('(pointer: coarse)').matches;
+  let suggestionsEl = null;
 
-  function placeBubble() {
-    const width = bubble.offsetWidth, height = bubble.offsetHeight;
-    bubble.style.transform = `translate3d(${clamp(pet.x - width / 2, 8, viewW() - width - 8).toFixed(1)}px,${clamp(pet.y - scale * BODY_H - height - 10, 8, viewH() - height - 8).toFixed(1)}px,0)`;
+  const perch = () => (chat.open ? chat.surface : welcomeCard.hidden ? null : welcomeSurface);
+
+  function leavePerch(surface) {
+    if (pet.surface !== surface) return;
+    pet.surface = null;
+    pet.vx = 0; pet.vy = 0;
+    if (rafId && !perch()) start(fly(), false);
   }
 
-  let bubbleTimer = 0;
+  // Follows the page: white with black buttons on Works, black with silver on Story.
+  function syncTone() {
+    const match = getComputedStyle(document.body).backgroundColor.match(/[\d.]+/g);
+    if (!match || (match.length > 3 && Number(match[3]) === 0)) return;
+    const [r, g, b] = match.map(Number);
+    const tone = r * .299 + g * .587 + b * .114 < 128 ? 'dark' : 'light';
+    [launcher, welcomeCard, chatPanel, stageGlow].forEach(element => { if (element.dataset.tone !== tone) element.dataset.tone = tone; });
+  }
+
+  let welcomeTimer = 0;
+  function storedNumber(storage, key) {
+    try { return Number(storage.getItem(key)) || 0; } catch { return 0; }
+  }
+  function welcomeDue() {
+    return !storedNumber(sessionStorage, SEEN_KEY) && storedNumber(localStorage, QUIET_KEY) <= Date.now();
+  }
   function welcome() {
-    let seen = false;
-    try { seen = sessionStorage.getItem(WELCOMED_KEY) === '1'; } catch {}
-    if (seen || chat.open || hidden || document.documentElement.classList.contains('in-castle')) return;
-    try { sessionStorage.setItem(WELCOMED_KEY, '1'); } catch {}
-    bubble.hidden = false;
-    placeBubble();
-    bubbleTimer = setTimeout(hideBubble, 9000);
+    if (chat.open || !welcomeDue() || document.documentElement.classList.contains('in-castle')) return;
+    try { sessionStorage.setItem(SEEN_KEY, '1'); } catch {}
+    syncTone();
+    stageGlow.hidden = false;
+    welcomeCard.hidden = false;
+    if (rafId && !hidden) start(welcomeAct(), false);
+    armWelcomeTimer();
   }
-  function hideBubble() {
-    clearTimeout(bubbleTimer);
-    bubble.hidden = true;
+  function armWelcomeTimer() {
+    clearTimeout(welcomeTimer);
+    welcomeTimer = setTimeout(() => closeWelcome(false), WELCOME_MS);
+  }
+  function closeWelcome(stayQuiet) {
+    clearTimeout(welcomeTimer);
+    if (stayQuiet) {
+      try { localStorage.setItem(QUIET_KEY, String(Date.now() + QUIET_MS)); } catch {}
+    }
+    if (welcomeCard.hidden) return;
+    welcomeCard.hidden = true;
+    stageGlow.hidden = true;
+    // Back to normal size, and off to run around the site.
+    onStage = false;
+    pet.lift = 0;
+    pet.rot = 0;
+    measure();
+    if (pet.surface === welcomeSurface) {
+      pet.surface = null;
+      pet.vx = 0; pet.vy = 0;
+      pet.airborne = false;
+      if (rafId && !perch()) start(chooseMove());
+    }
   }
 
-  function addMessage(role, text, links = [], contact = false) {
+  function addMessage(role, text, contact = false, retry = null) {
     const row = document.createElement('div');
     row.className = `zenitsu-msg zenitsu-msg-${role}`;
     const paragraph = document.createElement('p');
     paragraph.textContent = text;    // never as HTML: replies come from a model
     row.append(paragraph);
-    if (links.length || contact) {
+    if (contact || retry) {
       const actions = document.createElement('div');
       actions.className = 'zenitsu-msg-actions';
-      links.forEach(path => {
-        if (!PAGE_NAMES[path]) return;
-        const link = document.createElement('a');
-        link.href = path;
-        link.textContent = `${PAGE_NAMES[path]} →`;
-        actions.append(link);
-      });
+      if (retry) {
+        const again = document.createElement('button');
+        again.type = 'button';
+        again.textContent = 'Try again';
+        again.addEventListener('click', retry);
+        actions.append(again);
+      }
       if (contact) {
         const whatsapp = document.createElement('a');
         whatsapp.href = 'https://wa.me/255749498117';
@@ -703,16 +841,29 @@
     return row;
   }
 
-  function renderChips() {
-    chatChips.textContent = '';
+  function renderIntro() {
+    chatLog.textContent = '';
+    const intro = document.createElement('div');
+    intro.className = 'zenitsu-intro';
+    const heading = document.createElement('h2');
+    heading.textContent = "Hi, I'm Zenitsu.";
+    const line = document.createElement('p');
+    line.textContent = INTRO;
+    intro.append(heading, line);
+    chatLog.append(intro);
+    suggestionsEl = null;
     if (chat.messages.length) return;
-    CHIPS.forEach(text => {
-      const chip = document.createElement('button');
-      chip.type = 'button';
-      chip.textContent = text;
-      chip.addEventListener('click', () => sendMessage(text));
-      chatChips.append(chip);
+    suggestionsEl = document.createElement('div');
+    suggestionsEl.className = 'zenitsu-suggestions';
+    SUGGESTIONS.forEach(text => {
+      const suggestion = document.createElement('button');
+      suggestion.type = 'button';
+      suggestion.innerHTML = '<span></span><svg viewBox="0 0 20 20" width="15" height="15" aria-hidden="true"><path d="M6 14L14 6M7.5 6H14v6.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+      suggestion.firstElementChild.textContent = text;
+      suggestion.addEventListener('click', () => sendMessage(text));
+      suggestionsEl.append(suggestion);
     });
+    chatLog.append(suggestionsEl);
   }
 
   function saveHistory() {
@@ -720,28 +871,36 @@
   }
 
   function restoreChat() {
-    chatLog.textContent = '';
-    addMessage('assistant', GREETING);
     try {
       const saved = JSON.parse(sessionStorage.getItem(HISTORY_KEY) || '[]');
       if (Array.isArray(saved)) chat.messages = saved.filter(m => m && typeof m.content === 'string' && (m.role === 'user' || m.role === 'assistant')).slice(-12);
     } catch {}
-    chat.messages.forEach(message => addMessage(message.role, message.content, message.links || []));
-    renderChips();
+    renderIntro();
+    chat.messages.forEach(message => addMessage(message.role, message.content));
+  }
+
+  function addTyping() {
+    const row = document.createElement('div');
+    row.className = 'zenitsu-msg zenitsu-msg-assistant zenitsu-typing';
+    row.setAttribute('aria-label', 'Zenitsu is thinking');
+    row.innerHTML = '<span></span><span></span><span></span>';
+    chatLog.append(row);
+    chatLog.scrollTop = chatLog.scrollHeight;
+    return row;
   }
 
   async function sendMessage(text) {
     const content = text.trim().slice(0, 500);
     if (!content || chat.thinking) return;
+    suggestionsEl?.remove();
+    suggestionsEl = null;
     chat.messages.push({ role: 'user', content });
-    addMessage('user', content);
-    renderChips();
+    const sentRow = addMessage('user', content);
     chatInput.value = '';
     chat.thinking = true;
     chatSend.disabled = true;
-    const typing = addMessage('assistant', 'Thinking…');
-    typing.classList.add('zenitsu-typing');
-    let reply = '', links = [], failure = '';
+    const typing = addTyping();
+    let reply = '', failure = '';
     try {
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 50000);
@@ -756,7 +915,6 @@
       const data = await response.json().catch(() => ({}));
       if (response.ok && data.reply) {
         reply = data.reply;
-        links = Array.isArray(data.links) ? data.links : [];
       } else {
         failure = data.error || 'offline';
       }
@@ -767,47 +925,82 @@
     chat.thinking = false;
     chatSend.disabled = false;
     if (failure) {
-      // A failed turn stays out of the history so the next attempt can simply retry.
+      // A failed turn stays out of the history; the visitor can retry without retyping.
       chat.messages.pop();
-      addMessage('assistant', FALLBACKS[failure] || FALLBACKS.busy, [], failure !== 'slow-down');
+      sentRow.classList.add('zenitsu-msg-failed');
+      const notice = addMessage('assistant', FALLBACKS[failure] || FALLBACKS.busy, failure !== 'slow-down', () => {
+        sentRow.remove();
+        notice.remove();
+        sendMessage(content);
+      });
     } else {
-      chat.messages.push({ role: 'assistant', content: reply, links });
+      chat.messages.push({ role: 'assistant', content: reply });
       chat.messages = chat.messages.slice(-12);
-      addMessage('assistant', reply, links);
+      addMessage('assistant', reply);
       saveHistory();
       // He's delighted with himself every time he gets an answer right.
       if (!motion.matches && !hidden && chat.open && rafId) start(slash());
     }
-    if (chat.open && !matchMedia('(pointer: coarse)').matches) chatInput.focus({ preventScroll: true });
+    if (chat.open && !coarsePointer()) chatInput.focus({ preventScroll: true });
+  }
+
+  function setOptions(open) {
+    optionsPanel.hidden = !open;
+    moreButton.setAttribute('aria-expanded', String(open));
   }
 
   function setChat(open) {
     if (open === chat.open) return;
     chat.open = open;
     chatPanel.hidden = !open;
-    hideBubble();
-    setMenu(false);
+    launcher.toggleAttribute('data-open', open);
+    launcherButton.setAttribute('aria-expanded', String(open));
+    launcherLabel.textContent = open ? 'Close' : 'Ask me';
+    launcherButton.setAttribute('aria-label', open ? 'Close chat with Zenitsu' : "Ask Zenitsu, the site's AI guide");
+    setOptions(false);
     if (open) {
+      syncTone();
+      fitToViewport();
+      closeWelcome(true);
       if (!chatLog.childElementCount) restoreChat();
       chatLog.scrollTop = chatLog.scrollHeight;
-      if (rafId) start(hopOntoPanel());
+      if (rafId) start(hopOnto(chat.surface));
       // Opening a phone keyboard uninvited would hide the panel he just opened.
-      if (!matchMedia('(pointer: coarse)').matches) chatInput.focus({ preventScroll: true });
+      if (!coarsePointer()) chatInput.focus({ preventScroll: true });
       else chatLog.focus({ preventScroll: true });
-    } else if (pet.surface === chat.surface) {
-      pet.surface = null;
-      pet.vx = 0; pet.vy = 0;
-      if (rafId) start(fly(), false);
+    } else {
+      leavePerch(chat.surface);
     }
   }
 
-  bubble.addEventListener('click', () => setChat(true));
-  openChatButton.addEventListener('click', () => setChat(true));
-  chatPanel.querySelector('.zenitsu-chat-close').addEventListener('click', () => { setChat(false); menuToggle.focus({ preventScroll: true }); });
+  // Keep the composer above a phone's on-screen keyboard.
+  function fitToViewport() {
+    const viewport = window.visualViewport;
+    if (!viewport) return;
+    const keyboard = Math.max(0, innerHeight - viewport.height - viewport.offsetTop);
+    const typing = keyboard > 80;
+    chatPanel.style.setProperty('--zen-viewport', `${viewport.height}px`);
+    chatPanel.style.setProperty('--zen-keyboard', `${keyboard}px`);
+    chatPanel.toggleAttribute('data-keyboard', typing);
+    launcher.toggleAttribute('data-keyboard', typing);
+  }
+
+  launcherButton.addEventListener('click', () => setChat(!chat.open));
+  welcomeCard.querySelector('.zenitsu-welcome-close').addEventListener('click', () => { closeWelcome(true); launcherButton.focus({ preventScroll: true }); });
+  welcomeCard.querySelector('.zenitsu-welcome-ask').addEventListener('click', () => setChat(true));
+  welcomeCard.querySelector('.zenitsu-welcome-prices').addEventListener('click', () => { setChat(true); sendMessage(PRICE_QUESTION); });
+  // Don't whisk the card away from someone who's reading or about to click it.
+  ['pointerenter', 'focusin'].forEach(type => welcomeCard.addEventListener(type, () => clearTimeout(welcomeTimer)));
+  ['pointerleave', 'focusout'].forEach(type => welcomeCard.addEventListener(type, () => { if (!welcomeCard.hidden) armWelcomeTimer(); }));
+  moreButton.addEventListener('click', () => setOptions(optionsPanel.hidden));
+  chatPanel.querySelector('.zenitsu-chat-close').addEventListener('click', () => { setChat(false); launcherButton.focus({ preventScroll: true }); });
   chatForm.addEventListener('submit', event => { event.preventDefault(); sendMessage(chatInput.value); });
+  window.visualViewport?.addEventListener('resize', fitToViewport);
+  window.visualViewport?.addEventListener('scroll', fitToViewport);
 
   /* ---------- lifecycle ---------- */
 
+  let rafIdEverStarted = false;
   function stop() {
     cancelAnimationFrame(rafId);
     rafId = 0;
@@ -817,7 +1010,7 @@
   function apply() {
     stop();
     layer.hidden = hidden;
-    visibility.textContent = hidden ? 'Bring Zenitsu back' : 'Hide Zenitsu';
+    visibility.textContent = hidden ? 'Bring Zenitsu back on the page' : 'Hide Zenitsu from the page';
     if (hidden) return;
     measure();
     pet.surface = null;
@@ -826,7 +1019,7 @@
     pet.rot = 0;
     if (motion.matches) {
       // Reduced motion: a still figure in the corner, nothing moving or clickable.
-      pet.x = viewW() - 90;
+      pet.x = viewW() - 150;
       pet.y = floorY();
       pet.dir = -1;
       layer.dataset.still = '';
@@ -835,34 +1028,33 @@
       return;
     }
     delete layer.dataset.still;
-    start(chat.open ? hopOntoPanel() : entrance(), false);
+    let opening = entrance;
+    if (perch()) opening = () => hopOnto(perch());
+    else if (welcomeDue() && !rafIdEverStarted) opening = waitInWings;
+    rafIdEverStarted = true;
+    start(opening(), false);
     lastTime = performance.now();
     rafId = requestAnimationFrame(tick);
   }
 
-  function setMenu(open) {
-    menuPanel.hidden = !open;
-    menuToggle.setAttribute('aria-expanded', String(open));
-  }
-
-  menuToggle.addEventListener('click', () => setMenu(menuPanel.hidden));
   visibility.addEventListener('click', () => {
     hidden = !hidden;
     try { localStorage.setItem(STORAGE_KEY, hidden ? '1' : '0'); } catch {}
-    setMenu(false);
+    setOptions(false);
     apply();
-    menuToggle.focus({ preventScroll: true });
   });
   document.addEventListener('keydown', event => {
-    if (event.key === 'Escape' && !menuPanel.hidden) { setMenu(false); menuToggle.focus({ preventScroll: true }); }
-    else if (event.key === 'Escape' && chat.open) { setChat(false); menuToggle.focus({ preventScroll: true }); }
+    if (event.key !== 'Escape') return;
+    if (!optionsPanel.hidden) { setOptions(false); moreButton.focus({ preventScroll: true }); }
+    else if (chat.open) { setChat(false); launcherButton.focus({ preventScroll: true }); }
+    else if (!welcomeCard.hidden) closeWelcome(true);
   });
   document.addEventListener('pointerdown', event => {
-    if (!menuPanel.hidden && !menu.contains(event.target)) setMenu(false);
+    if (!optionsPanel.hidden && !optionsPanel.contains(event.target) && !moreButton.contains(event.target)) setOptions(false);
   });
   motion.addEventListener('change', apply);
   // He goes into the castle gallery in person, and blinks back in when it closes.
-  addEventListener('castle:enter', () => { setChat(false); hideBubble(); stop(); });
+  addEventListener('castle:enter', () => { setChat(false); closeWelcome(false); stop(); });
   addEventListener('castle:leave', apply);
   addEventListener('resize', () => {
     if (hidden) return;
@@ -872,12 +1064,32 @@
     draw();
   });
 
-  document.body.append(layer, chatPanel, menu);
-  layer.append(bubble);
+  document.body.append(stageGlow, layer, chatPanel, welcomeCard, launcher);
+  // Headline rises word by word when the card opens.
+  const welcomeTitle = welcomeCard.querySelector('.zenitsu-welcome-title');
+  ["Welcome!", "I'm", 'Zenitsu.'].forEach((word, index) => {
+    const outer = document.createElement('span');
+    outer.setAttribute('aria-hidden', 'true');
+    const inner = document.createElement('span');
+    inner.textContent = word;
+    inner.style.setProperty('--i', index);
+    outer.append(inner);
+    welcomeTitle.append(outer, ' ');
+  });
+  if (welcomeDue() && !motion.matches && !hidden && !navigator.connection?.saveData) {
+    Object.values(STAGE_SHEETS).forEach(sheetData => {
+      const image = new Image();
+      image.onload = () => { sheetData.ready = true; };
+      image.src = sheetData.src;
+    });
+  }
+  syncTone();
+  // The site's client router changes the page colour without a reload.
+  setInterval(syncTone, 700);
   // Preload every strip after first paint so moves never flash blank.
   const preload = () => Object.values(SHEETS).forEach(({ src }) => { new Image().src = src; });
   if ('requestIdleCallback' in window) requestIdleCallback(preload, { timeout: 2500 });
   else setTimeout(preload, 800);
   setTimeout(apply, 900);
-  setTimeout(welcome, 2600);
+  setTimeout(welcome, 1700);
 })();

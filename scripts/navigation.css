@@ -1,4 +1,3 @@
-.portfolio-mobile-jumps { display:none; }
 /* Phone layouts use quick, readable motion and shorter browsing distances. */
 @media(max-width:639px) {
   #hero { height:auto !important; min-height:0 !important; }
@@ -13,8 +12,6 @@
   [data-framer-name="areas"] .framer-195fpsc { flex:none !important; height:auto !important; gap:20px !important; opacity:1 !important; transform:none !important; }
   [data-framer-name="areas"] .framer-vpkqyr { width:56px !important; height:56px !important; }
   [data-framer-name="areas"] .framer-1o506iq p { font-size:28px !important; line-height:1.15 !important; }
-  .portfolio-mobile-jumps { display:flex; align-items:center; flex-wrap:wrap; gap:10px; margin-top:18px; }
-  .portfolio-mobile-jumps a { display:flex; gap:14px; align-items:center; min-height:40px; padding:6px 12px; border:1px solid #d4d4d4; border-radius:7px; color:#222; background:linear-gradient(#fff,#f3f3f3); font:13px/1.4 "Inter Display",Inter,sans-serif; text-decoration:none; }
   #projects,#services { scroll-margin-top:65px; }
   a { -webkit-tap-highlight-color:transparent; }
 }

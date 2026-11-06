@@ -398,6 +398,8 @@ for name,soup in pages.items():
     script=soup.new_tag('script',src='/assets/personal/personal.js');script['defer']='';soup.head.append(script)
     soup.head.append(soup.new_tag('link',rel='stylesheet',href='/assets/personal/zenitsu-companion.css'))
     soup.head.append(soup.new_tag('script',src='/assets/personal/zenitsu-companion.js',defer=''))
+    soup.head.append(soup.new_tag('link',rel='stylesheet',href='/assets/personal/projects-showcase.css'))
+    soup.head.append(soup.new_tag('script',src='/assets/personal/projects-showcase.js',defer=''))
     output=replace_all(clean_snippets(str(soup)))
     (DIST/(name+'.html')).write_text(output,encoding='utf8')
     project=next((p for p in DATA['projects'] if p['legacy']==name),None)
@@ -675,8 +677,10 @@ lab_html=f'''<!doctype html><html lang="en"><head><meta charset="utf-8"><meta na
 <section class="lab-section lab-grid"><img src="/assets/personal/tanstack-live.png" alt="Public TanStack Tanzania website"><div><span class="eyebrow">Backend development</span><h2>TanStack Tanzania</h2><p>A platform connecting Tanzanian tech students with opportunities, resources, and career support. I contributed backend development as part of our lab project work.</p><a class="lab-button" href="/tanstack-tanzania">Explore the project ↗</a></div></section></main>
 <footer><p>Open to freelance projects & collaborations</p><a href="mailto:{esc(DATA['email'])}">{esc(DATA['email'])}</a></footer></body></html>'''
 (DIST/'robotics.html').write_text(lab_html,encoding='utf8')
-for asset in ('zenitsu-companion.css', 'zenitsu-companion.js'):
+for asset in ('zenitsu-companion.css', 'zenitsu-companion.js', 'projects-showcase.css'):
     (PERSONAL / asset).write_bytes((ROOT / 'scripts' / asset).read_bytes())
+showcase_projects = [{'slug': p['slug'], 'name': p['name'], 'role': p['role'], 'tags': p['tags'], 'color': p['color'], 'cover': cover(p)} for p in DATA['projects']]
+(PERSONAL / 'projects-showcase.js').write_text((ROOT / 'scripts' / 'projects-showcase.js').read_text(encoding='utf8').replace('__SHOWCASE_PROJECTS__', json.dumps(showcase_projects, ensure_ascii=False)), encoding='utf8')
 for asset in (ROOT / 'scripts' / 'castle').rglob('*'):
     if asset.is_file():
         target = PERSONAL / 'castle' / asset.relative_to(ROOT / 'scripts' / 'castle')

@@ -1,43 +1,21 @@
-# What Zenitsu knows about Isack
+# What Zenitsu knows
 
-Edit this file to change what the site assistant knows. It is the assistant's only
-source of facts. Anything not written here, he will say he doesn't know.
+Edit this file to change what the site assistant knows. It is his only source of facts.
+Anything not written here, he will say he doesn't know.
 
 ## Isack
-- Full name: Isack Madaha Lugata. Goes by Isack Lugata.
-- Full-stack and mobile developer working in applied AI, based in Dar es Salaam, Tanzania.
-- Co-founder, CEO and AI Lead of Ecofy Africa.
-- Studied Computer Science at the University of Dar es Salaam.
-- Former chairperson of the 3D Solutions & Robotics Lab at UDSM CoICT.
-- Spoke at Tanzania AI Forum 2025.
-- Open to freelance projects and collaborations.
-- Works with founders and teams across agriculture, commerce, property and legal technology.
+- Isack Lugata, a full-stack and mobile developer who builds systems for people and businesses. Based in Dar es Salaam, Tanzania.
+- Open to new projects.
 
 ## Contact
 - Email: lugata619@gmail.com
 - WhatsApp: +255749498117
-- Instagram: @zac_eye
 
-## Services
-- Frontend & web apps: responsive websites, product interfaces and web applications, connected to real APIs.
+## What he builds
+- Websites and web apps: responsive websites, product interfaces and web applications.
 - Mobile apps: mobile applications with clear interfaces, reliable APIs and practical everyday workflows.
-- Backend & integrations: Python APIs, authentication, databases, payments, messaging and internal management systems, built with deployment and maintenance in mind.
-- Applied AI: AI assistants, retrieval over documents, document processing and language-model integrations for English and Swahili.
-
-## Projects (page on this site in brackets)
-- Ecofy Africa [/ecofy]: farm planning, activity records and agricultural guidance for Tanzanian farmers. Co-founder, CEO and AI Lead; frontend and backend.
-- Wakili Msomi [/wakili-msomi]: AI-powered legal-information application for the Tanzanian context. Frontend and backend.
-- GloboExpats [/globoexpats]: marketplace for the expat community in Tanzania. Mainly frontend.
-- Habitek [/habitek]: property discovery plus property and hospitality management in Tanzania. Frontend and backend.
-- Osher Market [/osher-market]: commerce and business platform. Backend.
-- Falco Finance [/falco]: internal management system. Backend.
-- TanStack Tanzania [/tanstack-tanzania]: connects tech students with opportunities, learning resources and career support. Backend, as a lab project.
-- 3D Solutions & Robotics Lab and Nena AI (Swahili speech) [/robotics]: lab work at UDSM.
-
-## Pages on this site
-- / : home and selected work
-- /about : Isack's story and the photo gallery
-- /blog/ : Isack's writing
+- Backend systems and integrations: Python APIs, authentication, databases, payments, messaging and internal management systems, built with deployment and maintenance in mind.
+- AI features: AI assistants, search over your documents, document processing and language-model integrations for English and Swahili.
 
 ## Prices
 All prices are starting prices in Tanzanian shillings (TZS). The final price is confirmed in a written quote after discussing scope. Domains, transaction fees, paid tools, taxes and hosting resources are confirmed in that quote.

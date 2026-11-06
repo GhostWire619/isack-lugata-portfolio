@@ -73,122 +73,180 @@
   to { opacity:0; transform:translate(16px,-44px) scale(1.35); }
 }
 
-.zenitsu-menu {
-  position:fixed;
-  z-index:105;
-  right:max(12px,env(safe-area-inset-right));
-  bottom:max(12px,env(safe-area-inset-bottom));
-  color:#f7eada;
-  font:13px/1.4 Inter,system-ui,sans-serif;
+.zenitsu-launcher,.zenitsu-welcome,.zenitsu-chat {
+  --z-surface:#fff; --z-ink:#000; --z-muted:rgba(0,0,0,.6); --z-faint:rgba(0,0,0,.45); --z-line:rgba(0,0,0,.1); --z-fill:rgba(0,0,0,.05); --z-fill-strong:rgba(0,0,0,.09);
+  --z-button:#000; --z-button-ink:#fff; --z-sheen:linear-gradient(rgba(255,255,255,.5),rgba(255,255,255,.1));
+  --z-button-shadow:inset 0 -1px 1px rgba(0,0,0,.4),inset 0 -4px 5px rgba(255,255,255,.3),inset 0 -8px 8px rgba(255,255,255,.2),0 3px 5px -1px rgba(0,0,0,.35),0 6px 10px -1px rgba(0,0,0,.15);
+  --z-card-shadow:0 0 0 1px rgba(0,0,0,.08),0 2px 4px rgba(0,0,0,.05),0 20px 50px -8px rgba(0,0,0,.24);
+  --z-sans:'Inter Display','Inter Display Placeholder',Inter,system-ui,sans-serif;
+  --z-serif:'LT Superior Serif Regular','LT Superior Serif Regular Placeholder',Georgia,serif;
+  --z-spring:cubic-bezier(.2,.9,.25,1.08);
+  color:var(--z-ink); font:400 15px/22px var(--z-sans); letter-spacing:.1px;
 }
-.zenitsu-menu button { font:inherit; color:inherit; cursor:pointer; }
-.zenitsu-menu :focus-visible { outline:2px solid #f6ba71; outline-offset:3px; }
-.zenitsu-menu-toggle {
-  display:grid;
-  place-items:center;
-  width:40px;
-  height:40px;
-  padding:0;
-  border:1px solid #eaba7e80;
-  border-radius:50%;
-  background:#201711;
-  color:#f6ba71 !important;
-  box-shadow:0 4px 14px #130b0780;
-  transition:border-color .2s,transform .2s;
+[data-tone="dark"].zenitsu-launcher,[data-tone="dark"].zenitsu-welcome,[data-tone="dark"].zenitsu-chat {
+  --z-surface:#0b0b0b; --z-ink:#fff; --z-muted:rgba(255,255,255,.64); --z-faint:rgba(255,255,255,.48); --z-line:rgba(255,255,255,.13); --z-fill:rgba(255,255,255,.07); --z-fill-strong:rgba(255,255,255,.13);
+  --z-button:#c2c2c2; --z-button-ink:#000; --z-sheen:linear-gradient(#fff,rgba(255,255,255,.15));
+  --z-button-shadow:inset 0 -1px 2px rgba(0,0,0,.4),inset 0 -4px 4px rgba(255,255,255,.6),inset 0 -8px 8px rgba(255,255,255,.5),0 3px 5px -1px rgba(255,255,255,.3),0 6px 10px -1px rgba(255,255,255,.12);
+  --z-card-shadow:0 0 0 1px rgba(255,255,255,.14),0 24px 60px -10px #000;
 }
-.zenitsu-menu-toggle:hover,.zenitsu-menu-toggle[aria-expanded="true"] { border-color:#ffd390; transform:translateY(-2px); }
-.zenitsu-menu-panel {
-  position:absolute;
-  right:0;
-  bottom:calc(100% + 8px);
-  width:min(250px,calc(100vw - 24px));
-  padding:10px;
-  border:1px solid #795235;
-  border-radius:12px;
-  background:#1a130f;
-  box-shadow:0 12px 40px #160b06a3;
-}
-.zenitsu-open-chat {
-  width:100%; min-height:38px; margin-bottom:6px; border:0; border-radius:8px; background:#a63d1b; color:#fff4e2;
-  box-shadow:inset 0 -1px 2px #00000066,inset 0 -4px 4px #ffbe6e50,inset 0 -8px 8px #ffaa5038;
-}
-.zenitsu-open-chat:hover { background:#bd4820; }
-.zenitsu-visibility {
-  width:100%;
-  min-height:38px;
-  border:1px solid #ad7d545e;
-  border-radius:6px;
-  background:#2c211a;
-  transition:background-color .18s;
-}
-.zenitsu-visibility:hover { background:#513422; }
-.zenitsu-menu-panel p { margin:8px 2px 0; font-size:11px; color:#dfbfa4; }
-.zenitsu-menu-panel a { color:inherit; text-decoration:underline; }
-@media (prefers-reduced-motion:reduce) {
-  .zenitsu-menu button { transition:none; }
-}
+.zenitsu-launcher *,.zenitsu-welcome *,.zenitsu-chat * { box-sizing:border-box; }
+.zenitsu-launcher button,.zenitsu-welcome button,.zenitsu-chat button { font:inherit; letter-spacing:inherit; color:inherit; cursor:pointer; }
+.zenitsu-launcher :focus-visible,.zenitsu-welcome :focus-visible,.zenitsu-chat :focus-visible { outline:2px solid var(--z-ink); outline-offset:2px; }
 
-.zenitsu-bubble {
-  position:absolute; left:0; top:0; width:max-content; max-width:min(250px,calc(100vw - 24px)); padding:8px 11px;
-  border:1px solid #eaba7e; border-radius:11px; background:#201711; color:#fff1dc; cursor:pointer; pointer-events:auto;
-  font:13.5px/1.35 'Inter Display',Inter,system-ui,sans-serif; text-align:left; box-shadow:0 6px 18px #0009;
-  animation:zenitsu-bubble-in .32s cubic-bezier(.2,.8,.2,1.2) both;
+/* Launcher: his face on the site's button, with a label beneath it. */
+.zenitsu-launcher {
+  position:fixed; z-index:105; right:max(14px,env(safe-area-inset-right)); bottom:max(10px,env(safe-area-inset-bottom));
 }
-.zenitsu-bubble[hidden] { display:none; }
-.zenitsu-bubble:hover { background:#34221a; }
-.zenitsu-bubble:focus-visible { outline:2px solid #f6ba71; outline-offset:2px; }
-@keyframes zenitsu-bubble-in { from { opacity:0; scale:.85; } }
+.zenitsu-launcher[data-keyboard] { display:none; }
+.zenitsu-launcher-button {
+  display:grid; justify-items:center; padding:0; border:0; background:none; -webkit-tap-highlight-color:transparent;
+}
+.zenitsu-disc {
+  position:relative; display:block; width:54px; height:54px; overflow:hidden; border-radius:50%;
+  background-color:var(--z-button); box-shadow:var(--z-button-shadow);
+  transition:transform .28s var(--z-spring);
+}
+.zenitsu-disc::before {
+  content:""; position:absolute; z-index:0; top:1px; left:12%; right:12%; height:46%; border-radius:50%; background:var(--z-sheen); opacity:.5;
+}
+.zenitsu-disc img { position:absolute; z-index:1; left:0; top:0; display:block; width:100%; height:100%; transform:translateY(5%) scale(1.14); }
+.zenitsu-launcher-label {
+  position:relative; z-index:1; margin-top:-6px; padding:1px 8px; border-radius:7px; background-color:var(--z-button); color:var(--z-button-ink);
+  font-size:11.5px; line-height:17px; white-space:nowrap; box-shadow:0 0 0 2px var(--z-surface),inset 0 -2px 3px rgba(127,127,127,.35);
+}
+.zenitsu-launcher-button:hover .zenitsu-disc { transform:translateY(-2px) scale(1.04); }
+.zenitsu-launcher-button:active .zenitsu-disc { transform:scale(.96); }
 
+/* Shared controls */
+.zenitsu-icon-button {
+  display:grid; place-items:center; flex:none; width:30px; height:30px; padding:0; border:0; border-radius:8px; background:none; color:var(--z-muted) !important;
+  transition:background-color .15s,color .15s;
+}
+.zenitsu-icon-button:hover,.zenitsu-icon-button[aria-expanded="true"] { background:var(--z-fill); color:var(--z-ink) !important; }
+.zenitsu-button {
+  position:relative; height:36px; padding:0 14px; border:0; border-radius:9px; background-color:var(--z-button); color:var(--z-button-ink) !important;
+  font-size:14px !important; line-height:20px !important; box-shadow:var(--z-button-shadow); isolation:isolate; transition:transform .15s;
+}
+.zenitsu-button::before {
+  content:""; position:absolute; z-index:-1; top:1px; left:2px; right:2px; height:48%; border-radius:7px; background:var(--z-sheen); opacity:.55; pointer-events:none;
+}
+.zenitsu-button:hover { transform:translateY(-1px); }
+.zenitsu-button:active { transform:scale(.98); }
+.zenitsu-button-quiet {
+  height:36px; padding:0 12px; border:0; border-radius:9px; background:none; color:var(--z-muted) !important; font-size:14px !important; line-height:20px !important;
+  transition:background-color .15s,color .15s;
+}
+.zenitsu-button-quiet:hover { background:var(--z-fill); color:var(--z-ink) !important; }
+
+/* Welcome: center stage. He strikes down onto this card, greets, then runs off. */
+.zenitsu-stage {
+  position:fixed; z-index:102; inset:0; pointer-events:none; animation:zenitsu-stage-in .5s ease both;
+  background:radial-gradient(ellipse 72% 62% at 50% 72%,rgba(255,255,255,.96) 0,rgba(255,255,255,.72) 42%,rgba(255,255,255,0) 100%);
+}
+.zenitsu-stage[data-tone="dark"] { background:radial-gradient(ellipse 72% 62% at 50% 72%,rgba(0,0,0,.92) 0,rgba(0,0,0,.66) 42%,rgba(0,0,0,0) 100%); }
+.zenitsu-stage[hidden] { display:none; }
+@keyframes zenitsu-stage-in { from { opacity:0; } }
+.zenitsu-welcome {
+  position:fixed; z-index:103; left:50%; bottom:max(13vh,104px); width:min(452px,calc(100vw - 28px)); margin-left:calc(min(452px,calc(100vw - 28px)) / -2);
+  padding:22px 24px 18px; border-radius:20px; background:var(--z-surface); box-shadow:var(--z-card-shadow); text-align:center;
+  transform-origin:50% 0; animation:zenitsu-welcome-pop .5s .1s var(--z-spring) both;
+}
+.zenitsu-welcome[hidden] { display:none; }
+/* The little notch that makes it his speech card. */
+.zenitsu-welcome::before {
+  content:""; position:absolute; left:50%; top:-7px; width:14px; height:14px; margin-left:-7px; border-radius:3px 0 0 0; background:inherit; transform:rotate(45deg);
+  box-shadow:-1px -1px 0 rgba(127,127,127,.18);
+}
+.zenitsu-welcome-title { margin:0 0 7px; font:400 clamp(30px,5vw,38px)/1.1 var(--z-serif); letter-spacing:-1.3px; }
+.zenitsu-welcome-title > span { display:inline-block; overflow:hidden; padding-bottom:.08em; vertical-align:top; }
+.zenitsu-welcome-title > span > span { display:inline-block; animation:zenitsu-word .7s cubic-bezier(.16,.8,.24,1) both; animation-delay:calc(var(--i) * 70ms + .3s); }
+@keyframes zenitsu-word { from { transform:translateY(110%); } }
+.zenitsu-welcome p { margin:0 auto 16px; max-width:360px; color:var(--z-muted); font-size:15px; line-height:22px; }
+.zenitsu-welcome-close { position:absolute; top:10px; right:10px; }
+.zenitsu-welcome-actions { display:flex; align-items:center; justify-content:center; gap:6px; }
+@keyframes zenitsu-welcome-pop { from { opacity:0; transform:translateY(26px) scale(.9); } }
+
+/* Chat */
 .zenitsu-chat {
-  position:fixed; z-index:103; right:max(12px,env(safe-area-inset-right)); bottom:max(62px,calc(env(safe-area-inset-bottom) + 62px));
-  display:flex; flex-direction:column; width:min(360px,calc(100vw - 24px)); height:min(500px,calc(100dvh - 210px));
-  border:1px solid #795235; border-radius:14px; background:#1a130f; color:#f7eada; box-shadow:0 14px 42px #0b0503b8;
-  font:14px/1.42 'Inter Display',Inter,system-ui,sans-serif; animation:zenitsu-chat-in .24s cubic-bezier(.2,.7,.2,1) both;
+  position:fixed; z-index:103; right:max(14px,env(safe-area-inset-right)); bottom:calc(max(10px,env(safe-area-inset-bottom)) + 84px);
+  display:flex; flex-direction:column; width:min(376px,calc(100vw - 28px)); height:min(560px,calc(var(--zen-viewport,100dvh) - 264px)); min-height:280px; /* leaves room for the site nav and Zenitsu standing on top */
+  border-radius:18px; background:var(--z-surface); box-shadow:var(--z-card-shadow);
+  transform-origin:calc(100% - 27px) calc(100% + 40px); animation:zenitsu-pop .34s var(--z-spring) both;
 }
 .zenitsu-chat[hidden] { display:none; }
-@keyframes zenitsu-chat-in { from { opacity:0; transform:translateY(10px) scale(.98); } }
-.zenitsu-chat-head { display:flex; align-items:baseline; gap:8px; padding:10px 10px 9px 14px; border-bottom:1px solid #4c3322; }
-.zenitsu-chat-head strong { font:400 21px/1.1 'LT Superior Serif Regular',Georgia,serif; letter-spacing:-.02em; }
-.zenitsu-chat-head span { color:#dfbfa4; font-size:12px; }
-.zenitsu-chat-close {
-  align-self:center; margin-left:auto; width:30px; height:30px; padding:0; border:1px solid #a981614f; border-radius:7px;
-  background:#ffffff0a; color:inherit; font-size:18px; line-height:1; cursor:pointer;
-}
-.zenitsu-chat-close:hover { background:#ffffff1a; }
-.zenitsu-chat-log { flex:1; min-height:0; overflow-y:auto; overscroll-behavior:contain; padding:12px 12px 4px; outline:0; }
-.zenitsu-msg { display:flex; flex-direction:column; align-items:flex-start; margin-bottom:9px; }
-.zenitsu-msg p { margin:0; max-width:88%; padding:8px 11px; border-radius:12px 12px 12px 3px; background:#2c211a; white-space:pre-wrap; overflow-wrap:anywhere; }
-.zenitsu-msg-user { align-items:flex-end; }
-.zenitsu-msg-user p { border-radius:12px 12px 3px 12px; background:#a63d1b; color:#fff4e2; }
-.zenitsu-typing p { color:#dfbfa4; font-style:italic; animation:zenitsu-pulse 1.1s ease-in-out infinite; }
-@keyframes zenitsu-pulse { 50% { opacity:.5; } }
-.zenitsu-msg-actions { display:flex; flex-wrap:wrap; gap:5px; margin-top:5px; }
-.zenitsu-msg-actions a {
-  padding:4px 9px; border:1px solid #ad7d54; border-radius:7px; color:#ffdcb0; font-size:12.5px; text-decoration:none;
-}
-.zenitsu-msg-actions a:hover { background:#513422; }
-.zenitsu-chat-chips { display:flex; flex-wrap:wrap; gap:5px; padding:2px 12px 8px; }
-.zenitsu-chat-chips:empty { display:none; }
-.zenitsu-chat-chips button {
-  padding:5px 9px; border:1px solid #ad7d545e; border-radius:999px; background:#2c211a; color:inherit; font:inherit; font-size:12.5px; cursor:pointer;
-}
-.zenitsu-chat-chips button:hover { background:#513422; }
-.zenitsu-chat-form { display:flex; gap:6px; padding:8px 10px 6px; border-top:1px solid #4c3322; }
-.zenitsu-chat-form input {
-  flex:1; min-width:0; height:38px; padding:0 11px; border:1px solid #795235; border-radius:9px; background:#120c09; color:inherit;
-  font:16px 'Inter Display',Inter,system-ui,sans-serif;  /* 16px stops iOS zooming the page on focus */
-}
-.zenitsu-chat-form input::placeholder { color:#b39880; font-size:13.5px; }
-.zenitsu-chat-form button {
-  width:38px; height:38px; padding:0; border:0; border-radius:9px; background:#a63d1b; color:#fff4e2; cursor:pointer;
-  box-shadow:inset 0 -1px 2px #00000066,inset 0 -4px 4px #ffbe6e50;
-}
-.zenitsu-chat-form button:hover:enabled { background:#bd4820; }
-.zenitsu-chat-form button:disabled { opacity:.5; cursor:default; }
-.zenitsu-chat :focus-visible { outline:2px solid #f6ba71; outline-offset:2px; }
+.zenitsu-chat[data-keyboard] { bottom:calc(var(--zen-keyboard) + 8px); height:min(560px,calc(var(--zen-viewport) - 16px)); min-height:0; }
+.zenitsu-chat-head { display:flex; align-items:center; gap:10px; padding:11px 10px 11px 13px; border-bottom:1px solid var(--z-line); }
+.zenitsu-disc-small { flex:none; width:34px; height:34px; }
+.zenitsu-chat-title { display:grid; flex:1; min-width:0; }
+.zenitsu-chat-title strong { font:400 19px/22px var(--z-serif); letter-spacing:-.4px; }
+.zenitsu-chat-title span { color:var(--z-muted); font-size:12px; line-height:16px; }
+.zenitsu-options { padding:10px 13px 12px; border-bottom:1px solid var(--z-line); background:var(--z-fill); }
+.zenitsu-options[hidden] { display:none; }
+.zenitsu-options button { display:block; width:100%; padding:7px 0; border:0; background:none; font-size:14px; text-align:left; text-decoration:underline; text-underline-offset:3px; text-decoration-color:var(--z-line); }
+.zenitsu-options button:hover { text-decoration-color:currentColor; }
+.zenitsu-options p { margin:4px 0 0; color:var(--z-muted); font-size:11.5px; line-height:16px; }
+.zenitsu-options a { color:inherit; }
+
+.zenitsu-chat-log { flex:1; min-height:0; overflow-y:auto; overscroll-behavior:contain; padding:16px 16px 6px; outline:0; scrollbar-width:thin; scrollbar-color:var(--z-line) transparent; }
 .zenitsu-chat-log:focus-visible { outline:0; }
-.zenitsu-chat-note { margin:0; padding:0 12px 9px; color:#b39880; font-size:10.5px; line-height:1.35; }
-.in-castle .zenitsu-chat,.in-castle .zenitsu-bubble { visibility:hidden; }
+.zenitsu-intro h2 { margin:0 0 6px; font:400 30px/34px var(--z-serif); letter-spacing:-1px; }
+.zenitsu-intro p { margin:0 0 14px; color:var(--z-muted); }
+.zenitsu-suggestions { display:grid; margin-bottom:8px; border-top:1px solid var(--z-line); }
+.zenitsu-suggestions button {
+  display:flex; align-items:center; justify-content:space-between; gap:10px; min-height:44px; padding:8px 2px; border:0; border-bottom:1px solid var(--z-line); background:none; text-align:left;
+  transition:padding-left .2s cubic-bezier(.2,.7,.2,1);
+}
+.zenitsu-suggestions svg { flex:none; color:var(--z-faint); transition:color .15s,transform .2s; }
+.zenitsu-suggestions button:hover { padding-left:6px; }
+.zenitsu-suggestions button:hover svg { color:var(--z-ink); transform:translate(1px,-1px); }
+
+.zenitsu-msg { margin-bottom:14px; animation:zenitsu-rise .26s cubic-bezier(.2,.7,.2,1) both; }
+.zenitsu-msg p { margin:0; white-space:pre-wrap; overflow-wrap:anywhere; }
+.zenitsu-msg-user { display:flex; flex-direction:column; align-items:flex-end; }
+.zenitsu-msg-user p { max-width:86%; padding:7px 12px; border-radius:14px; background:var(--z-fill-strong); }
+.zenitsu-msg-failed p { opacity:.55; }
+@keyframes zenitsu-rise { from { opacity:0; transform:translateY(6px); } }
+.zenitsu-msg-actions { display:flex; flex-wrap:wrap; gap:6px; margin-top:9px; }
+.zenitsu-msg-actions a,.zenitsu-msg-actions button {
+  display:inline-flex; align-items:center; height:30px; padding:0 10px; border:0; border-radius:8px; background:none; box-shadow:inset 0 0 0 1px var(--z-line); color:var(--z-ink);
+  font-size:13px; line-height:18px; text-decoration:none; transition:background-color .15s;
+}
+.zenitsu-msg-actions a:hover,.zenitsu-msg-actions button:hover { background:var(--z-fill); }
+.zenitsu-typing { display:flex; gap:4px; height:22px; align-items:center; }
+.zenitsu-typing span { width:6px; height:6px; border-radius:50%; background:var(--z-faint); animation:zenitsu-dot 1.2s ease-in-out infinite; }
+.zenitsu-typing span:nth-child(2) { animation-delay:.15s; }
+.zenitsu-typing span:nth-child(3) { animation-delay:.3s; }
+@keyframes zenitsu-dot { 0%,60%,100% { transform:none; opacity:.5; } 30% { transform:translateY(-3px); opacity:1; } }
+
+.zenitsu-chat-form {
+  display:flex; align-items:center; gap:6px; margin:6px 12px 0; padding:5px 5px 5px 13px; border-radius:13px; box-shadow:inset 0 0 0 1px var(--z-line); transition:box-shadow .15s;
+}
+.zenitsu-chat-form:focus-within { box-shadow:inset 0 0 0 1px var(--z-ink); }
+.zenitsu-chat-form input {
+  flex:1; min-width:0; height:34px; padding:0; border:0; outline:0; background:none; color:var(--z-ink);
+  font:400 16px/22px var(--z-sans); /* 16px stops iOS zooming the page on focus */
+}
+.zenitsu-chat-form input:focus-visible { outline:0; } /* the composer around it shows focus */
+.zenitsu-chat-form input::placeholder { color:var(--z-faint); font-size:14px; }
+.zenitsu-send {
+  position:relative; display:grid; place-items:center; flex:none; width:34px; height:34px; padding:0; border:0; border-radius:10px; background-color:var(--z-button); color:var(--z-button-ink) !important; box-shadow:var(--z-button-shadow); isolation:isolate;
+  transition:transform .15s,opacity .15s;
+}
+.zenitsu-send::before { content:""; position:absolute; z-index:-1; top:1px; left:2px; right:2px; height:46%; border-radius:8px; background:var(--z-sheen); opacity:.55; }
+.zenitsu-send:hover:enabled { transform:translateY(-1px); }
+.zenitsu-send:disabled { opacity:.4; cursor:default; }
+.zenitsu-chat-note { margin:0; padding:7px 14px 10px; color:var(--z-faint); font-size:11px; line-height:15px; text-align:center; }
+
+.in-castle .zenitsu-chat,.in-castle .zenitsu-welcome,.in-castle .zenitsu-launcher { visibility:hidden; }
+
+@media (max-width:700px) {
+  .zenitsu-disc:not(.zenitsu-disc-small) { width:48px; height:48px; }
+  .zenitsu-chat { right:14px; left:14px; width:auto; bottom:calc(max(10px,env(safe-area-inset-bottom)) + 76px); }
+  .zenitsu-welcome { bottom:calc(max(10px,env(safe-area-inset-bottom)) + 82px); padding:18px 18px 15px; }
+  .zenitsu-chat { height:min(560px,calc(var(--zen-viewport,100dvh) - 226px)); }
+  .zenitsu-chat[data-keyboard] { left:8px; right:8px; }
+}
 @media (prefers-reduced-motion:reduce) {
-  .zenitsu-bubble,.zenitsu-chat,.zenitsu-typing p { animation:none; }
+  .zenitsu-stage,.zenitsu-welcome,.zenitsu-welcome-title > span > span,.zenitsu-chat,.zenitsu-msg,.zenitsu-typing span { animation:none; }
+  .zenitsu-disc,.zenitsu-button,.zenitsu-suggestions button { transition:none; }
 }

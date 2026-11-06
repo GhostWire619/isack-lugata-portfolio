@@ -56,29 +56,18 @@ class AssistantTests(TestCase):
         self.assertIn('TSh 500,000', sent[0]['content'])
         self.assertEqual(sent[1:], self.user())
 
-    def test_only_known_pages_become_links(self):
-        raw = 'See this! [[go:/ecofy]] [[go:https://evil.example]] [[go:/admin/]] **bold** [[other]]'
+    def test_model_markup_never_reaches_visitors(self):
+        raw = 'He can build that! **Really** [[go:/ecofy]] [/about] [[anything]]'
         with mock.patch.object(assistant, '_ask', return_value=raw):
             data = self.post(self.user()).json()
-        self.assertEqual(data['links'], ['/ecofy'])
-        self.assertEqual(data['reply'], 'See this! bold')
+        self.assertEqual(data, {'reply': 'He can build that! Really'})
 
-    def test_tag_variants_and_dangling_sentence(self):
-        for raw in (
-            'Ecofy helps farmers. You can learn more at [[go:/ecofy]].',
-            'Ecofy helps farmers. You can learn more at [[/ecofy]].',
-            'Ecofy helps farmers. You can learn more at [/ecofy].',
-        ):
-            with self.subTest(raw=raw), mock.patch.object(assistant, '_ask', return_value=raw):
-                cache.clear()
-                data = self.post(self.user()).json()
-                self.assertEqual(data['links'], ['/ecofy'])
-                self.assertEqual(data['reply'], 'Ecofy helps farmers.')
-
-    def test_normal_sentences_are_left_alone(self):
-        raw = 'He works at Ecofy Africa and looks at each problem closely. Ask him!'
-        with mock.patch.object(assistant, '_ask', return_value=raw):
-            self.assertEqual(self.post(self.user()).json()['reply'], raw)
+    def test_knowledge_is_only_about_getting_work_done(self):
+        knowledge = assistant._knowledge()
+        for term in ('Ecofy', 'agriculture', 'Wakili', 'Habitek', 'Robotics', '/ecofy'):
+            self.assertNotIn(term, knowledge)
+        for term in ('TSh 500,000', 'lugata619@gmail.com', 'Mobile apps'):
+            self.assertIn(term, knowledge)
 
     def test_rate_limit_per_visitor(self):
         with mock.patch.object(assistant, '_ask', return_value='Hi!') as ask:
