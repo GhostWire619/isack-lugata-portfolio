@@ -1,0 +1,198 @@
+.castle {
+  --ink:#fff1dc; --gold:#ecb878; --ember:#d9622b; --lacquer:#34110a;
+  position:fixed; inset:0; z-index:200; overflow:hidden; color:var(--ink);
+  font:15px/1.5 "Inter Display",Inter,system-ui,sans-serif;
+  background:transparent;
+}
+.castle *, .castle *::before, .castle *::after { box-sizing:border-box; }
+.castle-world { position:absolute; inset:0; background:#050302; }
+.castle-canvas { display:block; width:100%; height:100%; }
+.castle-scroll {
+  position:absolute; inset:0; overflow-x:hidden; overflow-y:hidden; overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch; scrollbar-width:none; outline:0; touch-action:pan-y;
+}
+.castle-scroll::-webkit-scrollbar { display:none; }
+.castle-spacer { width:1px; }
+.castle-ui { position:absolute; inset:0; pointer-events:none; }
+.castle-ui[hidden] { display:none; }
+.castle-ui button,.castle-ui a { pointer-events:auto; }
+
+/* Same build as the site's buttons, in vermilion lacquer. */
+.castle-button {
+  position:relative; display:inline-flex; align-items:center; justify-content:center; height:36px; padding:0 13px;
+  border:0; border-radius:9px; background-color:#a63d1b; color:#fff4e2; cursor:pointer;
+  font:400 14px/20px "Inter Display",Inter,system-ui,sans-serif; letter-spacing:.1px; white-space:nowrap;
+  box-shadow:inset 0 -1px 2px #00000066,inset 0 -4px 4px #ffbe6e50,inset 0 -8px 8px #ffaa5038,0 3px 5px -1px #ff963c4d,0 6px 10px -1px #ff822826;
+  transition:background-color .18s,transform .18s,opacity .2s;
+}
+.castle-button::before {
+  content:""; position:absolute; top:1px; left:2px; right:2px; height:50%; border-radius:7px; pointer-events:none;
+  background:linear-gradient(#ffdcaacc 0%,#ffdcaa12 100%);
+}
+.castle-button:hover { background-color:#c04a20; }
+.castle-button:active { transform:scale(.97); }
+.castle-button:disabled { opacity:.4; cursor:default; }
+.castle-button[data-off] { opacity:0; pointer-events:none !important; }
+.castle-button:focus-visible,.castle-tick:focus-visible { outline:2px solid #ffe2ab; outline-offset:3px; }
+
+.castle-topbar {
+  position:absolute; top:max(16px,env(safe-area-inset-top)); left:clamp(16px,3vw,36px); right:clamp(16px,3vw,36px);
+  display:flex; justify-content:space-between; align-items:center; gap:12px;
+}
+.castle-actions { display:flex; gap:8px; margin-left:auto; }
+.castle-room {
+  display:flex; align-items:center; gap:10px; margin:0; opacity:0; transform:translateY(-6px);
+  transition:opacity .35s,transform .45s cubic-bezier(.2,.7,.2,1);
+  font-size:13px; font-variant-numeric:tabular-nums; color:var(--gold); text-shadow:0 1px 8px #000;
+}
+.castle-room.is-shown { opacity:1; transform:none; }
+.castle-room-numeral { font:400 24px/1 "Yu Mincho","Hiragino Mincho ProN","Noto Serif CJK JP",serif; color:#fff1dc; }
+
+.castle-caption {
+  position:absolute; left:clamp(16px,3vw,36px); bottom:max(22px,env(safe-area-inset-bottom));
+  width:min(330px,calc(100% - 120px)); margin:0; opacity:0; pointer-events:none;
+  transform:translateY(10px); transition:opacity .28s,transform .5s cubic-bezier(.2,.7,.2,1);
+}
+.castle-caption.is-shown { opacity:1; transform:none; }
+.castle-count {
+  display:flex; align-items:baseline; gap:8px; margin:0 0 5px; font-variant-numeric:tabular-nums;
+  text-shadow:0 2px 14px #000;
+}
+.castle-count-now { font:400 44px/1 "LT Superior Serif Regular",Georgia,serif; letter-spacing:-.03em; }
+.castle-count-all { color:var(--gold); font-size:13px; }
+.castle-alt { margin:0; font-size:14px; line-height:1.42; color:#fff1dc; text-shadow:0 1px 3px #000,0 2px 16px #000; }
+.castle-word { display:inline-block; overflow:hidden; vertical-align:top; }
+.castle-word > span { display:inline-block; transform:translateY(105%); }
+.castle-caption.is-shown .castle-word > span {
+  transform:none; transition:transform .55s cubic-bezier(.16,.8,.24,1); transition-delay:calc(var(--i) * 22ms + 90ms);
+}
+
+.castle-rail {
+  --progress:0; position:absolute; right:clamp(10px,1.6vw,22px); top:50%; translate:0 -50%;
+  display:flex; flex-direction:column; align-items:flex-end;
+}
+.castle-rail::before {
+  content:""; position:absolute; right:0; top:4px; bottom:4px; width:1px; background:#ffe2ab2e;
+}
+.castle-rail::after {
+  content:""; position:absolute; right:0; top:4px; bottom:4px; width:1px; background:var(--gold);
+  transform-origin:top; transform:scaleY(var(--progress)); box-shadow:0 0 8px #ffbf6a;
+}
+.castle-tick {
+  position:relative; display:block; width:26px; height:clamp(13px,2.5vh,22px); padding:0; border:0; background:none; cursor:pointer;
+}
+.castle-tick::after {
+  content:""; position:absolute; right:0; top:50%; height:1px; width:7px; background:#ffe2ab80;
+  transition:width .3s cubic-bezier(.2,.7,.2,1),background-color .2s;
+}
+.castle-tick:hover::after { width:17px; background:#fff; }
+.castle-tick[data-active]::after { width:22px; background:#fff; box-shadow:0 0 8px #ffcf8a; }
+
+.castle-nav { position:absolute; right:clamp(16px,3vw,36px); bottom:max(22px,env(safe-area-inset-bottom)); display:flex; gap:7px; }
+.castle-prev,.castle-next { width:36px; padding:0; }
+
+.castle-hint {
+  position:absolute; left:50%; bottom:max(22px,env(safe-area-inset-bottom)); margin:0; transform:translateX(-50%);
+  display:grid; justify-items:center; gap:7px; opacity:0; transition:opacity .4s; font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--gold);
+  text-shadow:0 1px 8px #000;
+}
+.castle-hint.is-shown { opacity:1; }
+.castle-hint i { position:relative; display:block; width:1px; height:34px; overflow:hidden; background:#ffe2ab33; }
+.castle-hint i::after { content:""; position:absolute; inset:0; background:#fff0cf; animation:castle-hint 1.5s cubic-bezier(.6,0,.3,1) infinite; }
+@keyframes castle-hint { 0% { transform:translateY(-100%); } 60%,100% { transform:translateY(100%); } }
+
+.castle-title {
+  position:absolute; left:50%; top:25%; transform:translate(-50%,-50%); display:grid; justify-items:center; gap:6px;
+  opacity:0; transition:opacity .9s;
+}
+.castle-title::before {
+  content:""; position:absolute; inset:-55% -30%; z-index:-1; pointer-events:none;
+  background:radial-gradient(closest-side,#080302d9,#08030200);
+}
+.castle-title.is-shown { opacity:1; }
+/* The mask needs room below the baseline or the y loses its tail. */
+.castle-title-line { display:flex; overflow:hidden; padding:0 .06em .22em; font:400 clamp(58px,12.5vw,178px)/1.05 "LT Superior Serif Regular",Georgia,serif; letter-spacing:-.03em; }
+/* Controls wait until he's landed; only Close and Skip exist during the fall. */
+.castle:not(.is-ready) .castle-nav,.castle:not(.is-ready) .castle-rail,.castle:not(.is-ready) .castle-sound,.castle:not(.is-ready) .castle-caption,.castle:not(.is-ready) .castle-room { visibility:hidden; }
+.castle-nav,.castle-rail { animation:none; }
+.castle.is-ready .castle-nav,.castle.is-ready .castle-rail { animation:castle-appear .7s .1s ease-out both; }
+@keyframes castle-appear { from { opacity:0; } }
+.castle-title-line > span { display:block; transform:translateY(105%) rotate(7deg); transform-origin:left bottom; }
+.castle-title.is-shown .castle-title-line > span { transform:none; transition:transform .85s cubic-bezier(.14,.82,.2,1); transition-delay:calc(var(--i) * 42ms); }
+.castle-title-sub { color:var(--gold); letter-spacing:.16em; text-transform:uppercase; font-size:13px; }
+
+.castle-roomcard {
+  position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); display:grid; justify-items:center; gap:2px; opacity:0;
+  text-shadow:0 0 30px #ff9d4a,0 4px 40px #000;
+}
+.castle-roomcard-numeral { font:400 clamp(90px,17vw,210px)/1 "Yu Mincho","Hiragino Mincho ProN","Noto Serif CJK JP",serif; }
+.castle-roomcard-label { color:#ffdca8; letter-spacing:.2em; text-transform:uppercase; font-size:14px; }
+
+.castle-end {
+  position:absolute; left:50%; bottom:clamp(18px,7vh,70px); transform:translateX(-50%); display:grid; justify-items:center; gap:10px;
+  animation:castle-rise .6s cubic-bezier(.16,.8,.24,1) both;
+}
+.castle-end[hidden] { display:none; }
+.castle-end p { margin:0; white-space:nowrap; font:400 20px/1.2 "LT Superior Serif Regular",Georgia,serif; text-shadow:0 2px 14px #000; }
+@keyframes castle-rise { from { opacity:0; transform:translate(-50%,12px); } }
+
+.castle-skip { position:absolute; left:50%; bottom:max(22px,env(safe-area-inset-bottom)); transform:translateX(-50%); }
+.castle-skip:active { transform:translateX(-50%) scale(.97); }
+.castle-skip[hidden] { display:none; }
+
+.castle-cut { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; overflow:visible; }
+.castle-cut polyline { fill:none; stroke-linejoin:round; stroke-linecap:round; opacity:0; }
+.castle-cut-glow { stroke:#ffbe52; stroke-width:16; filter:blur(5px); }
+.castle-cut-core { stroke:#fffbe6; stroke-width:3; }
+.castle-cut line { stroke:#ffdb9a; stroke-width:2; filter:drop-shadow(0 0 7px #ff9a3d); }
+.castle-flash { position:absolute; inset:0; background:#fff4d2; opacity:0; pointer-events:none; }
+.castle-pagehero { position:absolute; left:0; top:0; background-repeat:no-repeat; pointer-events:none; will-change:transform; }
+
+/* The pet steps out of the page while its 3D self is in the castle. */
+.in-castle .zenitsu-pet,.in-castle .zenitsu-menu { visibility:hidden; }
+
+@media (max-width:700px) {
+  .castle-caption { width:calc(100% - 150px); }
+  .castle-count-now { font-size:34px; }
+  .castle-alt { font-size:13px; }
+  .castle-nav .castle-enlarge { display:none; }
+  .castle-rail { top:max(66px,calc(env(safe-area-inset-top) + 60px)); translate:none; }
+  .castle-tick { height:11px; width:18px; }
+  .castle-tick[data-active]::after { width:15px; }
+}
+
+.castle-plain { overflow-y:auto; background:#0c0605; padding:clamp(20px,4vw,48px); }
+.castle-plain .castle-close { position:fixed; top:16px; right:16px; z-index:1; }
+.castle-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(min(100%,280px),1fr)); gap:clamp(16px,2vw,26px); padding-top:40px; }
+.castle-grid figure { margin:0; }
+.castle-grid img { display:block; width:100%; height:auto; border:1px solid #6b4326; }
+.castle-grid figcaption { margin-top:7px; font-size:13px; color:#ecd8bd; }
+
+/* Same actions as clicking a frame; appear only for keyboard users. */
+.castle-picks { position:absolute; left:50%; top:max(64px,calc(env(safe-area-inset-top) + 60px)); translate:-50% 0; display:flex; gap:6px; }
+.castle-pick {
+  position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); padding:0; border:0;
+  background:#a63d1b; color:#fff4e2; border-radius:8px; font:13px/1 "Inter Display",Inter,sans-serif; white-space:nowrap;
+}
+.castle-pick:focus-visible { position:static; width:auto; height:32px; padding:0 11px; overflow:visible; clip-path:none; outline:2px solid #ffe2ab; outline-offset:2px; }
+.castle-tip {
+  position:absolute; left:50%; bottom:calc(max(22px,env(safe-area-inset-bottom)) + 62px); translate:-50% 0; margin:0;
+  padding:5px 11px; border-radius:7px; background:#160a06c4; color:#ffe7c4; font-size:12.5px; white-space:nowrap; opacity:0; transition:opacity .35s;
+}
+.castle-tip.is-shown { opacity:1; }
+.castle:not(.is-ready) .castle-tip,.castle:not(.is-ready) .castle-picks { visibility:hidden; }
+@media (max-width:700px) {
+  /* The tip already explains the gestures; the Scroll cue would sit on the caption. */
+  .castle-hint { display:none; }
+  .castle-tip { bottom:auto; top:max(64px,calc(env(safe-area-inset-top) + 60px)); }
+}
+
+.castle-z {
+  position:absolute; pointer-events:none; color:#fff1dc; font:italic 700 19px/1 Georgia,serif; text-shadow:0 1px 6px #000c;
+  animation:castle-z 1.7s ease-out both;
+}
+@keyframes castle-z {
+  from { opacity:0; transform:translate(0,0) scale(.6); }
+  22% { opacity:1; }
+  to { opacity:0; transform:translate(var(--drift,18px),-62px) scale(1.5); }
+}

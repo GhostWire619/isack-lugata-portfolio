@@ -3,7 +3,7 @@
 The immutable capture commit is the input, so this is safe to run repeatedly.
 Motion components, font files, layout rules and responsive variants are retained.
 """
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from collections import OrderedDict
 import copy
 import html
@@ -13,6 +13,7 @@ import subprocess
 import urllib.parse
 import urllib.request
 from bs4 import BeautifulSoup
+from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[1]
 BASE = 'd644207659b68a8a866714bf4216042a9229802a'
@@ -158,7 +159,6 @@ for name,soup in pages.items():
 
 add(home.h1.get_text(),DATA['hero'])
 add(about.h1.get_text(),DATA['aboutHero'])
-add('Where I stand','What I build now')
 # Keep the reference's adventure heading and paper-collage composition.
 
 for old,new in zip(long_paragraphs(about),DATA['about']):add(old.get_text(),new)
@@ -396,6 +396,8 @@ for name,soup in pages.items():
     script=soup.new_tag('script',src='/assets/personal/navigation.js');script['defer']='';soup.head.append(script)
     script=soup.new_tag('script',src='/assets/personal/contact.js');script['defer']='';soup.head.append(script)
     script=soup.new_tag('script',src='/assets/personal/personal.js');script['defer']='';soup.head.append(script)
+    soup.head.append(soup.new_tag('link',rel='stylesheet',href='/assets/personal/zenitsu-companion.css'))
+    soup.head.append(soup.new_tag('script',src='/assets/personal/zenitsu-companion.js',defer=''))
     output=replace_all(clean_snippets(str(soup)))
     (DIST/(name+'.html')).write_text(output,encoding='utf8')
     project=next((p for p in DATA['projects'] if p['legacy']==name),None)
@@ -461,13 +463,34 @@ img[src^="/assets/identity/story-"],img[src^="/assets/identity/ready-"],img[src^
 .personal-live-link { display:inline-flex; width:fit-content; align-self:flex-start; padding:10px 15px; margin-top:16px; border-radius:8px; background:linear-gradient(#555,#111); box-shadow:inset 0 0 0 1px #000,0 3px 6px #0003; color:white !important; font:14px Inter,sans-serif !important; text-decoration:none !important; }
 [data-framer-name="tags"] > :nth-child(n+5) { display:none !important; }
 .personal-project-role { display:block; margin-top:10px; font:12px/1.5 Inter,sans-serif; opacity:.65; }
-.story-gallery { box-sizing:border-box; width:100%; padding:20px clamp(16px,3vw,40px); color:#fff; border-bottom:1px solid #545454; font:16px/1.5 Inter,sans-serif; }
-.story-gallery summary { width:fit-content; cursor:pointer; }
-.story-gallery-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin:20px 0 12px; }
-.story-gallery-grid a { display:block; background:#161616; }
-.story-gallery-grid img { display:block; width:100%; aspect-ratio:4/3; object-fit:contain; }
-.story-gallery-credit { color:inherit; font-size:14px; }
-@media(max-width:768px) { .story-gallery-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+.story-gallery { box-sizing:border-box; width:100%; padding:16px clamp(16px,3vw,40px) 20px; border-bottom:1px solid #ffffff2b; }
+/* Same construction as the site's main button, finished in castle lacquer. */
+.story-gallery-button {
+  position:relative; display:inline-flex; align-items:center; gap:8px; height:40px; padding:0 10px 0 16px; overflow:hidden;
+  border:0; border-radius:10px; background-color:#a63d1b; color:#fff4e2; cursor:pointer;
+  font:400 16px/24px 'Inter Display','Inter Display Placeholder',sans-serif; letter-spacing:.1px;
+  box-shadow:inset 0 -1px 2px #00000066,inset 0 -4px 4px #ffbe6e59,inset 0 -8px 8px #ffaa5040,0 3px 5px -1px #ff963c4d,0 6px 10px -1px #ff82281f;
+  transition:background-color .2s,box-shadow .25s,transform .18s;
+}
+.story-gallery-button::before {
+  content:""; position:absolute; top:1px; left:2px; right:2px; height:20px; border-radius:8px; pointer-events:none;
+  background:linear-gradient(#ffdcaad9 0%,#ffdcaa14 100%);
+}
+.story-gallery-button::after {
+  content:""; position:absolute; top:-40%; bottom:-40%; left:-30%; width:18%; pointer-events:none; opacity:0;
+  background:linear-gradient(90deg,transparent,#fff6d5e6,transparent); transform:skewX(-24deg);
+}
+.story-gallery-label,.story-gallery-count,.story-gallery-arrow { position:relative; z-index:1; }
+.story-gallery-count { padding-left:8px; border-left:1px solid #ffe2ab55; color:#ffdcb0; font-size:13px; font-variant-numeric:tabular-nums; }
+.story-gallery-arrow { display:block; width:20px; height:20px; opacity:.72; transition:transform .25s cubic-bezier(.2,.7,.2,1),opacity .2s; }
+.story-gallery-button:hover { background-color:#bd4820; box-shadow:inset 0 -1px 2px #00000066,inset 0 -4px 4px #ffbe6e66,inset 0 -8px 8px #ffaa5059,0 3px 7px -1px #ff963c80,0 8px 18px -2px #ff822859; }
+.story-gallery-button:hover .story-gallery-arrow { transform:translateX(2px); opacity:1; }
+.story-gallery-button:active { transform:scale(.98); }
+.story-gallery-button:focus-visible { outline:2px solid #ffd79d; outline-offset:3px; }
+.story-gallery-button[data-loading] { cursor:progress; }
+.story-gallery-button[data-loading]::after,.story-gallery-button:hover::after { opacity:1; animation:story-gallery-bolt .9s cubic-bezier(.3,.1,.3,1) infinite; }
+.story-gallery-button:hover::after { animation-iteration-count:1; opacity:0; }
+@keyframes story-gallery-bolt { from { left:-30%; opacity:1; } to { left:115%; opacity:1; } }
 [data-personal-gallery] { cursor:pointer; }
 [data-personal-gallery]::after { content:attr(data-personal-gallery-label); white-space:pre-line; position:absolute; inset:0; z-index:5; display:flex; align-items:flex-end; padding:22px; background:linear-gradient(transparent 45%,#000b); color:white; font:16px/1.6 Inter,sans-serif; pointer-events:none; }
 @media (prefers-reduced-motion:reduce) {
@@ -482,41 +505,57 @@ gallery=[
  {'title':'TanStack Tanzania','subtitle':'Backend development','href':'/tanstack-tanzania','image':'/assets/personal/tanstack-live.png'},
  {'title':'GloboExpats','subtitle':'Mainly frontend development','href':'/globoexpats','image':'/assets/personal/globoexpats-live.png'}
 ]
+story_gallery = []
+for photo in DATA['storyGallery']:
+    thumbnail = PurePosixPath(photo['src']).with_suffix('.thumb.webp')
+    with Image.open(DIST / str(thumbnail).lstrip('/')) as preview:
+        thumbnail_size = preview.size
+    with Image.open(DIST / photo['src'].lstrip('/')) as full:
+        story_gallery.append({
+            'thumbnail': str(thumbnail), 'src': photo['src'], 'alt': photo['alt'],
+            'fullWidth': full.width, 'fullHeight': full.height,
+        })
+
 out('personal.js','''
 (() => {
   const gallery = '''+json.dumps(gallery)+''';
   const projects = '''+json.dumps([{**{k:p.get(k) for k in ['slug','name','role','url']},'cover':cover(p)} for p in DATA['projects']])+''';
   const companies = '''+json.dumps(DATA.get('companies',[]))+''';
-  const storyGallery = '''+json.dumps(DATA['storyGallery'])+''';
-  const storyGallerySource = '''+json.dumps(DATA['storyGallerySource'])+''';
+  const storyGallery = '''+json.dumps(story_gallery)+''';
   let pending = false;
   function addStoryGallery() {
     const stack = document.querySelector('#test .framer-rpyux0');
     if (!stack || stack.nextElementSibling?.classList.contains('story-gallery')) return;
-    const details = document.createElement('details');
-    details.className = 'story-gallery';
-    const summary = document.createElement('summary');
-    summary.textContent = `View all ${storyGallery.length} photos from Zanzibar`;
-    const grid = document.createElement('div');
-    grid.className = 'story-gallery-grid';
-    for (const photo of storyGallery) {
-      const link = document.createElement('a');
-      link.href = photo.src;
-      link.target = '_blank';
-      link.rel = 'noopener';
-      const image = document.createElement('img');
-      image.src = photo.src;
-      image.alt = photo.alt;
-      image.loading = 'lazy';
-      link.append(image);
-      grid.append(link);
-    }
-    const credit = document.createElement('a');
-    credit.className = 'story-gallery-credit';
-    credit.href = storyGallerySource;
-    credit.textContent = 'Photos by CoICT UDSM on LinkedIn';
-    details.append(summary, grid, credit);
-    stack.after(details);
+    const wrap = document.createElement('div');
+    wrap.className = 'story-gallery';
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'story-gallery-button';
+    button.setAttribute('aria-haspopup', 'dialog');
+    const label = document.createElement('span');
+    label.className = 'story-gallery-label';
+    label.textContent = 'View gallery';
+    const count = document.createElement('span');
+    count.className = 'story-gallery-count';
+    count.textContent = `${storyGallery.length} photos`;
+    button.append(label, count);
+    button.insertAdjacentHTML('beforeend', '<svg class="story-gallery-arrow" viewBox="0 0 20 20" aria-hidden="true"><path fill="currentColor" d="M7.2 5.3c-.5-.3-1.1 0-1.1.6v8.2c0 .6.6.9 1.1.6l6.6-4.1c.5-.3.5-1 0-1.3z"/></svg>');
+    // The 3D world is a separate download; start fetching when interest shows.
+    const load = () => import('/assets/personal/castle/castle-gallery.js');
+    button.addEventListener('pointerenter', load, {once:true});
+    button.addEventListener('focus', load, {once:true});
+    button.addEventListener('click', async () => {
+      if (button.dataset.loading !== undefined) return;
+      button.dataset.loading = '';
+      try {
+        const {openCastle} = await load();
+        await openCastle({photos:storyGallery, trigger:button});
+      } finally {
+        delete button.dataset.loading;
+      }
+    });
+    wrap.append(button);
+    stack.after(wrap);
   }
   function update() {
     pending = false;
@@ -628,7 +667,7 @@ h1,h2{font-family:'LT Superior Serif Regular',Georgia,serif;font-weight:400;lett
 @media(max-width:640px){.lab-hero{padding:85px 20px 32px}.lab-section{padding:32px 20px}.lab-grid{grid-template-columns:1fr}header{padding:0 20px;font-size:14px}h2{font-size:34px}}
 @media(prefers-reduced-motion:no-preference){h1{animation:arrive .8s both}@keyframes arrive{from{opacity:0;filter:blur(8px);transform:translateY(8px)}to{opacity:1;filter:none;transform:none}}}
 '''
-lab_html=f'''<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Robotics, Nena AI & lab projects — {esc(DATA['name'])}</title><meta name="description" content="Former lab chairperson and backend contributor. Nena AI, TanStack Tanzania, and shared lab work."><link rel="icon" href="/assets/personal/mark-il.svg"><style>{fonts}\n{lab_style}</style></head><body>
+lab_html=f'''<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Robotics, Nena AI & lab projects — {esc(DATA['name'])}</title><meta name="description" content="Former lab chairperson and backend contributor. Nena AI, TanStack Tanzania, and shared lab work."><link rel="icon" href="/assets/personal/mark-il.svg"><style>{fonts}\n{lab_style}</style><link rel="stylesheet" href="/assets/personal/zenitsu-companion.css"><script defer src="/assets/personal/zenitsu-companion.js"></script></head><body>
 <header><a href="/">{esc(DATA['name'])}</a><nav><a href="/">Works</a><a href="/about">Story</a><a href="mailto:{esc(DATA['email'])}">Let's chat</a></nav></header>
 <main><section class="lab-hero"><span class="eyebrow">{esc(lab['role'])}</span><h1>Software, speech, and shared curiosity.</h1><p>{esc(lab['description'])}</p><a class="lab-button" href="{esc(lab['url'])}" target="_blank" rel="noopener noreferrer">Visit the lab website ↗</a></section>
 <section class="lab-section"><img class="lab-image" src="{esc(lab['cover'])}" alt="Public UDSM robotics lab website preview"><p class="eyebrow">Public lab website · My role: former chairperson and backend contributor</p></section>
@@ -636,6 +675,16 @@ lab_html=f'''<!doctype html><html lang="en"><head><meta charset="utf-8"><meta na
 <section class="lab-section lab-grid"><img src="/assets/personal/tanstack-live.png" alt="Public TanStack Tanzania website"><div><span class="eyebrow">Backend development</span><h2>TanStack Tanzania</h2><p>A platform connecting Tanzanian tech students with opportunities, resources, and career support. I contributed backend development as part of our lab project work.</p><a class="lab-button" href="/tanstack-tanzania">Explore the project ↗</a></div></section></main>
 <footer><p>Open to freelance projects & collaborations</p><a href="mailto:{esc(DATA['email'])}">{esc(DATA['email'])}</a></footer></body></html>'''
 (DIST/'robotics.html').write_text(lab_html,encoding='utf8')
+for asset in ('zenitsu-companion.css', 'zenitsu-companion.js'):
+    (PERSONAL / asset).write_bytes((ROOT / 'scripts' / asset).read_bytes())
+for asset in (ROOT / 'scripts' / 'castle').rglob('*'):
+    if asset.is_file():
+        target = PERSONAL / 'castle' / asset.relative_to(ROOT / 'scripts' / 'castle')
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(asset.read_bytes())
+(PERSONAL / 'zenitsu').mkdir(exist_ok=True)
+for sprite in (ROOT / 'scripts' / 'zenitsu-sprites').glob('*.webp'):
+    (PERSONAL / 'zenitsu' / sprite.name).write_bytes(sprite.read_bytes())
 
 # Redirect superseded project labels to the now-confirmed real project names.
 aliases={p['legacy']:p['slug'] for p in DATA['projects']}

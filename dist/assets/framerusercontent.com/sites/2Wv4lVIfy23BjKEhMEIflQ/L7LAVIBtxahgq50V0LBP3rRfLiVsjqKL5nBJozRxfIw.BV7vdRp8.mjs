@@ -1,4 +1,4 @@
-import{n as e}from"./rolldown-runtime.BgaNhQyE.mjs?v=6abcfcd614a58b43";async function t(e,t,i){let a=r[e],o=a?await a(t,i):void 0,s={bodyEnd:[],bodyStart:[],headEnd:[],headStart:[]};for(let t of n){if(t.pageIds&&!t.pageIds.has(e))continue;let n=t.code(o);n&&s[t.placement].push({...t,code:n})}return s}var n,r,i,a;e((()=>{n=[{code:e=>``,id:`sOW9zLbFN`,loadMode:`always`,name:`Pinterest Site Verification`,placement:`headStart`},{code:e=>`<script type="application/ld+json">
+import{n as e}from"./rolldown-runtime.BgaNhQyE.mjs?v=1e7fa648e579b1ed";async function t(e,t,i){let a=r[e],o=a?await a(t,i):void 0,s={bodyEnd:[],bodyStart:[],headEnd:[],headStart:[]};for(let t of n){if(t.pageIds&&!t.pageIds.has(e))continue;let n=t.code(o);n&&s[t.placement].push({...t,code:n})}return s}var n,r,i,a;e((()=>{n=[{code:e=>``,id:`sOW9zLbFN`,loadMode:`always`,name:`Pinterest Site Verification`,placement:`headStart`},{code:e=>`<script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@graph": [
@@ -26,7 +26,7 @@ import{n as e}from"./rolldown-runtime.BgaNhQyE.mjs?v=6abcfcd614a58b43";async fun
     {
       "@type": "ImageObject",
       "@id": "https://isack.space/#primaryimage",
-      "url": "/assets/framerusercontent.com/images/lbsbUx2GE8xpHox9nbxwXz4J8.opt.webp?v=6abcfcd614a58b43",
+      "url": "/assets/framerusercontent.com/images/lbsbUx2GE8xpHox9nbxwXz4J8.opt.webp?v=1e7fa648e579b1ed",
       "width": 2400,
       "height": 1260,
       "caption": "Isack Lugata — web and brand designer"
@@ -53,11 +53,11 @@ import{n as e}from"./rolldown-runtime.BgaNhQyE.mjs?v=6abcfcd614a58b43";async fun
         "address": { "@type": "Country", "name": "Spain" }
       },
       "knowsAbout": [
-        "Online Stores & Payments design",
-        "Business Websites & SEO",
+        "Backend & integrations design",
+        "Frontend & web apps",
         "Framer development",
         "Webflow development",
-        "AI Assistants & Automation",
+        "Applied AI",
         "Design systems",
         "Visual identity",
         "Product design",
@@ -85,7 +85,7 @@ import{n as e}from"./rolldown-runtime.BgaNhQyE.mjs?v=6abcfcd614a58b43";async fun
       "url": "https://isack.space/",
       "logo": { "@id": "https://isack.space/#primaryimage" },
       "image": { "@id": "https://isack.space/#primaryimage" },
-      "description": "Online Stores & Payments, web design, development, and illustration for SaaS and Web3 startups, from seed to Series C.",
+      "description": "Backend & integrations, web design, development, and illustration for SaaS and Web3 startups, from seed to Series C.",
       "founder": { "@id": "https://isack.space/#daniel" },
       "employee": { "@id": "https://isack.space/#daniel" },
       "email": "mailto:lugata619@gmail.com",
@@ -109,7 +109,7 @@ import{n as e}from"./rolldown-runtime.BgaNhQyE.mjs?v=6abcfcd614a58b43";async fun
             "@type": "Offer",
             "itemOffered": {
               "@type": "Service",
-              "name": "Business Websites & SEO",
+              "name": "Frontend & web apps",
               "description": "Site structure, navigation, and every UI element built around the single decision you want a visitor to make.",
               "provider": { "@id": "https://isack.space/#daniel" }
             }
@@ -118,7 +118,7 @@ import{n as e}from"./rolldown-runtime.BgaNhQyE.mjs?v=6abcfcd614a58b43";async fun
             "@type": "Offer",
             "itemOffered": {
               "@type": "Service",
-              "name": "Mobile Apps for Your Customers",
+              "name": "Mobile apps",
               "description": "Building the design in Framer or Webflow, handed over so the team can edit it without opening an engineering ticket.",
               "provider": { "@id": "https://isack.space/#daniel" }
             }
@@ -127,7 +127,7 @@ import{n as e}from"./rolldown-runtime.BgaNhQyE.mjs?v=6abcfcd614a58b43";async fun
             "@type": "Offer",
             "itemOffered": {
               "@type": "Service",
-              "name": "Online Stores & Payments",
+              "name": "Backend & integrations",
               "description": "Logo, type, color, patterns, and marketing collateral built as one system, handed over as a guide the team can actually use.",
               "provider": { "@id": "https://isack.space/#daniel" }
             }
@@ -136,7 +136,7 @@ import{n as e}from"./rolldown-runtime.BgaNhQyE.mjs?v=6abcfcd614a58b43";async fun
             "@type": "Offer",
             "itemOffered": {
               "@type": "Service",
-              "name": "AI Assistants & Automation",
+              "name": "Applied AI",
               "description": "Custom icons, product visuals, isometric scenes, and conceptual pieces.",
               "provider": { "@id": "https://isack.space/#daniel" }
             }
@@ -151,13 +151,13 @@ import{n as e}from"./rolldown-runtime.BgaNhQyE.mjs?v=6abcfcd614a58b43";async fun
       "itemListOrder": "https://schema.org/ItemListOrderAscending",
       "numberOfItems": 7,
       "itemListElement": [
-        { "@type": "ListItem", "position": 1, "item": { "@type": "CreativeWork", "name": "Ecofy Africa", "url": "https://isack.space/ecofy", "creator": { "@id": "https://isack.space/#daniel" }, "about": "Business Websites & SEO and marketing design for a San Francisco developer-tools company" } },
-        { "@type": "ListItem", "position": 2, "item": { "@type": "CreativeWork", "name": "Osher Market", "url": "https://isack.space/osher-market", "creator": { "@id": "https://isack.space/#daniel" }, "about": "Online Stores & Payments and bilingual platform design for a Qatari fintech" } },
+        { "@type": "ListItem", "position": 1, "item": { "@type": "CreativeWork", "name": "Ecofy Africa", "url": "https://isack.space/ecofy", "creator": { "@id": "https://isack.space/#daniel" }, "about": "Frontend & web apps and marketing design for a San Francisco developer-tools company" } },
+        { "@type": "ListItem", "position": 2, "item": { "@type": "CreativeWork", "name": "Osher Market", "url": "https://isack.space/osher-market", "creator": { "@id": "https://isack.space/#daniel" }, "about": "Backend & integrations and bilingual platform design for a Qatari fintech" } },
         { "@type": "ListItem", "position": 3, "item": { "@type": "CreativeWork", "name": "Wakili Msomi", "url": "https://isack.space/wakili-msomi", "creator": { "@id": "https://isack.space/#daniel" }, "about": "Systems, web design, and development" } },
         { "@type": "ListItem", "position": 4, "item": { "@type": "CreativeWork", "name": "Falco Finance", "url": "https://isack.space/falco", "creator": { "@id": "https://isack.space/#daniel" }, "about": "Systems and platform design for a blockchain infrastructure network" } },
         { "@type": "ListItem", "position": 5, "item": { "@type": "CreativeWork", "name": "Habitek", "url": "https://isack.space/habitek", "creator": { "@id": "https://isack.space/#daniel" }, "about": "Systems and platform design" } },
         { "@type": "ListItem", "position": 6, "item": { "@type": "CreativeWork", "name": "TanStack Tanzania", "url": "https://isack.space/tanstack-tanzania", "creator": { "@id": "https://isack.space/#daniel" }, "about": "Systems, web design, and development" } },
-        { "@type": "ListItem", "position": 7, "item": { "@type": "CreativeWork", "name": "GloboExpats", "url": "https://isack.space/globoexpats", "creator": { "@id": "https://isack.space/#daniel" }, "about": "Business Websites & SEO and development for a personal brand site" } }
+        { "@type": "ListItem", "position": 7, "item": { "@type": "CreativeWork", "name": "GloboExpats", "url": "https://isack.space/globoexpats", "creator": { "@id": "https://isack.space/#daniel" }, "about": "Frontend & web apps and development for a personal brand site" } }
       ]
     }
   ]

@@ -169,14 +169,19 @@ def polaroid(name,photo,caption,angle=0):
     for i,line in enumerate(lines):b+=f'<text class="hand" x="390" y="{705+i*46}" text-anchor="middle" font-size="39" fill="#151515">{html.escape(line)}</text>'
     return write(name,b+'</g>',780,860)
 
-portrait='/assets/personal/portrait.png'
-story_gallery=DATA['storyGallery']
+portrait='/assets/personal/portrait.png';lab=URL+'lab-photo.jpg'
+for photo in DATA['storyGallery']:
+    original = DIST / photo['src'].lstrip('/')
+    with Image.open(original) as preview:
+        preview.thumbnail((640, 640), Image.Resampling.LANCZOS)
+        preview.save(original.with_suffix('.thumb.webp'), 'WEBP', quality=80, method=4)
+
 photos=[
- polaroid('story-portrait.svg',story_gallery[3]['src'],'At IIT Madras Zanzibar.',-3),
- polaroid('story-team.svg',story_gallery[2]['src'],'The Ecofy team in Zanzibar.',3),
- polaroid('story-ecofy.svg',story_gallery[1]['src'],'With the team in Zanzibar.',-2),
- polaroid('story-lab.svg',story_gallery[6]['src'],'Getting ready to present.',1),
- polaroid('story-products.svg',story_gallery[4]['src'],'Presenting Ecofy in Zanzibar.',-3),
+ polaroid('story-portrait.svg',portrait,'Curiosity got me here.',-3),
+ polaroid('story-team.svg',lab,'A good team changes everything.',3),
+ polaroid('story-ecofy.svg',URL+'lab-exhibition.jpg','Ideas deserve a real-world test.',-2),
+ polaroid('story-lab.svg',URL+'lab-work.jpg','Life around the lab.',1),
+ polaroid('story-products.svg','/assets/personal/tanstack-live.png','Built with people, for people.',-3),
 ]
 ready_photo=polaroid('ready-portrait.svg',portrait,'Always up for|the next adventure.',-6)
 note=DEFS+FONT+'<g transform="rotate(8 352 388)" filter="url(#shadow)"><path d="M90 75H630V650Q625 720 540 720H90Z" fill="#fff19a"/>'

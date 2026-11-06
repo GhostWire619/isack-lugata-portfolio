@@ -173,7 +173,7 @@ for path in sorted(DIST.rglob('*')):
         hasher.update(path.relative_to(DIST).as_posix().encode())
         hasher.update(path.read_bytes())
 version = hasher.hexdigest()[:16]
-resource = re.compile(r'(?:/assets/|\.{1,2}/)[A-Za-z0-9_./%~-]+\.(?:mjs|js|css|woff2?|otf|ttf|svg|png|jpe?g|webp|avif|gif|json|mp4|webm)(?![A-Za-z0-9_.])')
+resource = re.compile(r'(?:/assets/|\.{1,2}/)[A-Za-z0-9_./%~-]+\.(?:mjs|js|css|woff2?|otf|ttf|svg|png|jpe?g|webp|avif|gif|json|mp4|m4a|webm)(?![A-Za-z0-9_.])')
 for path in DIST.rglob('*'):
     if path.suffix not in TEXT or path.name == 'asset-version.json':
         continue

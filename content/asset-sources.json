@@ -1,8 +1,106 @@
 [
   {
-    "name": "coict-zanzibar-01.jpg",
-    "url": "https://www.linkedin.com/posts/udsm-coict_congratulations-to-coict-students-for-securing-activity-7436072198273982464-_NqW",
-    "bytes": 111654
+    "name": "personal/zenitsu/*.webp (animation frames rendered from the model)",
+    "url": "https://sketchfab.com/3d-models/agatsuma-zenitsu-8f877f1dc7b4475c831851c6defd4d7d",
+    "author": "Witsanu Superball",
+    "license": "http://creativecommons.org/licenses/by/4.0/"
+  },
+  {
+    "name": "personal/castle/zenitsu/*.webp and zenitsu-lite/*.webp (animation frames rendered from the model)",
+    "url": "https://sketchfab.com/3d-models/agatsuma-zenitsu-8f877f1dc7b4475c831851c6defd4d7d",
+    "author": "Witsanu Superball",
+    "license": "http://creativecommons.org/licenses/by/4.0/"
+  },
+  {
+    "name": "personal/castle/three.module.min.js (three.js r170)",
+    "url": "https://www.npmjs.com/package/three/v/0.170.0",
+    "license": "MIT, see personal/castle/three-LICENSE.txt"
+  },
+  {
+    "name": "castle-zenitsu.webp",
+    "url": "https://sketchfab.com/3d-models/agatsuma-zenitsu-8f877f1dc7b4475c831851c6defd4d7d",
+    "author": "Witsanu Superball",
+    "license": "http://creativecommons.org/licenses/by/4.0/",
+    "bytes": 53524
+  },
+  {
+    "name": "castle-zenitsu-idle.webp",
+    "url": "https://sketchfab.com/3d-models/agatsuma-zenitsu-8f877f1dc7b4475c831851c6defd4d7d",
+    "author": "Witsanu Superball",
+    "license": "http://creativecommons.org/licenses/by/4.0/",
+    "bytes": 325222
+  },
+  {
+    "name": "castle-zenitsu-react.webp",
+    "url": "https://sketchfab.com/3d-models/agatsuma-zenitsu-8f877f1dc7b4475c831851c6defd4d7d",
+    "author": "Witsanu Superball",
+    "license": "http://creativecommons.org/licenses/by/4.0/",
+    "bytes": 134260
+  },
+  {
+    "name": "isack-startup-challenge.webp",
+    "source": "Photo supplied by Isack Lugata",
+    "bytes": 368090
+  },
+  {
+    "name": "isack-tanzania-ai-forum.webp",
+    "source": "Photo supplied by Isack Lugata",
+    "bytes": 465856
+  },
+  {
+    "name": "isack-costume-event.webp",
+    "source": "Photo supplied by Isack Lugata",
+    "bytes": 593544
+  },
+  {
+    "name": "isack-nena-01.jpg",
+    "url": "https://www.linkedin.com/feed/update/urn:li:activity:7325954261907865602/",
+    "bytes": 326419
+  },
+  {
+    "name": "isack-nena-03.jpg",
+    "url": "https://www.linkedin.com/feed/update/urn:li:activity:7325954261907865602/",
+    "bytes": 350351
+  },
+  {
+    "name": "isack-nena-04.jpg",
+    "url": "https://www.linkedin.com/feed/update/urn:li:activity:7325954261907865602/",
+    "bytes": 278262
+  },
+  {
+    "name": "isack-nena-05.jpg",
+    "url": "https://www.linkedin.com/feed/update/urn:li:activity:7325954261907865602/",
+    "bytes": 225469
+  },
+  {
+    "name": "isack-nena-06.jpg",
+    "url": "https://www.linkedin.com/feed/update/urn:li:activity:7325954261907865602/",
+    "bytes": 216318
+  },
+  {
+    "name": "isack-bluefin-01.jpg",
+    "url": "https://www.linkedin.com/feed/update/urn:li:activity:7381250838851215360/",
+    "bytes": 146455
+  },
+  {
+    "name": "isack-instagram-weekend-01.jpg",
+    "url": "https://www.instagram.com/p/DVnoz7FDdz4/",
+    "bytes": 208428
+  },
+  {
+    "name": "isack-instagram-weekend-02.jpg",
+    "url": "https://www.instagram.com/p/DVnoz7FDdz4/",
+    "bytes": 222244
+  },
+  {
+    "name": "isack-instagram-weekend-03.jpg",
+    "url": "https://www.instagram.com/p/DVnoz7FDdz4/",
+    "bytes": 215547
+  },
+  {
+    "name": "isack-instagram-weekend-04.jpg",
+    "url": "https://www.instagram.com/p/DVnoz7FDdz4/",
+    "bytes": 206722
   },
   {
     "name": "coict-zanzibar-02.jpg",
@@ -20,29 +118,9 @@
     "bytes": 79465
   },
   {
-    "name": "coict-zanzibar-05.jpg",
-    "url": "https://www.linkedin.com/posts/udsm-coict_congratulations-to-coict-students-for-securing-activity-7436072198273982464-_NqW",
-    "bytes": 61040
-  },
-  {
-    "name": "coict-zanzibar-06.jpg",
-    "url": "https://www.linkedin.com/posts/udsm-coict_congratulations-to-coict-students-for-securing-activity-7436072198273982464-_NqW",
-    "bytes": 59880
-  },
-  {
     "name": "coict-zanzibar-07.jpg",
     "url": "https://www.linkedin.com/posts/udsm-coict_congratulations-to-coict-students-for-securing-activity-7436072198273982464-_NqW",
     "bytes": 64501
-  },
-  {
-    "name": "coict-zanzibar-08.jpg",
-    "url": "https://www.linkedin.com/posts/udsm-coict_congratulations-to-coict-students-for-securing-activity-7436072198273982464-_NqW",
-    "bytes": 53185
-  },
-  {
-    "name": "coict-zanzibar-09.jpg",
-    "url": "https://www.linkedin.com/posts/udsm-coict_congratulations-to-coict-students-for-securing-activity-7436072198273982464-_NqW",
-    "bytes": 53085
   },
   {
     "name": "coict-zanzibar-10.jpg",
