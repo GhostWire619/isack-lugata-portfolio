@@ -1,12 +1,12 @@
 {
-  "version": "ceeeee7f41350156",
-  "optimizedRasterFiles": 100,
-  "rasterBytesBefore": 22664064,
-  "rasterBytesAfter": 8633738,
-  "svgBytesBefore": 7479946,
-  "svgBytesAfter": 7479946,
-  "textBytesBeforeGzip": 13383504,
-  "textBytesAfterGzip": 5981407,
-  "homepageBytes": 784466,
-  "homepageGzipBytes": 50879
+  "version": "6abcfcd614a58b43",
+  "optimizedRasterFiles": 102,
+  "rasterBytesBefore": 22766822,
+  "rasterBytesAfter": 8721066,
+  "svgBytesBefore": 15123052,
+  "svgBytesAfter": 6241174,
+  "textBytesBeforeGzip": 12143510,
+  "textBytesAfterGzip": 5027061,
+  "homepageBytes": 784780,
+  "homepageGzipBytes": 50934
 }

@@ -5,29 +5,29 @@
   "location": "Dar es Salaam, Tanzania",
   "hero": "Hey! I'm Isack Lugata. I build websites, mobile apps, and AI-powered products that work for real people.",
   "intro": "Full-stack & mobile developer in Dar es Salaam. Co-founder of Ecofy Africa. Open to freelance projects.",
-  "aboutHero": "I turn ambitious ideas into thoughtful digital products, from the interface to the systems behind it.",
+  "aboutHero": "I’m Isack, a developer in Dar es Salaam and co-founder of Ecofy Africa.",
   "about": [
-    "My route into software started with a simple habit: taking an idea apart until I understood how it worked. Computer Science at the University of Dar es Salaam gave that curiosity a foundation. Building real products taught me the rest: how to connect an interface to an API, untangle a backend, and turn a promising idea into something people can actually use.",
-    "Today I'm based in Dar es Salaam, working with founders and teams across agriculture, commerce, property, and legal technology. I co-founded Ecofy Africa and work across its frontend, backend, and AI. Elsewhere, my work has helped shape products including GloboExpats, Habitek, and Wakili Msomi, alongside backend systems for Osher Market, Falco, and TanStack Tanzania.",
-    "I work across frontend, mobile, backend, and applied AI, moving comfortably between the interface and the systems behind it. That range has taken me from community marketplaces and property platforms to legal assistants and internal management tools. My role changes with the project; the standard stays the same: understand the problem, make thoughtful decisions, and build something that holds together.",
-    "As chairperson of the UDSM 3D Solutions & Robotics Lab, I learned to bring people, ideas, and technical work into the same room. Our projects included Nena AI and TanStack Tanzania. I bring that same approach to client work today: collaborate closely, take ownership of my contribution, and care about the details that make a product feel finished."
+    "I studied computer science at the University of Dar es Salaam, where I chaired the 3D Solutions & Robotics Lab. One of the projects we worked on was TanStack Tanzania, a place for tech students to find internships, share resources, and meet other people learning to build software.",
+    "I also co-founded Ecofy Africa. We’re building a tool in Swahili that helps farmers plan their seasons and keep track of what’s happening on their farms. In March 2026, we presented Ecofy at a startup showcase in Zanzibar and placed fourth.",
+    "I work with founders and small teams on things like websites that bring in inquiries, apps that make it easier to book a service, and tools that cut down on paperwork.",
+    "Before we talk about features, I ask what your customers or team are doing the hard way today. That usually tells us where to start."
   ],
   "services": [
     {
-      "title": "Frontend & web apps",
-      "description": "Responsive websites, product interfaces, and web applications. Clear user journeys, thoughtful interaction, and frontend work connected to real APIs."
+      "title": "Business Websites & SEO",
+      "description": "Help customers find you on Google with a fast, mobile-friendly website. Make it easy for them to see what you offer, request a quote, or reach you on WhatsApp."
     },
     {
-      "title": "Mobile apps",
-      "description": "Mobile applications built around clear interfaces, reliable APIs, and practical everyday workflows, from the first screen to the services behind it."
+      "title": "Mobile Apps for Your Customers",
+      "description": "Give customers a simple way to book services, place orders, and track updates from their phones. Build the app around what they need to do most often."
     },
     {
-      "title": "Backend & integrations",
-      "description": "Python APIs, authentication, databases, payments, messaging, and internal management systems. Built with deployment and maintenance in mind."
+      "title": "Online Stores & Payments",
+      "description": "Sell online and let customers pay by mobile money or card. Keep orders and payments in one place so your team can see what's paid and what needs attention."
     },
     {
-      "title": "Applied AI",
-      "description": "AI assistants, retrieval over your documents, document processing, and language-model integrations for useful English and Swahili experiences."
+      "title": "AI Assistants & Automation",
+      "description": "Give customers quick answers in English or Swahili. Help your team find information in company documents and spend less time on repetitive paperwork."
     }
   ],
   "projects": [
@@ -460,5 +460,48 @@
   "whatsapp": "+255749498117",
   "instagram": "https://www.instagram.com/zac_eye/",
   "inquiry": "Hi Isack, I came across your portfolio and would like to discuss a project.\n\nProject idea: \nWhat I need help with: \nTimeline: \nBudget range: ",
-  "siteUrl": "https://isack.space"
+  "siteUrl": "https://isack.space",
+  "storyGallerySource": "https://www.linkedin.com/posts/udsm-coict_congratulations-to-coict-students-for-securing-activity-7436072198273982464-_NqW",
+  "storyGallery": [
+    {
+      "src": "/assets/identity/coict-zanzibar-01.jpg",
+      "alt": "CoICT UDSM announcement celebrating Ecofy Africa's fourth-place finish"
+    },
+    {
+      "src": "/assets/identity/coict-zanzibar-02.jpg",
+      "alt": "Three Ecofy team members at the Faculty Exchange Programme in Zanzibar"
+    },
+    {
+      "src": "/assets/identity/coict-zanzibar-03.jpg",
+      "alt": "Ecofy team and fellow participants at the Faculty Exchange Programme"
+    },
+    {
+      "src": "/assets/identity/coict-zanzibar-04.jpg",
+      "alt": "Group photo in front of the Faculty Exchange Programme backdrop"
+    },
+    {
+      "src": "/assets/identity/coict-zanzibar-05.jpg",
+      "alt": "Isack presenting Ecofy with the team beside him"
+    },
+    {
+      "src": "/assets/identity/coict-zanzibar-06.jpg",
+      "alt": "Ecofy team presenting to attendees in the workshop room"
+    },
+    {
+      "src": "/assets/identity/coict-zanzibar-07.jpg",
+      "alt": "Ecofy team lined up beside their presentation"
+    },
+    {
+      "src": "/assets/identity/coict-zanzibar-08.jpg",
+      "alt": "Participants listening during the Student Mobility Exchange Programme"
+    },
+    {
+      "src": "/assets/identity/coict-zanzibar-09.jpg",
+      "alt": "Participants seated at a workshop table"
+    },
+    {
+      "src": "/assets/identity/coict-zanzibar-10.jpg",
+      "alt": "Attendees during a session at the Faculty Exchange Programme"
+    }
+  ]
 }

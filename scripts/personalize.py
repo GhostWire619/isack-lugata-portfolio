@@ -158,6 +158,7 @@ for name,soup in pages.items():
 
 add(home.h1.get_text(),DATA['hero'])
 add(about.h1.get_text(),DATA['aboutHero'])
+add('Where I stand','What I build now')
 # Keep the reference's adventure heading and paper-collage composition.
 
 for old,new in zip(long_paragraphs(about),DATA['about']):add(old.get_text(),new)
@@ -460,6 +461,13 @@ img[src^="/assets/identity/story-"],img[src^="/assets/identity/ready-"],img[src^
 .personal-live-link { display:inline-flex; width:fit-content; align-self:flex-start; padding:10px 15px; margin-top:16px; border-radius:8px; background:linear-gradient(#555,#111); box-shadow:inset 0 0 0 1px #000,0 3px 6px #0003; color:white !important; font:14px Inter,sans-serif !important; text-decoration:none !important; }
 [data-framer-name="tags"] > :nth-child(n+5) { display:none !important; }
 .personal-project-role { display:block; margin-top:10px; font:12px/1.5 Inter,sans-serif; opacity:.65; }
+.story-gallery { box-sizing:border-box; width:100%; padding:20px clamp(16px,3vw,40px); color:#fff; border-bottom:1px solid #545454; font:16px/1.5 Inter,sans-serif; }
+.story-gallery summary { width:fit-content; cursor:pointer; }
+.story-gallery-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin:20px 0 12px; }
+.story-gallery-grid a { display:block; background:#161616; }
+.story-gallery-grid img { display:block; width:100%; aspect-ratio:4/3; object-fit:contain; }
+.story-gallery-credit { color:inherit; font-size:14px; }
+@media(max-width:768px) { .story-gallery-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
 [data-personal-gallery] { cursor:pointer; }
 [data-personal-gallery]::after { content:attr(data-personal-gallery-label); white-space:pre-line; position:absolute; inset:0; z-index:5; display:flex; align-items:flex-end; padding:22px; background:linear-gradient(transparent 45%,#000b); color:white; font:16px/1.6 Inter,sans-serif; pointer-events:none; }
 @media (prefers-reduced-motion:reduce) {
@@ -479,9 +487,40 @@ out('personal.js','''
   const gallery = '''+json.dumps(gallery)+''';
   const projects = '''+json.dumps([{**{k:p.get(k) for k in ['slug','name','role','url']},'cover':cover(p)} for p in DATA['projects']])+''';
   const companies = '''+json.dumps(DATA.get('companies',[]))+''';
+  const storyGallery = '''+json.dumps(DATA['storyGallery'])+''';
+  const storyGallerySource = '''+json.dumps(DATA['storyGallerySource'])+''';
   let pending = false;
+  function addStoryGallery() {
+    const stack = document.querySelector('#test .framer-rpyux0');
+    if (!stack || stack.nextElementSibling?.classList.contains('story-gallery')) return;
+    const details = document.createElement('details');
+    details.className = 'story-gallery';
+    const summary = document.createElement('summary');
+    summary.textContent = `View all ${storyGallery.length} photos from Zanzibar`;
+    const grid = document.createElement('div');
+    grid.className = 'story-gallery-grid';
+    for (const photo of storyGallery) {
+      const link = document.createElement('a');
+      link.href = photo.src;
+      link.target = '_blank';
+      link.rel = 'noopener';
+      const image = document.createElement('img');
+      image.src = photo.src;
+      image.alt = photo.alt;
+      image.loading = 'lazy';
+      link.append(image);
+      grid.append(link);
+    }
+    const credit = document.createElement('a');
+    credit.className = 'story-gallery-credit';
+    credit.href = storyGallerySource;
+    credit.textContent = 'Photos by CoICT UDSM on LinkedIn';
+    details.append(summary, grid, credit);
+    stack.after(details);
+  }
   function update() {
     pending = false;
+    if (location.pathname === '/about' || location.pathname === '/about/') addStoryGallery();
     function setCover(img, project) {
       if (img.getAttribute('src') !== project.cover) img.setAttribute('src', project.cover);
       if (img.hasAttribute('srcset')) img.removeAttribute('srcset');
