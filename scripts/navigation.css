@@ -18,3 +18,22 @@
   #projects,#services { scroll-margin-top:65px; }
   a { -webkit-tap-highlight-color:transparent; }
 }
+
+/* Align the featured rows so the desktop reading order is clear. */
+@media (min-width:992px) {
+  .framer-n0UTl .framer-lvzy8y .framer-1yjyrti-container { aspect-ratio:1.18421; }
+}
+
+/* Read the desktop columns in the same order when they collapse into one. */
+@media (max-width:991.98px) {
+  .framer-lvzy8y > :is(.framer-1mdtcpj, .framer-oy8a34) { display:contents; }
+  .framer-lvzy8y > div > * { width:100%; }
+  .framer-lvzy8y :is(.framer-xe0j1m-container, .ssr-variant:has(> .framer-xe0j1m-container)) { order:1; }
+  .framer-lvzy8y :is(.framer-1yjyrti-container, .ssr-variant:has(> .framer-1yjyrti-container)) { order:2; }
+  .framer-lvzy8y :is(.framer-1rwjzw8-container, .ssr-variant:has(> .framer-1rwjzw8-container)) { order:3; }
+  .framer-lvzy8y :is(.framer-by8t9v-container, .ssr-variant:has(> .framer-by8t9v-container)) { order:4; }
+  .framer-lvzy8y :is(.framer-1chkbe0-container, .ssr-variant:has(> .framer-1chkbe0-container)) { order:5; }
+  .framer-lvzy8y :is(.framer-1uwhh11-container, .ssr-variant:has(> .framer-1uwhh11-container)) { order:6; }
+  .framer-lvzy8y :is(.framer-3dgf2s-container, .ssr-variant:has(> .framer-3dgf2s-container)) { order:7; }
+  .framer-lvzy8y :is(.framer-6g7a6q-container, .ssr-variant:has(> .framer-6g7a6q-container)) { order:8; }
+}
