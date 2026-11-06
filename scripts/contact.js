@@ -18,8 +18,19 @@
     dialog.addEventListener('click', event => { if (event.target === dialog) { const r=dialog.getBoundingClientRect(); if(event.clientX<r.left || event.clientX>r.right || event.clientY<r.top || event.clientY>r.bottom) dialog.close(); } });
     document.addEventListener('click', event => {
       const a = event.target.closest('a');
-      if (!a || a.dataset.contactDirect || !a.getAttribute('href')?.startsWith('mailto:') || a.getAttribute('href').includes('?subject=')) return;
+      if (!a || a.dataset.contactDirect || !a.getAttribute('href')?.startsWith('mailto:') || (a.getAttribute('href').includes('?subject=') && !a.dataset.package)) return;
       event.preventDefault(); event.stopImmediatePropagation();
+      const packageName = a.dataset.package;
+      const period = a.dataset.packagePeriod;
+      const basePrice = Number(a.dataset.packagePrice);
+      const packageContext = packageName ? `Package: ${packageName}\nStarting price: TSh ${basePrice.toLocaleString('en-US')} (${period === 'one-time' ? 'one-time' : 'per '+period})\n${a.dataset.packageDisplay ? 'Displayed estimate: '+a.dataset.packageDisplay+'\n' : ''}\n` : '';
+      const projectContext = !packageName && document.querySelector('.case-title') ? `I was looking at your ${document.querySelector('.case-intro h1')?.textContent || ''} project.\n\n` : '';
+      const message = packageContext || projectContext ? `Hi Isack, I'd like to discuss a project.\n\n${packageContext}${projectContext}Project idea:\nWhat I need help with:\nTimeline:\nBudget range:\n` : contact.inquiry;
+      options[0].href = 'mailto:' + contact.email + '?subject=' + encodeURIComponent(packageName ? packageName + ' package enquiry' : 'Project enquiry') + '&body=' + encodeURIComponent(message);
+      options[1].href = 'https://wa.me/' + contact.whatsapp.replace(/\D/g,'') + '?text=' + encodeURIComponent(message);
+      dialog.querySelector('h2').textContent = packageName ? 'Let’s talk '+packageName.toLowerCase()+'.' : 'Let’s build something.';
+      dialog.querySelector('p').textContent = packageName ? `${packageName} · from TSh ${basePrice.toLocaleString('en-US')} ${period === 'one-time' ? 'one-time' : 'per '+period}. Choose email or WhatsApp to discuss your scope.` : 'Have a project in mind? Choose how you’d like to get in touch.';
+      if (packageName && typeof window.gtag === 'function' && !navigator.globalPrivacyControl && navigator.doNotTrack !== '1') window.gtag('event','portfolio_package_enquiry',{package:packageName});
       if (!dialog.open) dialog.showModal();
     }, true);
   }

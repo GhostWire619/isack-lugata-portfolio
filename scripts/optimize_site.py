@@ -137,10 +137,10 @@ for path in DIST.glob('*.html'):
         video['preload'] = 'none'
         video.attrs.pop('autoplay', None)
     for img in soup.select('img'):
-        first_card = img.find_parent('a', href='./ecofy') or img.find_parent('a', href='./osher-market')
+        first_card = img.find_parent('a', href='./globoexpats') or img.find_parent('a', href='./falco')
         hero = img.find_parent(attrs={'data-framer-name':'hero'}) or img.find_parent('figure', class_='case-media')
         header = img.find_parent(class_='framer-QEZlT')
-        if header:
+        if header or first_card:
             img['loading'] = 'eager'
             img['decoding'] = 'async'
         elif not first_card and not hero:

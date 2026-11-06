@@ -593,7 +593,7 @@ lab_html=f'''<!doctype html><html lang="en"><head><meta charset="utf-8"><meta na
 <header><a href="/">{esc(DATA['name'])}</a><nav><a href="/">Works</a><a href="/about">Story</a><a href="mailto:{esc(DATA['email'])}">Let's chat</a></nav></header>
 <main><section class="lab-hero"><span class="eyebrow">{esc(lab['role'])}</span><h1>Software, speech, and shared curiosity.</h1><p>{esc(lab['description'])}</p><a class="lab-button" href="{esc(lab['url'])}" target="_blank" rel="noopener noreferrer">Visit the lab website ↗</a></section>
 <section class="lab-section"><img class="lab-image" src="{esc(lab['cover'])}" alt="Public UDSM robotics lab website preview"><p class="eyebrow">Public lab website · My role: former chairperson and backend contributor</p></section>
-<section class="lab-section lab-grid" id="nena-ai"><div><span class="eyebrow">AI · Lab team project</span><h2>Nena AI</h2><p>{esc(lab['nena']['description'])}</p><p>The project grew out of our lab's work on language technology and practical AI.</p></div><img src="{panel(nena,0)}" alt="Nena AI lab project artwork"></section>
+<section class="lab-section lab-grid" id="nena-ai"><div><span class="eyebrow">AI · Lab team project</span><h2>Nena AI</h2><p>{esc(lab['nena']['description'])}</p><p>The live Nena product offers motion ads and marketing visuals from words and product photos, with voice-overs in Kiswahili or English.</p><a class="lab-button" href="https://nenaai.ecofy.co.tz/" target="_blank" rel="noopener noreferrer">Try Nena AI ↗</a></div><img src="{panel(nena,0)}" alt="Concept illustration of the lab's Swahili speech work"></section>
 <section class="lab-section lab-grid"><img src="/assets/personal/tanstack-live.png" alt="Public TanStack Tanzania website"><div><span class="eyebrow">Backend development</span><h2>TanStack Tanzania</h2><p>A platform connecting Tanzanian tech students with opportunities, resources, and career support. I contributed backend development as part of our lab project work.</p><a class="lab-button" href="/tanstack-tanzania">Explore the project ↗</a></div></section></main>
 <footer><p>Open to freelance projects & collaborations</p><a href="mailto:{esc(DATA['email'])}">{esc(DATA['email'])}</a></footer></body></html>'''
 (DIST/'robotics.html').write_text(lab_html,encoding='utf8')
@@ -614,7 +614,7 @@ print('Replaced',len(ASSETS),'asset references and',len(MAPPINGS),'content strin
 # Contact choices share the same configuration across every page.
 out('contact.css',(ROOT/'scripts/contact.css').read_text(encoding='utf8'))
 out('navigation.css',(ROOT/'scripts/navigation.css').read_text(encoding='utf8'))
-out('navigation.js',(ROOT/'scripts/navigation.js').read_text(encoding='utf8').replace('__CASE_ROUTES__',json.dumps(['/'+p['slug'] for p in DATA['projects']])))
+out('navigation.js',(ROOT/'scripts/navigation.js').read_text(encoding='utf8').replace('__CASE_ROUTES__',json.dumps(['/'+p['slug'] for p in DATA['projects']])).replace('__PROJECT_DESCRIPTIONS__',json.dumps({'/'+p['slug']:p['cardDescription'] for p in DATA['projects']})))
 contact_data={key:DATA[key] for key in ['email','whatsapp','instagram','inquiry']}
 out('contact.js',(ROOT/'scripts/contact.js').read_text(encoding='utf8').replace('__PORTFOLIO_CONTACT__',json.dumps(contact_data,ensure_ascii=False)))
 lab_path=DIST/'robotics.html'

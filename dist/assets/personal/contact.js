@@ -7,7 +7,7 @@
     dialog = document.createElement('dialog');
     dialog.className = 'portfolio-contact';
     dialog.setAttribute('aria-labelledby', 'contact-title');
-    dialog.innerHTML = '<button class="contact-close" aria-label="Close contact options">×</button><h2 id="contact-title">Let’s build something.</h2><p>Have a project in mind? Choose how you’d like to get in touch.</p><a class="contact-option" data-contact-direct="true"><img src="/assets/identity/contact-email.svg?v=ceeeee7f41350156" alt=""><div>Email me<span></span></div></a><a class="contact-option" data-contact-direct="true" target="_blank" rel="noopener noreferrer"><img src="/assets/identity/contact-whatsapp.svg?v=ceeeee7f41350156" alt=""><div>Chat on WhatsApp<span></span></div></a>';
+    dialog.innerHTML = '<button class="contact-close" aria-label="Close contact options">×</button><h2 id="contact-title">Let’s build something.</h2><p>Have a project in mind? Choose how you’d like to get in touch.</p><a class="contact-option" data-contact-direct="true"><img src="/assets/identity/contact-email.svg?v=b185cdb7dd2eff5d" alt=""><div>Email me<span></span></div></a><a class="contact-option" data-contact-direct="true" target="_blank" rel="noopener noreferrer"><img src="/assets/identity/contact-whatsapp.svg?v=b185cdb7dd2eff5d" alt=""><div>Chat on WhatsApp<span></span></div></a>';
     const options = dialog.querySelectorAll('a');
     options[0].href = email;
     options[0].querySelector('span').textContent = contact.email;
@@ -18,8 +18,19 @@
     dialog.addEventListener('click', event => { if (event.target === dialog) { const r=dialog.getBoundingClientRect(); if(event.clientX<r.left || event.clientX>r.right || event.clientY<r.top || event.clientY>r.bottom) dialog.close(); } });
     document.addEventListener('click', event => {
       const a = event.target.closest('a');
-      if (!a || a.dataset.contactDirect || !a.getAttribute('href')?.startsWith('mailto:') || a.getAttribute('href').includes('?subject=')) return;
+      if (!a || a.dataset.contactDirect || !a.getAttribute('href')?.startsWith('mailto:') || (a.getAttribute('href').includes('?subject=') && !a.dataset.package)) return;
       event.preventDefault(); event.stopImmediatePropagation();
+      const packageName = a.dataset.package;
+      const period = a.dataset.packagePeriod;
+      const basePrice = Number(a.dataset.packagePrice);
+      const packageContext = packageName ? `Package: ${packageName}\nStarting price: TSh ${basePrice.toLocaleString('en-US')} (${period === 'one-time' ? 'one-time' : 'per '+period})\n${a.dataset.packageDisplay ? 'Displayed estimate: '+a.dataset.packageDisplay+'\n' : ''}\n` : '';
+      const projectContext = !packageName && document.querySelector('.case-title') ? `I was looking at your ${document.querySelector('.case-intro h1')?.textContent || ''} project.\n\n` : '';
+      const message = packageContext || projectContext ? `Hi Isack, I'd like to discuss a project.\n\n${packageContext}${projectContext}Project idea:\nWhat I need help with:\nTimeline:\nBudget range:\n` : contact.inquiry;
+      options[0].href = 'mailto:' + contact.email + '?subject=' + encodeURIComponent(packageName ? packageName + ' package enquiry' : 'Project enquiry') + '&body=' + encodeURIComponent(message);
+      options[1].href = 'https://wa.me/' + contact.whatsapp.replace(/\D/g,'') + '?text=' + encodeURIComponent(message);
+      dialog.querySelector('h2').textContent = packageName ? 'Let’s talk '+packageName.toLowerCase()+'.' : 'Let’s build something.';
+      dialog.querySelector('p').textContent = packageName ? `${packageName} · from TSh ${basePrice.toLocaleString('en-US')} ${period === 'one-time' ? 'one-time' : 'per '+period}. Choose email or WhatsApp to discuss your scope.` : 'Have a project in mind? Choose how you’d like to get in touch.';
+      if (packageName && typeof window.gtag === 'function' && !navigator.globalPrivacyControl && navigator.doNotTrack !== '1') window.gtag('event','portfolio_package_enquiry',{package:packageName});
       if (!dialog.open) dialog.showModal();
     }, true);
   }

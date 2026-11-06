@@ -1,12 +1,12 @@
 {
-  "version": "ceeeee7f41350156",
+  "version": "b185cdb7dd2eff5d",
   "optimizedRasterFiles": 100,
   "rasterBytesBefore": 22664064,
   "rasterBytesAfter": 8633738,
   "svgBytesBefore": 7479946,
   "svgBytesAfter": 7479946,
-  "textBytesBeforeGzip": 13383504,
-  "textBytesAfterGzip": 5981407,
-  "homepageBytes": 784466,
-  "homepageGzipBytes": 50879
+  "textBytesBeforeGzip": 13444767,
+  "textBytesAfterGzip": 5998106,
+  "homepageBytes": 786913,
+  "homepageGzipBytes": 51250
 }
