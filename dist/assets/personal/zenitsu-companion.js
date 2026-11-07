@@ -3,14 +3,14 @@
 
   // Paths stay literal so optimize_site.py can append its cache-busting token.
   const SHEETS = {
-    idle: { src: '/assets/personal/zenitsu/idle.webp?v=938c7c04d1c07005', frames: 19, fps: 14 },
-    run: { src: '/assets/personal/zenitsu/run.webp?v=938c7c04d1c07005', frames: 9, fps: 16 },
-    slash: { src: '/assets/personal/zenitsu/atk01.webp?v=938c7c04d1c07005', frames: 19, fps: 18 },
-    spin: { src: '/assets/personal/zenitsu/skl01.webp?v=938c7c04d1c07005', frames: 21, fps: 18 },
-    dash: { src: '/assets/personal/zenitsu/skl02.webp?v=938c7c04d1c07005', frames: 36, fps: 26 },
-    hit: { src: '/assets/personal/zenitsu/hit01.webp?v=938c7c04d1c07005', frames: 7, fps: 14 },
-    recoil: { src: '/assets/personal/zenitsu/hit02.webp?v=938c7c04d1c07005', frames: 7, fps: 14 },
-    faint: { src: '/assets/personal/zenitsu/die.webp?v=938c7c04d1c07005', frames: 23, fps: 16 },
+    idle: { src: '/assets/personal/zenitsu/idle.webp?v=a0a140b664f3b03d', frames: 19, fps: 14 },
+    run: { src: '/assets/personal/zenitsu/run.webp?v=a0a140b664f3b03d', frames: 9, fps: 16 },
+    slash: { src: '/assets/personal/zenitsu/atk01.webp?v=a0a140b664f3b03d', frames: 19, fps: 18 },
+    spin: { src: '/assets/personal/zenitsu/skl01.webp?v=a0a140b664f3b03d', frames: 21, fps: 18 },
+    dash: { src: '/assets/personal/zenitsu/skl02.webp?v=a0a140b664f3b03d', frames: 36, fps: 26 },
+    hit: { src: '/assets/personal/zenitsu/hit01.webp?v=a0a140b664f3b03d', frames: 7, fps: 14 },
+    recoil: { src: '/assets/personal/zenitsu/hit02.webp?v=a0a140b664f3b03d', frames: 7, fps: 14 },
+    faint: { src: '/assets/personal/zenitsu/die.webp?v=a0a140b664f3b03d', frames: 23, fps: 16 },
   };
   // Crop geometry from the sprite build, in captured pixels.
   const CROP_W = 570, CROP_H = 295, BODY_H = 275, FEET_X = 260, FEET_Y = 290;
@@ -18,7 +18,6 @@
   const STORAGE_KEY = 'zenitsu-pet-hidden';
 
   const motion = matchMedia('(prefers-reduced-motion: reduce)');
-  const phoneMode = matchMedia('(max-width:760px), (pointer:coarse)').matches;
   const random = (min, max) => min + Math.random() * (max - min);
   const pick = list => list[Math.floor(Math.random() * list.length)];
   const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
@@ -26,7 +25,10 @@
   const ease = t => 1 - (1 - clamp(t, 0, 1)) ** 3;
   const viewW = () => document.documentElement.clientWidth;
   const viewH = () => window.visualViewport?.height || innerHeight;
-  const floorY = () => viewH() - 4;
+  // While a phone keyboard is up, the floor stays at the layout bottom, behind the keyboard,
+  // so he never lands on the chat composer sitting just above it.
+  let keyboardOpen = false;
+  const floorY = () => (keyboardOpen ? innerHeight : viewH()) - 4;
 
   const layer = document.createElement('div');
   layer.className = 'zenitsu-pet';
@@ -40,7 +42,7 @@
   launcher.className = 'zenitsu-launcher';
   launcher.innerHTML = `
     <button type="button" class="zenitsu-launcher-button" aria-label="Ask Zenitsu, the site's AI guide" aria-expanded="false" aria-controls="zenitsu-chat">
-      <span class="zenitsu-disc"><img src="/assets/personal/zenitsu/avatar.webp?v=938c7c04d1c07005" alt="" width="96" height="96" decoding="async"></span>
+      <span class="zenitsu-disc"><img src="/assets/personal/zenitsu/avatar.webp?v=a0a140b664f3b03d" alt="" width="96" height="96" decoding="async"></span>
       <span class="zenitsu-launcher-label">Ask me</span>
     </button>`;
 
@@ -51,7 +53,7 @@
   chatPanel.setAttribute('aria-label', 'Chat with Zenitsu, the site AI guide');
   chatPanel.innerHTML = `
     <header class="zenitsu-chat-head">
-      <span class="zenitsu-disc zenitsu-disc-small"><img src="/assets/personal/zenitsu/avatar.webp?v=938c7c04d1c07005" alt="" width="64" height="64" decoding="async"></span>
+      <span class="zenitsu-disc zenitsu-disc-small"><img src="/assets/personal/zenitsu/avatar.webp?v=a0a140b664f3b03d" alt="" width="64" height="64" decoding="async"></span>
       <div class="zenitsu-chat-title"><strong>Zenitsu</strong><span>Isack's AI guide</span></div>
       <button type="button" class="zenitsu-icon-button zenitsu-chat-more" aria-label="More options" aria-expanded="false" aria-controls="zenitsu-options">
         <svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><g fill="currentColor"><circle cx="4" cy="10" r="1.5"/><circle cx="10" cy="10" r="1.5"/><circle cx="16" cy="10" r="1.5"/></g></svg>
@@ -64,7 +66,7 @@
     </div>
     <div class="zenitsu-chat-log" role="log" aria-live="polite" tabindex="0"></div>
     <form class="zenitsu-chat-form">
-      <input type="text" name="message" maxlength="500" autocomplete="off" autocapitalize="sentences" enterkeyhint="send" placeholder="What do you want built?" aria-label="Your message">
+      <input type="text" name="message" maxlength="500" autocomplete="off" enterkeyhint="send" placeholder="What do you want built?" aria-label="Your message">
       <button type="submit" class="zenitsu-send" aria-label="Send message">
         <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><path d="M10 15.5v-11M5.5 9L10 4.5 14.5 9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
@@ -107,41 +109,32 @@
     frame = -1;
   }
 
-  // Sheets download when first needed; until then he holds a pose he already has.
-  function fetchSheet(data) {
-    if (data.state) return;
-    data.state = 'loading';
-    const image = new Image();
-    image.onload = () => { data.state = 'ready'; };
-    image.src = data.src;
-  }
-
   function show(name, index) {
-    let data = SHEETS[name];
-    fetchSheet(data);
-    if (data.state !== 'ready') {
-      if (name === 'idle' || SHEETS.idle.state !== 'ready') return;
-      name = 'idle';
-      index = 0;
-      data = SHEETS.idle;
-    }
-    if (!sheet || sheet.name !== name || !sheet.applied) {
-      sheet = { name, applied: true };
+    const data = SHEETS[name];
+    const key = name;
+    const cols = data.cols || data.frames, rows = data.rows || 1;
+    if (!sheet || sheet.name !== key || !sheet.applied) {
+      sheet = { name: key, applied: true };
       sprite.style.backgroundImage = `url("${data.src}")`;
-      sprite.style.backgroundSize = `${data.frames * cellW}px ${cellH}px`;
+      sprite.style.backgroundSize = `${cols * cellW}px ${rows * cellH}px`;
       frame = -1;
     }
     if (index !== frame) {
       frame = index;
-      sprite.style.backgroundPosition = `${-index * cellW}px 0`;
+      sprite.style.backgroundPosition = `${-(index % cols) * cellW}px ${-Math.floor(index / cols) * cellH}px`;
     }
   }
 
+  // Every style write invalidates style; while he stands still, nothing is written at all.
+  const written = { move: '', origin: '', turn: '' };
   function draw() {
     const feetX = FEET_X * scale, feetY = FEET_Y * scale;
-    body.style.transform = `translate3d(${(pet.x - feetX).toFixed(1)}px,${(pet.y - feetY).toFixed(1)}px,0)`;
-    sprite.style.transformOrigin = `${feetX}px ${pet.pivotBody ? feetY - BODY_H * scale * .45 : feetY}px`;
-    sprite.style.transform = `rotate(${pet.rot.toFixed(1)}deg) scaleX(${pet.dir})`;
+    const move = `translate3d(${(pet.x - feetX).toFixed(1)}px,${(pet.y - feetY).toFixed(1)}px,0)`;
+    const origin = `${feetX}px ${pet.pivotBody ? feetY - BODY_H * scale * .45 : feetY}px`;
+    const turn = `rotate(${pet.rot.toFixed(1)}deg) scaleX(${pet.dir})`;
+    if (move !== written.move) body.style.transform = written.move = move;
+    if (origin !== written.origin) sprite.style.transformOrigin = written.origin = origin;
+    if (turn !== written.turn) sprite.style.transform = written.turn = turn;
   }
 
   /* ---------- effects ---------- */
@@ -155,7 +148,6 @@
   }
 
   function sparks(x, y, count = 8) {
-    if (phoneMode) return;
     for (let i = 0; i < count; i++) {
       const spark = effect('i', 'zenitsu-spark', 520);
       const angle = random(0, Math.PI * 2), reach = random(20, 70);
@@ -168,7 +160,6 @@
   }
 
   function bolt(x1, y1, x2, y2) {
-    if (phoneMode) return;
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     svg.setAttribute('class', 'zenitsu-bolt');
     const length = Math.hypot(x2 - x1, y2 - y1) || 1;
@@ -228,7 +219,7 @@
     const nodes = document.querySelectorAll('h1,h2,h3,img,picture,video,article,figure');
     for (const el of nodes) {
       if (found.length >= 40) break;
-      if (el.closest('nav,header,.zenitsu-pet,.zenitsu-launcher,.zenitsu-chat,.zenitsu-welcome')) continue;
+      if (el.closest('nav,header,.zenitsu-pet,.zenitsu-launcher,.zenitsu-chat')) continue;
       const box = el.getBoundingClientRect();
       if (box.bottom < 70 || box.top > viewH() || box.width < 100) continue;
       const isText = /^H[1-3]$/.test(el.tagName);
@@ -514,7 +505,6 @@
 
   function* entrance() {
     pet.x = -60; pet.y = floorY(); pet.dir = 1;
-    if (phoneMode) { yield* runTo(viewW() * .62, 200); return; }
     yield* blink(viewW() * random(.55, .8), floorY(), null);
     yield* play('dash', { from: 31, to: 35 });
     yield* slash();
@@ -525,11 +515,6 @@
     if (home) {
       if (pet.surface !== home) return hopOnto(home);
       return chat.thinking ? roam() : idle(random(1.2, 2.4));
-    }
-    if (phoneMode) {
-      // Phones get an easy-going floor routine: no page scanning, no effects.
-      const roll = Math.random();
-      return roll < .55 ? roam() : roll < .88 ? idle(random(1.5, 3.5)) : roll < .94 ? slash() : spin();
     }
     const grounded = !pet.surface;
     const moves = [
@@ -562,15 +547,8 @@
     behavior.next();
   }
 
-  let skipFrame = false, lastScrollAt = 0;
   function tick(time) {
     rafId = requestAnimationFrame(tick);
-    if (phoneMode) {
-      // Scrolling always wins on a phone; he also only needs 30fps.
-      if (time - lastScrollAt < 200) { lastTime = time; return; }
-      skipFrame = !skipFrame;
-      if (skipFrame) return;
-    }
     const dt = clamp((time - lastTime) / 1000 || 0, 0, .05);
     lastTime = time;
 
@@ -680,7 +658,7 @@
   const coarsePointer = () => matchMedia('(pointer: coarse)').matches;
   let suggestionsEl = null;
 
-  const perch = () => (chat.open && !phoneMode ? chat.surface : null);
+  const perch = () => (chat.open ? chat.surface : null);
 
   function leavePerch(surface) {
     if (pet.surface !== surface) return;
@@ -696,19 +674,6 @@
     const [r, g, b] = match.map(Number);
     const tone = r * .299 + g * .587 + b * .114 < 128 ? 'dark' : 'light';
     [launcher, chatPanel].forEach(element => { if (element.dataset.tone !== tone) element.dataset.tone = tone; });
-  }
-  // The client router changes the page colour without a reload, so check only when it moves.
-  function watchRoutes() {
-    const check = () => { syncTone(); setTimeout(syncTone, 350); setTimeout(syncTone, 1200); };
-    for (const method of ['pushState', 'replaceState']) {
-      const original = history[method];
-      history[method] = function (...args) {
-        const result = original.apply(this, args);
-        check();
-        return result;
-      };
-    }
-    addEventListener('popstate', check);
   }
 
   function addMessage(role, text, contact = false, retry = null) {
@@ -872,19 +837,6 @@
     moreButton.setAttribute('aria-expanded', String(open));
   }
 
-  // On phones the page underneath must not scroll or shift while the sheet is up.
-  let lockedAt = 0;
-  function lockPage(locked) {
-    const body = document.body.style;
-    if (locked) {
-      lockedAt = scrollY;
-      Object.assign(body, { position: 'fixed', top: `${-lockedAt}px`, left: '0', right: '0', width: '100%' });
-    } else {
-      Object.assign(body, { position: '', top: '', left: '', right: '', width: '' });
-      scrollTo({ top: lockedAt, behavior: 'instant' });
-    }
-  }
-
   function setChat(open) {
     if (open === chat.open) return;
     chat.open = open;
@@ -896,59 +848,60 @@
     setOptions(false);
     if (open) {
       syncTone();
+      fitToViewport();
       if (!chatLog.childElementCount) restoreChat();
       chatLog.scrollTop = chatLog.scrollHeight;
-    }
-    if (phoneMode) {
-      lockPage(open);
-      fitToViewport();
-      // Nothing else animates while the sheet is open.
-      if (open) { stop(); layer.hidden = true; }
-      else if (!hidden && !motion.matches) apply();
-      if (open) chatLog.focus({ preventScroll: true });
-      if (!open) chatInput.blur();
-      return;
-    }
-    if (open) {
       if (rafId) start(hopOnto(chat.surface));
+      // Opening a phone keyboard uninvited would hide the panel he just opened.
       if (!coarsePointer()) chatInput.focus({ preventScroll: true });
+      else chatLog.focus({ preventScroll: true });
     } else {
       leavePerch(chat.surface);
     }
   }
 
-  // The on-screen keyboard shrinks the visual viewport; pin the sheet to exactly that.
+  // Keep the composer above a phone's on-screen keyboard. The keyboard fires a burst of
+  // viewport events while it slides; they are folded into one update per frame.
   let fitFrame = 0;
   function fitToViewport() {
-    if (fitFrame) return;
-    fitFrame = requestAnimationFrame(() => {
-      fitFrame = 0;
-      const viewport = window.visualViewport;
-      if (!phoneMode || !viewport || !chat.open) return;
-      const height = `${Math.round(viewport.height)}px`;
-      const offset = `translateY(${Math.round(viewport.offsetTop)}px)`;
-      if (chatPanel.style.height !== height) {
-        const atBottom = chatLog.scrollHeight - chatLog.scrollTop - chatLog.clientHeight < 40;
-        chatPanel.style.height = height;
-        if (atBottom) chatLog.scrollTop = chatLog.scrollHeight;
-      }
-      if (chatPanel.style.transform !== offset) chatPanel.style.transform = offset;
-    });
+    if (!fitFrame) fitFrame = requestAnimationFrame(fitNow);
+  }
+  function fitNow() {
+    fitFrame = 0;
+    const viewport = window.visualViewport;
+    if (!viewport) return;
+    const keyboard = Math.round(Math.max(0, innerHeight - viewport.height - viewport.offsetTop));
+    const typing = keyboard > 80;
+    // The newest message stays in view when the panel shrinks or grows around the keyboard.
+    const atBottom = chatLog.scrollHeight - chatLog.scrollTop - chatLog.clientHeight < 40;
+    chatPanel.style.setProperty('--zen-viewport', `${Math.round(viewport.height)}px`);
+    chatPanel.style.setProperty('--zen-keyboard', `${keyboard}px`);
+    if (typing !== keyboardOpen) {
+      keyboardOpen = typing;
+      chatPanel.toggleAttribute('data-keyboard', typing);
+      launcher.toggleAttribute('data-keyboard', typing);
+      layer.toggleAttribute('data-typing', typing);
+    }
+    if (atBottom) chatLog.scrollTop = chatLog.scrollHeight;
   }
 
   launcherButton.addEventListener('click', () => setChat(!chat.open));
   moreButton.addEventListener('click', () => setOptions(optionsPanel.hidden));
   chatPanel.querySelector('.zenitsu-chat-close').addEventListener('click', () => { setChat(false); launcherButton.focus({ preventScroll: true }); });
   chatForm.addEventListener('submit', event => { event.preventDefault(); sendMessage(chatInput.value); });
-  // Tapping send must not drop the keyboard mid-conversation.
-  chatSend.addEventListener('pointerdown', event => event.preventDefault());
+  // Tapping send must not take focus from the input, or the keyboard drops mid-send
+  // and the panel jumps while the message is going out.
+  chatSend.addEventListener('pointerdown', event => { if (document.activeElement === chatInput) event.preventDefault(); });
+  // While typing, a drag on the page behind would pan the phone's viewport and drag the
+  // panel with it. Only the conversation itself scrolls then.
+  document.addEventListener('touchmove', event => {
+    if (keyboardOpen && chat.open && !chatLog.contains(event.target)) event.preventDefault();
+  }, { passive: false });
   window.visualViewport?.addEventListener('resize', fitToViewport);
   window.visualViewport?.addEventListener('scroll', fitToViewport);
-  if (phoneMode) addEventListener('scroll', () => { lastScrollAt = performance.now(); }, { passive: true });
 
   /* ---------- lifecycle ---------- */
 
-  let hasEntered = false;
   function stop() {
     cancelAnimationFrame(rafId);
     rafId = 0;
@@ -978,8 +931,6 @@
     delete layer.dataset.still;
     let opening = entrance;
     if (perch()) opening = () => hopOnto(perch());
-    else if (hasEntered) opening = chooseMove;
-    hasEntered = true;
     start(opening(), false);
     lastTime = performance.now();
     rafId = requestAnimationFrame(tick);
@@ -1013,16 +964,23 @@
 
   document.body.append(layer, chatPanel, launcher);
   syncTone();
-  watchRoutes();
-  // He arrives after the page is ready; only his two everyday sheets load up front.
-  const arrive = () => {
-    fetchSheet(SHEETS.idle);
-    fetchSheet(SHEETS.run);
-    apply();
-  };
-  if (phoneMode) {
-    const later = () => setTimeout(arrive, 1800);
-    if (document.readyState === 'complete') later();
-    else addEventListener('load', later, { once: true });
-  } else setTimeout(arrive, 900);
+  // The site's client router changes the page colour without a reload. Check when the
+  // route changes (and once the page transition has painted) instead of polling.
+  const toneAfterRoute = () => { syncTone(); setTimeout(syncTone, 350); setTimeout(syncTone, 1200); };
+  for (const method of ['pushState', 'replaceState']) {
+    const original = history[method];
+    history[method] = function (...args) {
+      const result = original.apply(this, args);
+      toneAfterRoute();
+      return result;
+    };
+  }
+  addEventListener('popstate', toneAfterRoute);
+  // Preload every strip so moves never flash blank, but only once the page itself has
+  // finished loading, so 600 KB of sprites never compete with the page's own images.
+  const preload = () => Object.values(SHEETS).forEach(({ src }) => { new Image().src = src; });
+  const preloadWhenIdle = () => ('requestIdleCallback' in window ? requestIdleCallback(preload, { timeout: 2500 }) : setTimeout(preload, 800));
+  if (document.readyState === 'complete') preloadWhenIdle();
+  else addEventListener('load', preloadWhenIdle, { once: true });
+  setTimeout(apply, 900);
 })();

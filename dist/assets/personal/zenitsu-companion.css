@@ -26,6 +26,8 @@
 .zenitsu-hit:active { cursor:grabbing; }
 .zenitsu-hit:focus-visible { outline:2px solid #f6ba71; outline-offset:2px; }
 .zenitsu-pet[data-still] .zenitsu-hit { display:none; }
+/* While the keyboard is up he can never take a tap meant for the chat input or send. */
+.zenitsu-pet[data-typing] .zenitsu-hit { pointer-events:none; }
 
 .zenitsu-spark {
   position:absolute;
@@ -97,6 +99,7 @@
 .zenitsu-launcher {
   position:fixed; z-index:105; right:max(14px,env(safe-area-inset-right)); bottom:max(10px,env(safe-area-inset-bottom));
 }
+.zenitsu-launcher[data-keyboard] { display:none; }
 .zenitsu-launcher-button {
   display:grid; justify-items:center; padding:0; border:0; background:none; -webkit-tap-highlight-color:transparent;
 }
@@ -145,6 +148,7 @@
   transform-origin:calc(100% - 27px) calc(100% + 40px); animation:zenitsu-pop .34s var(--z-spring) both;
 }
 .zenitsu-chat[hidden] { display:none; }
+.zenitsu-chat[data-keyboard] { bottom:calc(var(--zen-keyboard) + 8px); height:min(560px,calc(var(--zen-viewport) - 16px)); min-height:0; }
 .zenitsu-chat-head { display:flex; align-items:center; gap:10px; padding:11px 10px 11px 13px; border-bottom:1px solid var(--z-line); }
 .zenitsu-disc-small { flex:none; width:34px; height:34px; }
 .zenitsu-chat-title { display:grid; flex:1; min-width:0; }
@@ -209,19 +213,11 @@
 
 .in-castle .zenitsu-chat,.in-castle .zenitsu-launcher { visibility:hidden; }
 
-/* Phones: a full sheet pinned to the visible area, so the keyboard can't break it. */
-@media (max-width:760px), (pointer:coarse) {
+@media (max-width:700px) {
   .zenitsu-disc:not(.zenitsu-disc-small) { width:48px; height:48px; }
-  .zenitsu-launcher[data-open] { display:none; }
-  .zenitsu-chat {
-    z-index:120; top:0; left:0; right:0; bottom:auto; width:auto; height:100dvh; min-height:0; border-radius:0; box-shadow:none;
-    overscroll-behavior:contain; animation:none; will-change:height;
-  }
-  .zenitsu-chat-head { padding-top:max(11px,env(safe-area-inset-top)); }
-  .zenitsu-chat-log { -webkit-overflow-scrolling:touch; }
-  .zenitsu-icon-button { width:40px; height:40px; }
-  .zenitsu-chat-note { padding-bottom:max(10px,env(safe-area-inset-bottom)); }
-  .zenitsu-msg { animation:none; }
+  .zenitsu-chat { right:14px; left:14px; width:auto; bottom:calc(max(10px,env(safe-area-inset-bottom)) + 76px); }
+  .zenitsu-chat { height:min(560px,calc(var(--zen-viewport,100dvh) - 226px)); }
+  .zenitsu-chat[data-keyboard] { left:8px; right:8px; }
 }
 @media (prefers-reduced-motion:reduce) {
   .zenitsu-chat,.zenitsu-msg,.zenitsu-typing span { animation:none; }

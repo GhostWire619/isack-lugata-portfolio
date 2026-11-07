@@ -1,19 +1,19 @@
 // Fullscreen, scroll-driven 3D photo gallery. Loaded only when the gallery opens.
 // Every scroll-driven value is a pure function of scroll position, so scrubbing
 // backwards plays each transition in reverse.
-import * as THREE from './three.module.min.js?v=938c7c04d1c07005';
+import * as THREE from './three.module.min.js?v=a0a140b664f3b03d';
 
-const STYLESHEET = '/assets/personal/castle/castle-gallery.css?v=938c7c04d1c07005';
-const BIWA = '/assets/personal/castle/nakime-biwa.m4a?v=938c7c04d1c07005';
-const PAGE_SLEEP = '/assets/personal/zenitsu/die.webp?v=938c7c04d1c07005';
+const STYLESHEET = '/assets/personal/castle/castle-gallery.css?v=a0a140b664f3b03d';
+const BIWA = '/assets/personal/castle/nakime-biwa.m4a?v=a0a140b664f3b03d';
+const PAGE_SLEEP = '/assets/personal/zenitsu/die.webp?v=a0a140b664f3b03d';
 const SPRITES = {
-  idle: { src: '/assets/personal/castle/zenitsu/idle.webp?v=938c7c04d1c07005', lite: '/assets/personal/castle/zenitsu-lite/idle.webp?v=938c7c04d1c07005', frames: 19, cols: 4, rows: 5 },
-  run: { src: '/assets/personal/castle/zenitsu/run.webp?v=938c7c04d1c07005', lite: '/assets/personal/castle/zenitsu-lite/run.webp?v=938c7c04d1c07005', frames: 9, cols: 3, rows: 3 },
-  slash: { src: '/assets/personal/castle/zenitsu/atk01.webp?v=938c7c04d1c07005', lite: '/assets/personal/castle/zenitsu-lite/atk01.webp?v=938c7c04d1c07005', frames: 19, cols: 4, rows: 5 },
-  spin: { src: '/assets/personal/castle/zenitsu/skl01.webp?v=938c7c04d1c07005', lite: '/assets/personal/castle/zenitsu-lite/skl01.webp?v=938c7c04d1c07005', frames: 21, cols: 4, rows: 6 },
-  dash: { src: '/assets/personal/castle/zenitsu/skl02.webp?v=938c7c04d1c07005', lite: '/assets/personal/castle/zenitsu-lite/skl02.webp?v=938c7c04d1c07005', frames: 36, cols: 5, rows: 8 },
-  hit: { src: '/assets/personal/castle/zenitsu/hit01.webp?v=938c7c04d1c07005', lite: '/assets/personal/castle/zenitsu-lite/hit01.webp?v=938c7c04d1c07005', frames: 7, cols: 2, rows: 4 },
-  faint: { src: '/assets/personal/castle/zenitsu/die.webp?v=938c7c04d1c07005', lite: '/assets/personal/castle/zenitsu-lite/die.webp?v=938c7c04d1c07005', frames: 23, cols: 4, rows: 6 },
+  idle: { src: '/assets/personal/castle/zenitsu/idle.webp?v=a0a140b664f3b03d', lite: '/assets/personal/castle/zenitsu-lite/idle.webp?v=a0a140b664f3b03d', frames: 19, cols: 4, rows: 5 },
+  run: { src: '/assets/personal/castle/zenitsu/run.webp?v=a0a140b664f3b03d', lite: '/assets/personal/castle/zenitsu-lite/run.webp?v=a0a140b664f3b03d', frames: 9, cols: 3, rows: 3 },
+  slash: { src: '/assets/personal/castle/zenitsu/atk01.webp?v=a0a140b664f3b03d', lite: '/assets/personal/castle/zenitsu-lite/atk01.webp?v=a0a140b664f3b03d', frames: 19, cols: 4, rows: 5 },
+  spin: { src: '/assets/personal/castle/zenitsu/skl01.webp?v=a0a140b664f3b03d', lite: '/assets/personal/castle/zenitsu-lite/skl01.webp?v=a0a140b664f3b03d', frames: 21, cols: 4, rows: 6 },
+  dash: { src: '/assets/personal/castle/zenitsu/skl02.webp?v=a0a140b664f3b03d', lite: '/assets/personal/castle/zenitsu-lite/skl02.webp?v=a0a140b664f3b03d', frames: 36, cols: 5, rows: 8 },
+  hit: { src: '/assets/personal/castle/zenitsu/hit01.webp?v=a0a140b664f3b03d', lite: '/assets/personal/castle/zenitsu-lite/hit01.webp?v=a0a140b664f3b03d', frames: 7, cols: 2, rows: 4 },
+  faint: { src: '/assets/personal/castle/zenitsu/die.webp?v=a0a140b664f3b03d', lite: '/assets/personal/castle/zenitsu-lite/die.webp?v=a0a140b664f3b03d', frames: 23, cols: 4, rows: 6 },
 };
 const ROOM_NUMERALS = ['壱', '弐', '参', '肆', '伍', '陸', '漆', '捌'];
 const PHOTOS_PER_ROOM = 3;
